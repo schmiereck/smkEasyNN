@@ -7,11 +7,29 @@ public class MlpService {
     public static final float BIAS_VALUE = 1.0F;
     public static final float NORM_VALUE = 1.0F;
 
-    public static void runTrain(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+    public static void runTrainOrder(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+        for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
+            int idx = expectedResultPos;
+            train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+        }
+    }
+
+    public static void runTrainRandom(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
         for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
             int idx = rnd.nextInt(expectedOutputArrArr.length);
             //int idx = expectedResultPos;
             train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+        }
+    }
+
+    public static void runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr, final Random rnd) {
+        for (int expectedResultArrPos = 0; expectedResultArrPos < expectedOutputArrArrArr.length; expectedResultArrPos++) {
+            final int idx = rnd.nextInt(expectedOutputArrArrArr.length);
+            final float[][] trainInputArrArr = trainInputArrArrArr[idx];
+            final float[][] expectedOutputArrArr = expectedOutputArrArrArr[idx];
+            for (int pos = 0; pos < expectedOutputArrArr.length; pos++) {
+                train(mlpNet, trainInputArrArr[pos], expectedOutputArrArr[pos], 0.3F, 0.6F);
+            }
         }
     }
 

@@ -2,7 +2,7 @@ package de.schmiereck.smkEasyNN.mlp;
 
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.printResultForEpoch;
-import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrain;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandom;
 
 import java.util.Random;
 
@@ -37,7 +37,7 @@ public class MlpNetXorTest {
         final int epochMax = 500;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
+            runTrainRandom(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 printResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, epochPos);

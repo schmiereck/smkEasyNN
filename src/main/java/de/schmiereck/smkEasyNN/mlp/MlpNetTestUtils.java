@@ -6,10 +6,21 @@ import org.junit.jupiter.api.Assertions;
 
 public class MlpNetTestUtils {
 
+    public static void printResultForEpoch(final MlpNet mlpNet, final float[][][] trainInputArrArrArr, final float[][] expectedOutputArrArrArr[], final int epochPos) {
+        printEpoch(epochPos);
+        for (int pos = 0; pos < trainInputArrArrArr.length; pos++) {
+            printResult(mlpNet, trainInputArrArrArr[pos], expectedOutputArrArrArr[pos]);
+        }
+    }
+
     public static void printResultForEpoch(final MlpNet mlpNet, final float[][] trainInputArrArr, final float[][] expectedOutputArrArr, final int epochPos) {
+        printEpoch(epochPos);
+        printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+    }
+
+    private static void printEpoch(int epochPos) {
         System.out.println();
         System.out.printf("%d epoch\n", epochPos + 1);
-        printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
     }
 
     static void printResult(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr) {
@@ -69,6 +80,12 @@ public class MlpNetTestUtils {
             formatter.format("%6.3f", outputArr[outputPos]);
         }
         return strBuf.toString();
+    }
+
+    static void actAssertExpectedOutput(final MlpNet mlpNet, final float[][][] inputArrArrArr, final float[][][] expectedOutputArrArrArr, final float delta) {
+        for (int pos = 0; pos < inputArrArrArr.length; pos++) {
+            actAssertExpectedOutput(mlpNet, inputArrArrArr[pos], expectedOutputArrArrArr[pos], delta);
+        }
     }
 
     static void actAssertExpectedOutput(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr, final float delta) {
