@@ -3,11 +3,8 @@ package de.schmiereck.smkEasyNN.mlp;
 import java.util.Random;
 
 public class MlpLayer {
-    MlpNeuron[] neuronArr;
-
     float[] inputArr;
-
-
+    MlpNeuron[] neuronArr;
     boolean isOutputLayer = false;
 
     public MlpLayer(final int inputSize, final int outputSize, final Random rnd) {

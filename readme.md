@@ -8,7 +8,8 @@ Ident:
 
 State:
 * values between 0.0 an 1.0
-* s(r,g,b)
+* s(r,g,b) values between 0.0 an 1.0
+* i(r,g,b) sum of values is always 1.0
 
 Target:
 * State == Ident
@@ -20,9 +21,14 @@ Input:
 Output:
 * transfer +/- x % of differenz between s0 and s1, s2, s3
 * transfer +/- y % of differenz between s0 and i1, i2, i3
-  * if i of neighbour cell is equal to net ident then cell is part of the net
+  * controlled: if i of neighbour cell is (nearly) equal to net ident then cell is part of the net
 
-Architektur:
+Architecture:
+* controlled cells
+  * every controlled cell has a net instance 
+    for itself and the neighboring cells
+* meta level of controlled neighbour cells
+  * meta-net see and affects the average of controlled cells
 * Node: Netz für Zelle mit Nachbarn
 * Meta-Node: 
 

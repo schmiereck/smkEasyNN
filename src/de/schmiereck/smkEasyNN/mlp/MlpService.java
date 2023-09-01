@@ -1,18 +1,36 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import java.util.Random;
+
 public class MlpService {
 
     public static final float BIAS_VALUE = 1.0F;
     public static final float NORM_VALUE = 1.0F;
 
-    public static void train(final MlpNet mlpNet, float[] inputArr, float[] targetOutputArr, float learningRate, float momentum) {
-        float[] calcOut = run(mlpNet, inputArr);
+    public static void runTrain(final MlpNet mlpNet, final float[][] expectedResultArr, final float[][] trainArr, final Random rnd) {
+        for (int expectedResultPos = 0; expectedResultPos < expectedResultArr.length; expectedResultPos++) {
+            int idx = rnd.nextInt(expectedResultArr.length);
+            //int idx = expectedResultPos;
+            train(mlpNet, trainArr[idx], expectedResultArr[idx], 0.3F, 0.6F);
+        }
+    }
 
-        float[] errorArr = new float[calcOut.length];
+    public static void train(final MlpNet mlpNet, float[] inputArr, float[] targetOutputArr, float learningRate, float momentum) {
+        float[] calcOutputArr = run(mlpNet, inputArr);
+
+        trainWithOutput(mlpNet, targetOutputArr, calcOutputArr, learningRate, momentum);
+    }
+
+    public static void trainWithOutput(final MlpNet mlpNet, float[] targetOutputArr, float[] calcOutputArr, float learningRate, float momentum) {
+        float[] errorArr = new float[calcOutputArr.length];
 
         for (int errorPos = 0; errorPos < errorArr.length; errorPos++) {
-            errorArr[errorPos] = targetOutputArr[errorPos] - calcOut[errorPos]; // negative error
+            errorArr[errorPos] = targetOutputArr[errorPos] - calcOutputArr[errorPos]; // negative error
         }
+        trainWithError(mlpNet, errorArr, learningRate, momentum);
+    }
+
+    public static void trainWithError(final MlpNet mlpNet, float[] errorArr, float learningRate, float momentum) {
         for (int layerPos = mlpNet.layers.length - 1; layerPos >= 0; layerPos--) {
             final MlpLayer mlpLayer = mlpNet.layers[layerPos];
             errorArr = MlpService.train(mlpLayer, errorArr, learningRate, momentum);
