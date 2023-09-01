@@ -35,12 +35,12 @@ public class Mlp2Main {
                 };
         final int[] layerSizeArr = new int[]{ 3, 3, 1 };
 
-        //final Random rnd = new Random(1234);
-        final Random rnd = new Random();
+        final Random rnd = new Random(1234);
+        //final Random rnd = new Random();
 
         final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
 
-        final int epochMax = 500;
+        final int epochMax = 600;
         for (int epochPos = 0; epochPos < epochMax; epochPos++) {
 
             runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);

@@ -15,13 +15,13 @@ public class MlpService {
         }
     }
 
-    public static void train(final MlpNet mlpNet, float[] trainInputArr, float[] expectedOutputArr, float learningRate, float momentum) {
+    public static void train(final MlpNet mlpNet, final float[] trainInputArr, final float[] expectedOutputArr, final float learningRate, final float momentum) {
         float[] calcOutputArr = run(mlpNet, trainInputArr);
 
         trainWithOutput(mlpNet, expectedOutputArr, calcOutputArr, learningRate, momentum);
     }
 
-    public static void trainWithOutput(final MlpNet mlpNet, float[] expectedOutputArr, float[] calcOutputArr, float learningRate, float momentum) {
+    public static void trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr, final float learningRate, final float momentum) {
         float[] errorArr = new float[calcOutputArr.length];
 
         for (int errorPos = 0; errorPos < errorArr.length; errorPos++) {
@@ -30,52 +30,47 @@ public class MlpService {
         trainWithError(mlpNet, errorArr, learningRate, momentum);
     }
 
-    public static void trainWithError(final MlpNet mlpNet, float[] errorArr, float learningRate, float momentum) {
+    public static void trainWithError(final MlpNet mlpNet, final float[] errorArr, final float learningRate, final float momentum) {
+        float[] actErrorArr = errorArr;
         for (int layerPos = mlpNet.layers.length - 1; layerPos >= 0; layerPos--) {
             final MlpLayer mlpLayer = mlpNet.layers[layerPos];
-            errorArr = MlpService.train(mlpLayer, errorArr, learningRate, momentum);
+            actErrorArr = MlpService.train(mlpLayer, actErrorArr, learningRate, momentum);
         }
     }
 
-    public static float[] run(final MlpNet mlpNet, float[] inputArr) {
-        float[] actInputArr = inputArr;
+    public static float[] run(final MlpNet mlpNet, final float[] inputArr) {
+        for (int inputPos = 0; inputPos < inputArr.length; inputPos++) {
+            mlpNet.setInputValue(inputPos, inputArr[inputPos]);
+        }
+
         for (int layerPos = 0; layerPos < mlpNet.layers.length; layerPos++) {
             final MlpLayer mlpLayer = mlpNet.layers[layerPos];
-            actInputArr = run(mlpLayer, actInputArr, mlpNet.getUseAdditionalBiasInput());
+            run(mlpLayer);
         }
-        return actInputArr;
+
+        final MlpLayer outputLayer = mlpNet.getOutputLayer();
+        final float[] layerOutputArr = new float[outputLayer.neuronArr.length];
+        for (int outputPos = 0; outputPos < outputLayer.neuronArr.length; outputPos++) {
+            layerOutputArr[outputPos] = outputLayer.neuronArr[outputPos].output;
+        }
+        return layerOutputArr;
     }
 
-    public static float[] run(final MlpLayer mlpLayer, final float[] parentLayerInputArr, final boolean useAdditionalBiasInput) {
-        //System.arraycopy(parentLayerInputArr, 0, mlpLayer.inputArr, 0, parentLayerInputArr.length);
-        for (int inputPos = 0; inputPos < parentLayerInputArr.length; inputPos++) {
-            mlpLayer.inputArr[inputPos] = parentLayerInputArr[inputPos];
-        }
-
-        if (useAdditionalBiasInput) {
-            mlpLayer.inputArr[mlpLayer.inputArr.length - 1] = BIAS_VALUE;
-        }
-
+    public static void run(final MlpLayer mlpLayer) {
         for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
             final MlpNeuron mlpNeuron = mlpLayer.neuronArr[outputPos];
             mlpNeuron.output = 0;
 
             for (int inputPos = 0; inputPos < mlpLayer.inputArr.length; inputPos++) {
-                mlpNeuron.output += mlpNeuron.weightArr[inputPos] * mlpLayer.inputArr[inputPos];
+                mlpNeuron.output += mlpNeuron.weightArr[inputPos] * mlpLayer.inputArr[inputPos].getInput();
             }
             if (!mlpLayer.isOutputLayer) {
                 mlpNeuron.output = sigmoid(mlpNeuron.output);
             }
         }
-
-        final float[] layerOutputArr = new float[mlpLayer.neuronArr.length];
-        for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
-            layerOutputArr[outputPos] = mlpLayer.neuronArr[outputPos].output;
-        }
-        return layerOutputArr;
     }
 
-    public static float[] train(final MlpLayer mlpLayer, float[] errorArr, float learningRate, float momentum) {
+    public static float[] train(final MlpLayer mlpLayer, final float[] errorArr, final float learningRate, final float momentum) {
         float[] nextError = new float[mlpLayer.inputArr.length];
         for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
             final MlpNeuron mlpNeuron = mlpLayer.neuronArr[outputPos];
@@ -87,7 +82,7 @@ public class MlpService {
 
             for (int inputPos = 0; inputPos < mlpLayer.inputArr.length; inputPos++) {
                 nextError[inputPos] += mlpNeuron.weightArr[inputPos] * error;
-                float dw = mlpLayer.inputArr[inputPos] * error * learningRate;
+                float dw = mlpLayer.inputArr[inputPos].getInput() * error * learningRate;
                 mlpNeuron.weightArr[inputPos] += mlpNeuron.dweightArr[inputPos] * momentum + dw;
                 mlpNeuron.dweightArr[inputPos] = dw;
             }
@@ -95,15 +90,15 @@ public class MlpService {
         return nextError;
     }
 
-    private static float sigmoidDerivative(float x) {
+    private static float sigmoidDerivative(final float x) {
         return (x * (NORM_VALUE - x));
     }
 
-    private static float sigmoid(float x) {
+    private static float sigmoid(final float x) {
         return (float) (NORM_VALUE / (NORM_VALUE + Math.exp(-x)));
     }
 
-    private static float digital(float x) {
+    private static float digital(final float x) {
         return x >= 0.0D ? NORM_VALUE : -NORM_VALUE;
         //return x >= 0.5D ? NORM_VALUE : 0.0F;
         //return x >= 0.0D ? NORM_VALUE : 0.0F;

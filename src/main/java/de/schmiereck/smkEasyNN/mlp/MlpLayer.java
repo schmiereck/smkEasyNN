@@ -3,17 +3,17 @@ package de.schmiereck.smkEasyNN.mlp;
 import java.util.Random;
 
 public class MlpLayer {
-    float[] inputArr;
+    MlpInputInterface[] inputArr;
     MlpNeuron[] neuronArr;
     boolean isOutputLayer = false;
 
-    public MlpLayer(final int inputSize, final int outputSize, final Random rnd) {
+    public MlpLayer(final MlpInputInterface[] inputArr, final int outputSize, final Random rnd) {
         this.neuronArr = new MlpNeuron[outputSize];
 
         for (int neuronPos = 0; neuronPos < this.neuronArr.length; neuronPos++) {
-            this.neuronArr[neuronPos] = new MlpNeuron(inputSize);
+            this.neuronArr[neuronPos] = new MlpNeuron(inputArr.length);
         }
-        this.inputArr = new float[inputSize];
+        this.inputArr = inputArr;
 
         initWeights(rnd);
     }
