@@ -5,6 +5,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrain;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class MlpNetXorTest {
@@ -28,13 +29,13 @@ public class MlpNetXorTest {
                 };
         final int[] layerSizeArr = new int[]{ 2, 1 };
 
-        //final Random rnd = new Random(1234);
-        final Random rnd = new Random();
+        final Random rnd = new Random(12345);
+        //final Random rnd = new Random();
 
         final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
 
         final int epochMax = 500;
-        for (int epochPos = 0; epochPos < epochMax; epochPos++) {
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
@@ -44,7 +45,17 @@ public class MlpNetXorTest {
         }
 
         // Act
-
         // Assert
+        for (int resultPos = 0; resultPos < expectedOutputArrArr.length; resultPos++) {
+            final float[] expectedOutputArr = expectedOutputArrArr[resultPos];
+            float[] trainInputArr = trainInputArrArr[resultPos];
+
+            final float[] resultArr = MlpService.run(mlpNet, trainInputArr);
+
+            for (int expectedOutputPos = 0; expectedOutputPos < expectedOutputArr.length; expectedOutputPos++) {
+                Assertions.assertEquals(expectedOutputArr[expectedOutputPos], resultArr[expectedOutputPos], 0.05F,
+                        String.format("expectedOutput line %d: expectedOutputPos %d", resultPos, expectedOutputPos));
+            }
+        }
     }
 }
