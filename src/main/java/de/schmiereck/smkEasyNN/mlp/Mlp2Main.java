@@ -9,7 +9,7 @@ public class Mlp2Main {
 
     public static void main(final String[] args) {
 
-        final float[][] train2Arr = new float[][]
+        final float[][] trainInputArrArr = new float[][]
                 {
                         new float[]{0, 0, 0},
                         new float[]{0, 0, 1},
@@ -21,7 +21,7 @@ public class Mlp2Main {
                         new float[]{1, 1, 0},
                         new float[]{1, 1, 1}
                 };
-        final float[][] expectedResult2Arr = new float[][]
+        final float[][] expectedOutputArrArr = new float[][]
                 {
                         new float[]{0},
                         new float[]{1},
@@ -33,11 +33,7 @@ public class Mlp2Main {
                         new float[]{1},
                         new float[]{0}
                 };
-        final int[] layerSize2Arr = new int[]{ 3, 3, 1 };
-
-        final float[][] trainArr = train2Arr;
-        final float[][] expectedResultArr = expectedResult2Arr;
-        final int[] layerSizeArr = layerSize2Arr;
+        final int[] layerSizeArr = new int[]{ 3, 3, 1 };
 
         //final Random rnd = new Random(1234);
         final Random rnd = new Random();
@@ -47,10 +43,10 @@ public class Mlp2Main {
         final int epochMax = 500;
         for (int epochPos = 0; epochPos < epochMax; epochPos++) {
 
-            runTrain(mlpNet, expectedResultArr, trainArr, rnd);
+            runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, expectedResultArr, trainArr, epochPos);
+                printResultForEpoch(mlpNet, expectedOutputArrArr, trainInputArrArr, epochPos);
             }
         }
     }

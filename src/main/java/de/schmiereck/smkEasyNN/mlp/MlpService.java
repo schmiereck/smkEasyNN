@@ -7,25 +7,25 @@ public class MlpService {
     public static final float BIAS_VALUE = 1.0F;
     public static final float NORM_VALUE = 1.0F;
 
-    public static void runTrain(final MlpNet mlpNet, final float[][] expectedResultArr, final float[][] trainArr, final Random rnd) {
-        for (int expectedResultPos = 0; expectedResultPos < expectedResultArr.length; expectedResultPos++) {
-            int idx = rnd.nextInt(expectedResultArr.length);
+    public static void runTrain(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+        for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
+            int idx = rnd.nextInt(expectedOutputArrArr.length);
             //int idx = expectedResultPos;
-            train(mlpNet, trainArr[idx], expectedResultArr[idx], 0.3F, 0.6F);
+            train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
         }
     }
 
-    public static void train(final MlpNet mlpNet, float[] inputArr, float[] targetOutputArr, float learningRate, float momentum) {
-        float[] calcOutputArr = run(mlpNet, inputArr);
+    public static void train(final MlpNet mlpNet, float[] trainInputArr, float[] expectedOutputArr, float learningRate, float momentum) {
+        float[] calcOutputArr = run(mlpNet, trainInputArr);
 
-        trainWithOutput(mlpNet, targetOutputArr, calcOutputArr, learningRate, momentum);
+        trainWithOutput(mlpNet, expectedOutputArr, calcOutputArr, learningRate, momentum);
     }
 
-    public static void trainWithOutput(final MlpNet mlpNet, float[] targetOutputArr, float[] calcOutputArr, float learningRate, float momentum) {
+    public static void trainWithOutput(final MlpNet mlpNet, float[] expectedOutputArr, float[] calcOutputArr, float learningRate, float momentum) {
         float[] errorArr = new float[calcOutputArr.length];
 
         for (int errorPos = 0; errorPos < errorArr.length; errorPos++) {
-            errorArr[errorPos] = targetOutputArr[errorPos] - calcOutputArr[errorPos]; // negative error
+            errorArr[errorPos] = expectedOutputArr[errorPos] - calcOutputArr[errorPos]; // negative error
         }
         trainWithError(mlpNet, errorArr, learningRate, momentum);
     }

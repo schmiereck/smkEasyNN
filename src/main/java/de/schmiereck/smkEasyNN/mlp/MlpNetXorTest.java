@@ -5,28 +5,28 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrain;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Test;
+
 public class MlpNetXorTest {
 
-    public static void main(final String[] args) {
-        final float[][] train1Arr = new float[][]
+    @Test
+    void GIVEN_2_binary_inputs_THEN_XOR_output() {
+        // Arrange
+        final float[][] trainInputArrArr = new float[][]
                 {
                         new float[]{0, 0},
                         new float[]{0, 1},
                         new float[]{1, 0},
                         new float[]{1, 1}
                 };
-        final float[][] expectedResult1Arr = new float[][]
+        final float[][] expectedOutputArrArr = new float[][]
                 {
                         new float[]{0},
                         new float[]{1},
                         new float[]{1},
                         new float[]{0}
                 };
-        final int[] layerSize1Arr = new int[]{ 2, 1 };
-
-        final float[][] trainArr = train1Arr;
-        final float[][] expectedResultArr = expectedResult1Arr;
-        final int[] layerSizeArr = layerSize1Arr;
+        final int[] layerSizeArr = new int[]{ 2, 1 };
 
         //final Random rnd = new Random(1234);
         final Random rnd = new Random();
@@ -36,11 +36,15 @@ public class MlpNetXorTest {
         final int epochMax = 500;
         for (int epochPos = 0; epochPos < epochMax; epochPos++) {
 
-            runTrain(mlpNet, expectedResultArr, trainArr, rnd);
+            runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, expectedResultArr, trainArr, epochPos);
+                printResultForEpoch(mlpNet, expectedOutputArrArr, trainInputArrArr, epochPos);
             }
         }
+
+        // Act
+
+        // Assert
     }
 }
