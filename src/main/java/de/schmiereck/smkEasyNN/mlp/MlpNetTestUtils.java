@@ -23,20 +23,19 @@ public class MlpNetTestUtils {
         }
     }
 
-    static void printSamplesOutput(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr) {
+    static void printSamplesOutput(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr, final int layerPos) {
         for (int resultPos = 0; resultPos < expectedOutputArrArr.length; resultPos++) {
             final float[] expectedOutputArr = expectedOutputArrArr[resultPos];
             final float[] trainInputArr = inputArrArr[resultPos];
 
             final float[] outputArr = MlpService.run(mlpNet, trainInputArr);
-            final float[] samplesOutputArr = collectSamplesOutputArr(mlpNet);
+            final float[] samplesOutputArr = collectSamplesOutputArr(mlpNet, layerPos);
 
             printResultLine(trainInputArr, samplesOutputArr);
         }
     }
 
-    private static float[] collectSamplesOutputArr(final MlpNet mlpNet) {
-        final int layerPos = 3;
+    private static float[] collectSamplesOutputArr(final MlpNet mlpNet, final int layerPos) {
         final MlpLayer mlpLayer = mlpNet.getLayer(layerPos);
 
         final float[] samplesOutputArr = new float[mlpLayer.neuronArr.length];

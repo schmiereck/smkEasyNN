@@ -103,4 +103,11 @@ public class MlpService {
         return (float) (NORM_VALUE / (NORM_VALUE + Math.exp(-x)));
     }
 
+    private static float digital(float x) {
+        return x >= 0.0D ? NORM_VALUE : -NORM_VALUE;
+        //return x >= 0.5D ? NORM_VALUE : 0.0F;
+        //return x >= 0.0D ? NORM_VALUE : 0.0F;
+        //return x * 0.5F;
+    }
+
 }

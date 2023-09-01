@@ -47,6 +47,10 @@ public class MlpNetValueToValueBottleneckTest {
 
         final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
 
+        final int bottleneckLayerPos = 3;
+        mlpNet.getLayer(bottleneckLayerPos).setOutputLayer(true);
+
+        //final int epochMax = 2200;
         final int epochMax = 8000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
@@ -63,6 +67,6 @@ public class MlpNetValueToValueBottleneckTest {
         System.out.println();
         System.out.println("samplesOutput:");
         //actAssertExpectedOutput(mlpNet, inputArrArr, unexpectedOutputArrArr, 0.6F);
-        printSamplesOutput(mlpNet, trainInputArrArr, expectedOutputArrArr);
+        printSamplesOutput(mlpNet, trainInputArrArr, expectedOutputArrArr, bottleneckLayerPos);
     }
 }
