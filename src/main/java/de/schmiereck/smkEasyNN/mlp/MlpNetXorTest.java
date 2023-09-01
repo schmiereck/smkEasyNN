@@ -54,7 +54,7 @@ public class MlpNetXorTest {
 
             for (int expectedOutputPos = 0; expectedOutputPos < expectedOutputArr.length; expectedOutputPos++) {
                 Assertions.assertEquals(expectedOutputArr[expectedOutputPos], resultArr[expectedOutputPos], 0.05F,
-                        String.format("expectedOutput line %d: expectedOutputPos %d", resultPos, expectedOutputPos));
+                        "expectedOutput line %d: expectedOutputPos %d".formatted(resultPos, expectedOutputPos));
             }
         }
     }
