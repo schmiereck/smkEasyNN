@@ -12,4 +12,9 @@ public class MlpInput implements MlpInputInterface {
     public float getInput() {
         return this.neuron.output;
     }
+
+    @Override
+    public void addError(final float error) {
+        this.neuron.error += error;
+    }
 }
