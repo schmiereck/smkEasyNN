@@ -9,33 +9,43 @@ import java.util.Random;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class MlpNetXorTest {
+public class MlpNetValueToBinaryTest {
 
     @Test
-    void GIVEN_2_binary_inputs_THEN_XOR_output() {
+    void GIVEN_7_value_inputs_THEN_binary_number_output() {
         // Arrange
         final float[][] trainInputArrArr = new float[][]
                 {
-                        new float[]{0, 0},
-                        new float[]{0, 1},
-                        new float[]{1, 0},
-                        new float[]{1, 1}
+                        new float[]{ 0, 0, 0, 0, 0, 0, 0 },
+                        new float[]{ 0, 0, 0, 0, 0, 0, 1 },
+                        new float[]{ 0, 0, 0, 0, 0, 1, 0 },
+                        new float[]{ 0, 0, 0, 0, 1, 0, 0 },
+
+                        new float[]{ 0, 0, 0, 1, 0, 0, 0 },
+                        new float[]{ 0, 0, 1, 0, 0, 0, 0 },
+                        new float[]{ 0, 1, 0, 0, 0, 0, 0 },
+                        new float[]{ 1, 0, 0, 0, 0, 0, 0 },
                 };
         final float[][] expectedOutputArrArr = new float[][]
                 {
-                        new float[]{0},
-                        new float[]{1},
-                        new float[]{1},
-                        new float[]{0}
-                };
-        final int[] layerSizeArr = new int[]{ 2, 1 };
+                        new float[]{0, 0, 0},
+                        new float[]{0, 0, 1},
+                        new float[]{0, 1, 0},
+                        new float[]{0, 1, 1},
 
-        final Random rnd = new Random(12345);
+                        new float[]{1, 0, 0},
+                        new float[]{1, 0, 1},
+                        new float[]{1, 1, 0},
+                        new float[]{1, 1, 1},
+                };
+        final int[] layerSizeArr = new int[]{ 7, 3 };
+
+        final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
         final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
 
-        final int epochMax = 500;
+        final int epochMax = 300;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
