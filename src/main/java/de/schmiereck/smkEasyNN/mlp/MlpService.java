@@ -74,25 +74,25 @@ public class MlpService {
 
         for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
             final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
-            float error = errorArr[outputPos];
+            //float error = errorArr[outputPos];
             float error2 = neuron.error;
 
             if (!mlpLayer.isOutputLayer) {
-                error *= sigmoidDerivative(mlpLayer.neuronArr[outputPos].output);
+                //error *= sigmoidDerivative(mlpLayer.neuronArr[outputPos].output);
                 error2 *= sigmoidDerivative(mlpLayer.neuronArr[outputPos].output);
             }
 
             for (int inputPos = 0; inputPos < mlpLayer.inputArr.size(); inputPos++) {
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
 
-                nextError[inputPos] += neuron.weightArr[inputPos] * error;
+                //nextError[inputPos] += neuron.weightArr[inputPos] * error;
                 synapse.input.addError(synapse.weight * error2);
 
-                float dw = mlpLayer.inputArr.get(inputPos).getInput() * error * learningRate;
+                //float dw = mlpLayer.inputArr.get(inputPos).getInput() * error * learningRate;
                 float dw2 = synapse.input.getInput() * error2 * learningRate;
 
-                neuron.weightArr[inputPos] += neuron.dweightArr[inputPos] * momentum + dw;
-                neuron.dweightArr[inputPos] = dw;
+                //neuron.weightArr[inputPos] += neuron.dweightArr[inputPos] * momentum + dw;
+                //neuron.dweightArr[inputPos] = dw;
                 synapse.weight += synapse.dweight * momentum + dw2;
                 synapse.dweight = dw2;
             }
@@ -122,16 +122,16 @@ public class MlpService {
         for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
             final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
             neuron.output = 0;
-            neuron.output2 = 0;
+            //neuron.output2 = 0;
 
             for (int inputPos = 0; inputPos < mlpLayer.inputArr.size(); inputPos++) {
-                neuron.output += neuron.weightArr[inputPos] * mlpLayer.inputArr.get(inputPos).getInput();
+                //neuron.output += neuron.weightArr[inputPos] * mlpLayer.inputArr.get(inputPos).getInput();
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
-                neuron.output2 += synapse.weight * synapse.input.getInput();
+                neuron.output += synapse.weight * synapse.input.getInput();
             }
             if (!mlpLayer.isOutputLayer) {
+                //neuron.output = sigmoid(neuron.output);
                 neuron.output = sigmoid(neuron.output);
-                neuron.output2 = sigmoid(neuron.output2);
             }
         }
     }
