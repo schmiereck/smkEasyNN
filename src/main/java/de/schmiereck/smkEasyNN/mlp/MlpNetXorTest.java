@@ -6,7 +6,6 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrain;
 
 import java.util.Random;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class MlpNetXorTest {
@@ -41,11 +40,11 @@ public class MlpNetXorTest {
             runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, expectedOutputArrArr, trainInputArrArr, epochPos);
+                printResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, epochPos);
             }
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, expectedOutputArrArr, trainInputArrArr);
+        actAssertExpectedOutput(mlpNet, trainInputArrArr, expectedOutputArrArr, 0.05F);
     }
 }

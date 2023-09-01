@@ -46,7 +46,7 @@ public class Mlp2Main {
             runTrain(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, expectedOutputArrArr, trainInputArrArr, epochPos);
+                printResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, epochPos);
             }
         }
     }
