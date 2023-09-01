@@ -12,10 +12,10 @@ public class MlpNetTestUtils {
         printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
     }
 
-    static void printResult(final MlpNet mlpNet, final float[][] trainInputArrArr, final float[][] expectedOutputArrArr) {
+    static void printResult(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr) {
         for (int resultPos = 0; resultPos < expectedOutputArrArr.length; resultPos++) {
             final float[] expectedOutputArr = expectedOutputArrArr[resultPos];
-            final float[] trainInputArr = trainInputArrArr[resultPos];
+            final float[] trainInputArr = inputArrArr[resultPos];
 
             final float[] outputArr = MlpService.run(mlpNet, trainInputArr);
 
@@ -23,7 +23,31 @@ public class MlpNetTestUtils {
         }
     }
 
-    private static void printResultLine(float[] inputArr, float[] outputArr) {
+    static void printSamplesOutput(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr) {
+        for (int resultPos = 0; resultPos < expectedOutputArrArr.length; resultPos++) {
+            final float[] expectedOutputArr = expectedOutputArrArr[resultPos];
+            final float[] trainInputArr = inputArrArr[resultPos];
+
+            final float[] outputArr = MlpService.run(mlpNet, trainInputArr);
+            final float[] samplesOutputArr = collectSamplesOutputArr(mlpNet);
+
+            printResultLine(trainInputArr, samplesOutputArr);
+        }
+    }
+
+    private static float[] collectSamplesOutputArr(final MlpNet mlpNet) {
+        final int layerPos = 3;
+        final MlpLayer mlpLayer = mlpNet.getLayer(layerPos);
+
+        final float[] samplesOutputArr = new float[mlpLayer.neuronArr.length];
+        for (int pos = 0; pos < mlpLayer.neuronArr.length; pos++) {
+            final MlpNeuron mlpNeuron = mlpLayer.neuronArr[pos];
+            samplesOutputArr[pos] = mlpNeuron.output;
+        }
+        return samplesOutputArr;
+    }
+
+    public static void printResultLine(float[] inputArr, float[] outputArr) {
         System.out.println(formatResultLine(inputArr, outputArr));
     }
 
