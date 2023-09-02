@@ -2,9 +2,7 @@ package de.schmiereck.smkEasyNN.mlp;
 
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
-import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.printResult;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.printResultForEpoch;
-import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandom;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
 import java.util.Arrays;
@@ -223,7 +221,7 @@ public class MlpNetValueMemoryAddTest {
                                 new float[]{ 0, 0, 0, 1, 1, 0, 0 }, // 3 + 4 = 7
                         },
                 };
-        final int[] layerSizeArr = new int[]{ 9, 18, 20, 18, 12, 7 };
+        final int[] layerSizeArr = new int[]{ 9, 24, 24, 24, 24, 24, 7 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -231,14 +229,14 @@ public class MlpNetValueMemoryAddTest {
         final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
 
         // 0
-        // 1 dest <---,
-        // 2 source --'
-        addBackwardInputs(mlpNet, 2, 1, rnd);
-        addBackwardInputs(mlpNet, 3, 2, rnd);
-        addBackwardInputs(mlpNet, 4, 2, rnd);
-        addBackwardInputs(mlpNet, 4, 3, rnd);
+        // 1 to   <---,
+        // 2 from ----'
+        addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs(mlpNet, 3, 2, rnd);
+        addForwwardInputs(mlpNet, 4, 2, rnd);
+        addForwwardInputs(mlpNet, 4, 3, rnd);
 
-        final int epochMax = 50000;
+        final int epochMax = 5000000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
@@ -252,16 +250,21 @@ public class MlpNetValueMemoryAddTest {
         actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.7F);
     }
 
-    private void addBackwardInputs(final MlpNet mlpNet, final int sourceLayerPos, final int destLayerPos, final Random rnd) {
-        final MlpLayer sourceLayer = mlpNet.getLayer(sourceLayerPos);
-        final MlpLayer destLayer = mlpNet.getLayer(destLayerPos);
+    /**
+     * // 0
+     * // 1 to   <---,
+     * // 2 from ----'
+     */
+    private void addForwwardInputs(final MlpNet mlpNet, final int fromLayerPos, final int toLayerPos, final Random rnd) {
+        final MlpLayer fromLayer = mlpNet.getLayer(fromLayerPos);
+        final MlpLayer toLayer = mlpNet.getLayer(toLayerPos);
 
-        Arrays.stream(sourceLayer.neuronArr).forEach(sourceNeuron -> {
-            Arrays.stream(destLayer.neuronArr).forEach(destNeuron -> {
+        Arrays.stream(fromLayer.neuronArr).forEach(fromNeuron -> {
+            Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
                 final MlpSynapse synapse = new MlpSynapse();
-                synapse.input = new MlpInput(sourceNeuron);
+                synapse.input = new MlpInput(fromNeuron);
                 synapse.weight = calcInitWeight(rnd);
-                destNeuron.synapseList.add(synapse);
+                toNeuron.synapseList.add(synapse);
             });
         });
     }
