@@ -17,8 +17,12 @@ public class MlpNetTimeTest {
         // Arrange
         final float[][][] trainInputArrArrArr = new float[][][]
                 {
-                        //                          1
+                        //                   1
                         {
+                                new float[]{ .2F }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, //
@@ -32,10 +36,14 @@ public class MlpNetTimeTest {
                                 new float[]{ 0 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 1 }, // = 0, 1, 0, 1
                         },
                 };
-        final int[] layerSizeArr = new int[]{ 1, 3, 3, 1 };
+        final int[] layerSizeArr = new int[]{ 1, 4, 7, 1 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -45,10 +53,12 @@ public class MlpNetTimeTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        //addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, rnd);
+        //addForwwardInputs(mlpNet, 3, 1, rnd);
+        //addForwwardInputs(mlpNet, 3, 2, rnd);
         //addInternalInputs(mlpNet, 2, rnd);
 
-        final int epochMax = 5000;
+        final int epochMax = 6_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);

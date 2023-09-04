@@ -1,7 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
 public class MlpInput implements MlpInputInterface {
-    //float input;
     MlpNeuron neuron;
 
     public MlpInput(final MlpNeuron neuron) {
@@ -14,7 +13,17 @@ public class MlpInput implements MlpInputInterface {
     }
 
     @Override
+    public float getLastInput() {
+        return this.neuron.lastOutput;
+    }
+
+    @Override
     public void addError(final float error) {
         this.neuron.error += error;
+    }
+
+    @Override
+    public void addLastError(final float error) {
+        this.neuron.lastError += error;
     }
 }

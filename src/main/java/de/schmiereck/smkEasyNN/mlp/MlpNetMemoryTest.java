@@ -104,7 +104,7 @@ public class MlpNetMemoryTest {
                                 new float[]{ 0 }, // = 0, 1, 0
                         },
                 };
-        final int[] layerSizeArr = new int[]{ 1, 4, 4, 1 };
+        final int[] layerSizeArr = new int[]{ 1, 4, 8, 1 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -117,7 +117,7 @@ public class MlpNetMemoryTest {
         addForwwardInputs(mlpNet, 2, 1, rnd);
         //addInternalInputs(mlpNet, 1, rnd);
 
-        final int epochMax = 20_000;
+        final int epochMax = 26_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
@@ -137,7 +137,6 @@ public class MlpNetMemoryTest {
         final float[][][] trainInputArrArrArr = new float[][][]
                 {
                         //                          1
-                        /*
                         {
                                 new float[]{ 0, 1,  0 }, //
                                 new float[]{ 1, 0,  0 }, // = 0 & 0
@@ -146,7 +145,6 @@ public class MlpNetMemoryTest {
                                 new float[]{ 0, 1,  1 }, //
                                 new float[]{ 1, 0,  0 }, // = 1 & 0
                         },
-                        */
                         {
                                 new float[]{ 0, 1,  0 }, //
                                 new float[]{ 1, 0,  1 }, // = 0 & 1
@@ -159,7 +157,6 @@ public class MlpNetMemoryTest {
         final float[][][] expectedOutputArrArrArr = new float[][][]
                 {
                         //                   1
-                        /*
                         {
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, // = 0 & 0
@@ -168,7 +165,6 @@ public class MlpNetMemoryTest {
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, // = 1 & 0
                         },
-                        */
                         {
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, // = 0 & 1
@@ -194,7 +190,7 @@ public class MlpNetMemoryTest {
         //addForwwardInputs(mlpNet, 3, 2, rnd);
         //addInternalInputs(mlpNet, 1, rnd);
 
-        final int epochMax = 20000;
+        final int epochMax = 20_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);

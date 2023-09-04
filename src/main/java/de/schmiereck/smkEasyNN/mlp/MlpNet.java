@@ -1,8 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class MlpNet {
@@ -20,6 +17,7 @@ public class MlpNet {
         for (int biasNeuronPos = 0; biasNeuronPos < layersSize.length; biasNeuronPos++) {
             this.biasNeuronArr[biasNeuronPos] = new MlpNeuron(0);
             this.biasNeuronArr[biasNeuronPos].output = MlpService.BIAS_VALUE;
+            this.biasNeuronArr[biasNeuronPos].lastOutput = MlpService.BIAS_VALUE;
         }
 
         this.valueInputArr = new MlpValueInput[layersSize[0]];
@@ -69,6 +67,10 @@ public class MlpNet {
 
     public void setInputValue(final int inputPos, final float inputValue) {
         this.valueInputArr[inputPos].setValue(inputValue);
+    }
+
+    public MlpValueInput[] getValueInputArr() {
+        return this.valueInputArr;
     }
 
     public MlpLayer getLayer(final int layerPos) {
