@@ -11,8 +11,11 @@ public class MlpNet {
     final MlpNeuron[] biasNeuronArr;
     private final MlpValueInput[] valueInputArr;
 
+    private boolean useAdditionalBiasInput;
+
     public MlpNet(int[] layersSize, final boolean useAdditionalBiasInput, final Random rnd) {
         this.layers = new MlpLayer[layersSize.length];
+        this.useAdditionalBiasInput = useAdditionalBiasInput;
         this.biasNeuronArr = new MlpNeuron[layersSize.length];
         for (int biasNeuronPos = 0; biasNeuronPos < layersSize.length; biasNeuronPos++) {
             this.biasNeuronArr[biasNeuronPos] = new MlpNeuron(0);
@@ -87,5 +90,9 @@ public class MlpNet {
 
     public MlpLayer getOutputLayer() {
         return this.layers[this.layers.length - 1];
+    }
+
+    public boolean getUseAdditionalBiasInput() {
+        return this.useAdditionalBiasInput;
     }
 }

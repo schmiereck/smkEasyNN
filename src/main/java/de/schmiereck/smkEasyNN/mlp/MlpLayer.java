@@ -37,6 +37,11 @@ public class MlpLayer {
         return (rnd.nextFloat() - 0.5F) * 4.0F;
     }
 
+    public static float calcInitWeight2(Random rnd) {
+        //return (rnd.nextFloat() - 0.5F) * 1.0F;
+        return (rnd.nextFloat() - 0.5F) * 0.1F;
+    }
+
     //public void initWeights(final Random rnd) {
     //    for (int neuronPos = 0; neuronPos < this.neuronArr.length; neuronPos++) {
     //        final MlpNeuron mlpNeuron = this.neuronArr[neuronPos];

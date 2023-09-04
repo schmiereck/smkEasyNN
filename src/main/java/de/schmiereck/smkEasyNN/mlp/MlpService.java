@@ -1,5 +1,8 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -94,6 +97,8 @@ public class MlpService {
                 //neuron.weightArr[inputPos] += neuron.dweightArr[inputPos] * momentum + dw;
                 //neuron.dweightArr[inputPos] = dw;
                 synapse.weight += synapse.dweight * momentum + dw2;
+                if (Float.isNaN(synapse.weight))
+                    throw new RuntimeException();
                 synapse.dweight = dw2;
             }
         }
@@ -128,6 +133,8 @@ public class MlpService {
                 //neuron.output += neuron.weightArr[inputPos] * mlpLayer.inputArr.get(inputPos).getInput();
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
                 neuron.output += synapse.weight * synapse.input.getInput();
+                if (Float.isNaN(neuron.output))
+                    throw new RuntimeException();
             }
             if (!mlpLayer.isOutputLayer) {
                 //neuron.output = sigmoid(neuron.output);
@@ -149,6 +156,68 @@ public class MlpService {
         //return x >= 0.5D ? NORM_VALUE : 0.0F;
         //return x >= 0.0D ? NORM_VALUE : 0.0F;
         //return x * 0.5F;
+    }
+
+    /**
+     * RNN
+     *
+     * Neuronales Netz · Seite · HOOU
+     * https://www.hoou.de/projects/neuronale-netze-kurz-erklart/pages/neuronales-netz
+     *
+     * Rekurrentes neuronales Netz – Wikipedia
+     * https://de.wikipedia.org/wiki/Rekurrentes_neuronales_Netz
+     *
+     * Long Short-Term Memory Units (kurz: LSTMs)
+     *
+     * Aufbau einer LSTM-Zelle
+     * https://www.bigdata-insider.de/was-ist-ein-long-short-term-memory-a-774848/
+     *
+     * // 0
+     * // 1 to   <---,
+     * // 2 from ----'
+     */
+    public static void addForwwardInputs(final MlpNet mlpNet, final int fromLayerPos, final int toLayerPos, final Random rnd) {
+        final MlpLayer fromLayer = mlpNet.getLayer(fromLayerPos);
+        final MlpLayer toLayer = mlpNet.getLayer(toLayerPos);
+
+        Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
+            Arrays.stream(fromLayer.neuronArr).forEach(fromNeuron -> {
+                final MlpSynapse synapse = new MlpSynapse();
+                synapse.input = new MlpInput(fromNeuron);
+                synapse.weight = calcInitWeight2(rnd);
+                toNeuron.synapseList.add(synapse);
+            });
+            if (mlpNet.getUseAdditionalBiasInput()) {
+                final MlpSynapse synapse = new MlpSynapse();
+                synapse.input = new MlpInput(mlpNet.biasNeuronArr[toLayerPos]);
+                synapse.weight = calcInitWeight2(rnd);
+                toNeuron.synapseList.add(synapse);
+            }
+        });
+    }
+
+    public static void addInternalInputs(final MlpNet mlpNet, final int layerPos, final Random rnd) {
+        final MlpLayer toLayer = mlpNet.getLayer(layerPos);
+
+        for (int toNeuronPos = 0; toNeuronPos < toLayer.neuronArr.length; toNeuronPos++) {
+            final MlpNeuron toNeuron = toLayer.neuronArr[toNeuronPos];
+
+            for (int fromNeuronPos = toNeuronPos; fromNeuronPos < toLayer.neuronArr.length; fromNeuronPos++) {
+                final MlpNeuron fromNeuron = toLayer.neuronArr[fromNeuronPos];
+
+                final MlpSynapse synapse = new MlpSynapse();
+                synapse.input = new MlpInput(fromNeuron);
+                synapse.weight = calcInitWeight2(rnd);
+                toNeuron.synapseList.add(synapse);
+            }
+
+            if (mlpNet.getUseAdditionalBiasInput()) {
+                final MlpSynapse synapse = new MlpSynapse();
+                synapse.input = new MlpInput(mlpNet.biasNeuronArr[layerPos]);
+                synapse.weight = calcInitWeight2(rnd);
+                toNeuron.synapseList.add(synapse);
+            }
+        }
     }
 
 }

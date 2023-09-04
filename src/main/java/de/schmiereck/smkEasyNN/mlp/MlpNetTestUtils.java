@@ -31,7 +31,7 @@ public class MlpNetTestUtils {
 
             final float[] outputArr = MlpService.run(mlpNet, trainInputArr);
 
-            printResultLine(trainInputArr, outputArr);
+            printResultLine(trainInputArr, outputArr, expectedOutputArr);
         }
     }
 
@@ -43,7 +43,7 @@ public class MlpNetTestUtils {
             final float[] outputArr = MlpService.run(mlpNet, trainInputArr);
             final float[] samplesOutputArr = collectSamplesOutputArr(mlpNet, layerPos);
 
-            printResultLine(trainInputArr, samplesOutputArr);
+            printResultLine(trainInputArr, samplesOutputArr, expectedOutputArr);
         }
     }
 
@@ -58,11 +58,11 @@ public class MlpNetTestUtils {
         return samplesOutputArr;
     }
 
-    public static void printResultLine(float[] inputArr, float[] outputArr) {
-        System.out.println(formatResultLine(inputArr, outputArr));
+    public static void printResultLine(float[] inputArr, float[] outputArr, final float[] expectedOutputArr) {
+        System.out.println(formatResultLine(inputArr, outputArr, expectedOutputArr));
     }
 
-    public static String formatResultLine(float[] inputArr, float[] outputArr) {
+    public static String formatResultLine(float[] inputArr, float[] outputArr, final float[] expectedOutputArr) {
         //final StringBuffer strBuf = new StringBuffer();
         final StringBuilder strBuf = new StringBuilder();
         final Formatter formatter = new Formatter(strBuf);
@@ -80,6 +80,7 @@ public class MlpNetTestUtils {
             }
             formatter.format("%6.3f", outputArr[outputPos]);
         }
+        formatter.format(" = %s", Arrays.toString(expectedOutputArr));
         return strBuf.toString();
     }
 
@@ -104,8 +105,8 @@ public class MlpNetTestUtils {
 
             for (int expectedOutputPos = 0; expectedOutputPos < expectedOutputArr.length; expectedOutputPos++) {
                 Assertions.assertEquals(expectedOutputArr[expectedOutputPos], outputArr[expectedOutputPos], delta,
-                        "expectedOutput line %d: expectedOutputPos %d\n%s\n%s".formatted(outputPos + resultPos, expectedOutputPos,
-                                formatResultLine(inputArr, outputArr), Arrays.toString(expectedOutputArr)));
+                        "expectedOutput line %d: expectedOutputPos %d\n%s".formatted(outputPos + resultPos, expectedOutputPos,
+                                formatResultLine(inputArr, outputArr, expectedOutputArr)));
             }
         }
     }
