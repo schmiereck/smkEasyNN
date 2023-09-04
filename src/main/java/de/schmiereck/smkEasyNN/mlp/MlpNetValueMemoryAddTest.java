@@ -222,7 +222,7 @@ public class MlpNetValueMemoryAddTest {
                                 new float[]{ 0, 0, 0, 1, 1, 0, 0 }, // 3 + 4 = 7
                         },
                 };
-        final int[] layerSizeArr = new int[]{ 9, 24, 24, 24, 24, 24, 7 };
+        final int[] layerSizeArr = new int[]{ 9, 6, 6, 7 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -233,12 +233,9 @@ public class MlpNetValueMemoryAddTest {
         // 1 to   <---,
         // 2 from ----'
         addForwwardInputs(mlpNet, 2, 1, rnd);
-        addForwwardInputs(mlpNet, 3, 2, rnd);
-        addForwwardInputs(mlpNet, 4, 2, rnd);
-        addForwwardInputs(mlpNet, 4, 3, rnd);
-        addForwwardInputs(mlpNet, 5, 4, rnd);
+        //addForwwardInputs(mlpNet, 1, 0, rnd);
 
-        final int epochMax = 5000000;
+        final int epochMax = 5_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
@@ -249,6 +246,6 @@ public class MlpNetValueMemoryAddTest {
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.7F);
+        actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.1F);
     }
 }
