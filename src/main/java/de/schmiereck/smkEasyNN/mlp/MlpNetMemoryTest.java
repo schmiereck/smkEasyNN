@@ -2,6 +2,7 @@ package de.schmiereck.smkEasyNN.mlp;
 
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.printResultForEpoch;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.printSamplesOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.addInternalInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -21,22 +22,42 @@ public class MlpNetMemoryTest {
                         {
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 0 }, // = 0, 0, 0
                         },
                         {
+                                new float[]{ 0 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, // = 1, 0, 0
                         },
                         {
                                 new float[]{ 0 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, // = 0, 1, 0
                         },
                         {
+                                new float[]{ 0 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, // = 1, 1, 0
+                        },
+                        {
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, // = 0, 1, 0
+                        },
+                        {
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, // = 0, 1, 0
                         },
                 };
         final float[][][] expectedOutputArrArrArr = new float[][][]
@@ -45,9 +66,11 @@ public class MlpNetMemoryTest {
                         {
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 0 }, // = 0, 0, 0
                         },
                         {
+                                new float[]{ 0 }, //
                                 new float[]{ 0 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, // = 1, 0, 0
@@ -55,15 +78,33 @@ public class MlpNetMemoryTest {
                         {
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 1 }, // = 0, 1, 0
                         },
                         {
                                 new float[]{ 0 }, //
+                                new float[]{ 0 }, //
                                 new float[]{ 1 }, //
                                 new float[]{ 1 }, // = 1, 1, 0
                         },
+                        {
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, // = 0, 1, 0
+                        },
+                        {
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, // = 0, 1, 0
+                        },
                 };
-        final int[] layerSizeArr = new int[]{ 1, 12, 12, 1 };
+        final int[] layerSizeArr = new int[]{ 1, 4, 4, 1 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -73,16 +114,16 @@ public class MlpNetMemoryTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        //addForwwardInputs(mlpNet, 2, 1, rnd);
-        addInternalInputs(mlpNet, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, rnd);
+        //addInternalInputs(mlpNet, 1, rnd);
 
-        final int epochMax = 50000;
+        final int epochMax = 20_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, 1);
             }
         }
 

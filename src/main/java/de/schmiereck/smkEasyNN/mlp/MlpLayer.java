@@ -4,19 +4,16 @@ import java.util.List;
 import java.util.Random;
 
 public class MlpLayer {
-    List<MlpInputInterface> inputArr;
+    //List<MlpInputInterface> inputArr;
     MlpNeuron[] neuronArr;
     boolean isOutputLayer = false;
 
-    public MlpLayer(final List<MlpInputInterface> inputArr, final int outputSize, final Random rnd) {
+    public MlpLayer(final int inputSize, final int outputSize, final Random rnd) {
         this.neuronArr = new MlpNeuron[outputSize];
 
         for (int neuronPos = 0; neuronPos < this.neuronArr.length; neuronPos++) {
-            this.neuronArr[neuronPos] = new MlpNeuron(inputArr.size());
+            this.neuronArr[neuronPos] = new MlpNeuron(inputSize);
         }
-        this.inputArr = inputArr;
-
-        //this.initWeights(rnd);
     }
 
     public void setOutputLayer(final boolean isSigmoid) {
@@ -28,7 +25,6 @@ public class MlpLayer {
             final MlpNeuron mlpNeuron = this.neuronArr[neuronPos];
             for (int weightPos = 0; weightPos < mlpNeuron.synapseList.size(); weightPos++) {
                 mlpNeuron.synapseList.get(weightPos).weight = calcInitWeight(rnd);
-                //mlpNeuron.synapseList.get(weightPos).weight = mlpNeuron.weightArr[weightPos];
             }
         }
     }
@@ -39,7 +35,8 @@ public class MlpLayer {
 
     public static float calcInitWeight2(Random rnd) {
         //return (rnd.nextFloat() - 0.5F) * 1.0F;
-        return (rnd.nextFloat() - 0.5F) * 0.1F;
+        //return (rnd.nextFloat() - 0.5F) * 0.1F;
+        return calcInitWeight(rnd);
     }
 
     //public void initWeights(final Random rnd) {

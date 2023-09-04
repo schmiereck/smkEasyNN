@@ -10,7 +10,22 @@ public class MlpNetTestUtils {
     public static void printResultForEpoch(final MlpNet mlpNet, final float[][][] trainInputArrArrArr, final float[][] expectedOutputArrArrArr[], final int epochPos) {
         printEpoch(epochPos);
         for (int pos = 0; pos < trainInputArrArrArr.length; pos++) {
-            printResult(mlpNet, trainInputArrArrArr[pos], expectedOutputArrArrArr[pos]);
+            final float[][] trainInputArrArr = trainInputArrArrArr[pos];
+            final float[][] expectedOutputArrArr = expectedOutputArrArrArr[pos];
+            printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+        }
+    }
+
+    public static void printResultForEpoch(final MlpNet mlpNet, final float[][][] trainInputArrArrArr, final float[][] expectedOutputArrArrArr[], final int epochPos, final int samplesLayerPos) {
+        printEpoch(epochPos);
+        for (int pos = 0; pos < trainInputArrArrArr.length; pos++) {
+            final float[][] trainInputArrArr = trainInputArrArrArr[pos];
+            final float[][] expectedOutputArrArr = expectedOutputArrArrArr[pos];
+            printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+
+            System.out.println("samplesOutput:");
+            printSamplesOutput(mlpNet, trainInputArrArr, expectedOutputArrArr, samplesLayerPos);
+            System.out.println();
         }
     }
 

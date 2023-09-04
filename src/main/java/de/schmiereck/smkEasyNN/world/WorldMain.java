@@ -107,7 +107,7 @@ public class WorldMain {
             // Error between w0WorldCell cell-state and cell-ident.
             // Differenz is the error value for: w0WorldCell.state[WorldCell.State.xs]
 
-            MlpService.trainWithError(worldNet.mlpNet, errorArr, 0.3F, 0.6F);
+            MlpService.trainWithError(worldNet.mlpNet, /*errorArr, */ 0.3F, 0.6F);
 
             // TODO calculate costs of life step
 

@@ -33,23 +33,10 @@ public class MlpNet {
             int allInputLayerSize = (useAdditionalBiasInput ? inputLayerSize + 1 : inputLayerSize);
             int layerOutputSize = layersSize[layerPos];
 
-            final List<MlpInputInterface> inputArr = new ArrayList<>(Collections.nCopies(allInputLayerSize, null));
-
-            final MlpLayer mlpLayer = new MlpLayer(inputArr, layerOutputSize, rnd);
+            final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerOutputSize, rnd);
             this.layers[layerPos] = mlpLayer;
 
             final MlpLayer inputLayer = this.layers[sizeInputLayerPos];
-
-            for (int neuronPos = 0; neuronPos < inputLayerSize; neuronPos++) {
-                if (layerPos == 0) {
-                    inputArr.set(neuronPos, this.valueInputArr[neuronPos]);
-                } else {
-                    inputArr.set(neuronPos, new MlpInput(this.layers[sizeInputLayerPos].neuronArr[neuronPos]));
-                }
-            }
-            if (useAdditionalBiasInput) {
-                inputArr.set(allInputLayerSize - 1, new MlpInput(this.biasNeuronArr[sizeInputLayerPos]));
-            }
 
             for (int neuronPos = 0; neuronPos < mlpLayer.neuronArr.length; neuronPos++) {
                 final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
