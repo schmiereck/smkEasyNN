@@ -22,7 +22,7 @@ public class MlpNetLimitTest {
         final float[][][] expectedOutputArrArrArr = new float[][][]
                 {
                         {
-                                new float[]{ 0 }, //
+                                new float[]{ Float.NaN }, //
                         },
                 };
         final int[] layerSizeArr = new int[]{ 1, 1001, 1 };
