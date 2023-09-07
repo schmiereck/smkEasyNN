@@ -66,20 +66,23 @@ public class GridworldGameService {
 
             switch (actionResult) {
                 case MovedGoal -> {
-                    randomizeExpectedOutput(expectedOutputArr, rnd); // All other actions are generating errors (+/-).
+                    initializeExpectedOutput(expectedOutputArr, 0.0F); // All other actions are generating errors (+/-).
                     expectedOutputArr[action] = 1.0F; // Great.
                 }
                 case Moved -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     //randomizeExpectedOutput(expectedOutputArr, rnd);
+                    normalizeExpectedOutput(expectedOutputArr, 0.5F);
                     expectedOutputArr[action] = 0.75F; // Good.
                 }
                 case HitWall -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
-                    expectedOutputArr[action] = -0.50F; // Not so good.
+                    randomizeExpectedOutput(expectedOutputArr, rnd);
+                    expectedOutputArr[action] = -0.5F; // Not so good.
                 }
                 case MovedPit -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    randomizeExpectedOutput(expectedOutputArr, rnd);
                     expectedOutputArr[action] = -0.75F; // Bad.
                 }
                 default -> throw new RuntimeException("Unexpected actionResult \"%s\".".formatted(actionResult));
@@ -113,6 +116,18 @@ public class GridworldGameService {
         }
         gameStatistic.moveCounter += move;
         return retHitGoalCounter;
+    }
+
+    private static void initializeExpectedOutput(final float[] expectedOutputArr, final float value) {
+        for (int pos = 0; pos < expectedOutputArr.length; pos++) {
+            expectedOutputArr[pos] = value;
+        }
+    }
+
+    private static void normalizeExpectedOutput(final float[] expectedOutputArr, final float value) {
+        for (int pos = 0; pos < expectedOutputArr.length; pos++) {
+            expectedOutputArr[pos] *= value;
+        }
     }
 
     private static void randomizeExpectedOutput(final float[] expectedOutputArr, final Random rnd) {
