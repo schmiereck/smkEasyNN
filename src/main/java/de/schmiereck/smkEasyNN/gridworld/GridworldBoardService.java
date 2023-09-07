@@ -66,12 +66,45 @@ public class GridworldBoardService {
                         board.board[3][3][ElementPosGoal] = true;
                         initBoardField(board, ElementPosPlayer, new Pos(3, 3), 3, true, rnd);
                     } else {
-                        // init randomly with increasing distance between player and goal
-                        initBoardField(board, ElementPosWall, rnd);
-                        initBoardField(board, ElementPosPit, rnd);
-                        final Pos goalPos = initBoardField(board, ElementPosGoal, rnd);
-                        final int distance = Math.min(level - 3, 4);
-                        initBoardField(board, ElementPosPlayer, goalPos, distance, true, rnd);
+                        if (level == 4) {
+                            // init randomly player on a not so easy pos with distance 1
+                            board.board[2][1][ElementPosWall] = true;
+                            board.board[1][3][ElementPosPit] = true;
+                            board.board[3][3][ElementPosGoal] = true;
+                            initBoardField(board, ElementPosPlayer, new Pos(3, 3), 1, false, rnd);
+                        } else {
+                            if (level == 5) {
+                                // init randomly player on a not so easy pos with distance 2
+                                board.board[2][1][ElementPosWall] = true;
+                                board.board[1][3][ElementPosPit] = true;
+                                board.board[3][3][ElementPosGoal] = true;
+                                initBoardField(board, ElementPosPlayer, new Pos(3, 3), 2, false, rnd);
+                            } else {
+                                if (level == 6) {
+                                    // init randomly player  on a not so easypos with distance 3
+                                    board.board[2][1][ElementPosWall] = true;
+                                    board.board[1][3][ElementPosPit] = true;
+                                    board.board[3][3][ElementPosGoal] = true;
+                                    initBoardField(board, ElementPosPlayer, new Pos(3, 3), 3, false, rnd);
+                                } else {
+                                    if (level <= 9) {
+                                        // init randomly fields with increasing distance between player and goal
+                                        initBoardField(board, ElementPosWall, rnd);
+                                        initBoardField(board, ElementPosPit, rnd);
+                                        final Pos goalPos = initBoardField(board, ElementPosGoal, rnd);
+                                        final int distance = Math.min(level - 6, 4);
+                                        initBoardField(board, ElementPosPlayer, goalPos, distance, true, rnd);
+                                    } else {
+                                        // init randomly fields with increasing distance between player and goal
+                                        initBoardField(board, ElementPosWall, rnd);
+                                        initBoardField(board, ElementPosPit, rnd);
+                                        final Pos goalPos = initBoardField(board, ElementPosGoal, rnd);
+                                        final int distance = Math.min(level - 9, 4);
+                                        initBoardField(board, ElementPosPlayer, goalPos, distance, false, rnd);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -87,7 +120,7 @@ public class GridworldBoardService {
                     posX = wrapBoardPos(pos.x + rnd.nextInt(distance * 2 + 1) - distance);
                     posY = pos.y;
                 } else {
-                    posX = pos.y;
+                    posX = pos.x;
                     posY = wrapBoardPos(pos.y + rnd.nextInt(distance * 2 + 1) - distance);
                 }
             } else {

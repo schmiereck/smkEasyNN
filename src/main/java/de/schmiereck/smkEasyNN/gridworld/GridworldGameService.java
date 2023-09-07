@@ -16,6 +16,7 @@ public class GridworldGameService {
     static final int MovePosDown = 1;
     static final int MovePosLeft = 2;
     static final int MovePosRight = 3;
+    public static final int MAX_MOVE_COUNT = 32;
 
     enum ActionResult {
         HitWall, MovedPit, MovedGoal, Moved
@@ -35,8 +36,16 @@ public class GridworldGameService {
 
         // New Game Reset:
         inputArr[4 * 4 * 4] = 1.0F;
-        MlpSaveService.run(net, inputArr);
-        MlpSaveService.run(net, inputArr);
+        {
+            final float[] expectedOutputArr = new float[4];
+            final float[] outputArr = MlpSaveService.run(net, inputArr);
+            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+        }
+        {
+            final float[] expectedOutputArr = new float[4];
+            final float[] outputArr = MlpSaveService.run(net, inputArr);
+            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+        }
         inputArr[4 * 4 * 4] = 0.0F;
 
         // Game-Play Loop:
@@ -91,7 +100,7 @@ public class GridworldGameService {
                     retHitGoalCounter = 0;
                     break;
                 } else {
-                    if (move > 16) {
+                    if (move > MAX_MOVE_COUNT) {
                         System.out.printf("%3d - %3d: ", level, move);
                         System.out.println("BREAK");
                         retHitGoalCounter = 0;

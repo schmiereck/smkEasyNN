@@ -42,7 +42,7 @@ public class GridworldMain {
         final MlpConfiguration config = new MlpConfiguration(true, false, 1.0F);
         final MlpNet net = new MlpNet(config, layerSizeArr, rnd);
 
-        addForwwardInputs(net, 2, 1, rnd);
+        //addForwwardInputs(net, 2, 1, rnd);
 
         int level = 0;
         int fittnesCounter = 0;
