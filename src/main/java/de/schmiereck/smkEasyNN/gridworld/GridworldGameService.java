@@ -66,21 +66,21 @@ public class GridworldGameService {
 
             switch (actionResult) {
                 case MovedGoal -> {
-                    expectedOutputArr[action] = 1.0F;
+                    randomizeExpectedOutput(expectedOutputArr, rnd); // All other actions are generating errors (+/-).
+                    expectedOutputArr[action] = 1.0F; // Great.
                 }
                 case Moved -> {
-                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4);
+                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     //randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = 0.75F;
+                    expectedOutputArr[action] = 0.75F; // Good.
                 }
                 case HitWall -> {
-                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4);
-                    expectedOutputArr[action] = -05.0F;
+                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    expectedOutputArr[action] = -0.50F; // Not so good.
                 }
                 case MovedPit -> {
-                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4);
-                    randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = -075.0F;
+                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    expectedOutputArr[action] = -0.75F; // Bad.
                 }
                 default -> throw new RuntimeException("Unexpected actionResult \"%s\".".formatted(actionResult));
             }
