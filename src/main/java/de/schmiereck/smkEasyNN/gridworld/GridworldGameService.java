@@ -30,7 +30,7 @@ public class GridworldGameService {
         }
     }
 
-    static int runPlayGame(final MlpNet net, final Board board, final int level, final int hitGoalCounter, final Random rnd) {
+    static int runPlayGame(final MlpNet net, final Board board, final int level, final GameStatistic gameStatistic, final int hitGoalCounter, final Random rnd) {
         int retHitGoalCounter = hitGoalCounter;
         final float[] inputArr = new float[4 * 4 * 4 + 1];
 
@@ -65,23 +65,24 @@ public class GridworldGameService {
             final float[] expectedOutputArr = new float[4];
 
             switch (actionResult) {
+                case MovedGoal -> {
+                    expectedOutputArr[action] = 1.0F;
+                }
                 case Moved -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4);
-                    randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = 1.0F;
+                    //randomizeExpectedOutput(expectedOutputArr, rnd);
+                    expectedOutputArr[action] = 0.75F;
                 }
                 case HitWall -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4);
-                    expectedOutputArr[action] = 0.0F;
-                }
-                case MovedGoal -> {
-                    expectedOutputArr[action] = 1.0F;
+                    expectedOutputArr[action] = -05.0F;
                 }
                 case MovedPit -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4);
                     randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = 0.0F;
+                    expectedOutputArr[action] = -075.0F;
                 }
+                default -> throw new RuntimeException("Unexpected actionResult \"%s\".".formatted(actionResult));
             }
             normalizeExpectedOutput(expectedOutputArr);
 
@@ -89,20 +90,20 @@ public class GridworldGameService {
             MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
 
             if (actionResult == GridworldGameService.ActionResult.MovedGoal) {
-                System.out.printf("%3d - %3d: ", level, move);
-                System.out.println("MovedGoal");
+                gameStatistic.hitGoalCounter++;
+                gameStatistic.actionResult = actionResult;
                 retHitGoalCounter++;
                 break;
             } else {
                 if (actionResult == GridworldGameService.ActionResult.MovedPit) {
-                    System.out.printf("%3d - %3d: ", level, move);
-                    System.out.println("MovedPit");
+                    gameStatistic.hitPitCounter++;
+                    gameStatistic.actionResult = actionResult;
                     retHitGoalCounter = 0;
                     break;
                 } else {
                     if (move > MAX_MOVE_COUNT) {
-                        System.out.printf("%3d - %3d: ", level, move);
-                        System.out.println("BREAK");
+                        gameStatistic.maxMoveCounter++;
+                        gameStatistic.actionResult = actionResult;
                         retHitGoalCounter = 0;
                         break;
                     }
@@ -110,6 +111,7 @@ public class GridworldGameService {
             }
             move++;
         }
+        gameStatistic.moveCounter += move;
         return retHitGoalCounter;
     }
 
