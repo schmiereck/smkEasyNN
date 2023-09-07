@@ -1,15 +1,14 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.CLOCK_VALUE;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.NORM_VALUE;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.run;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.sigmoidDerivative;
 
 import java.util.Arrays;
 import java.util.Random;
 
-public class MlpService {
-
-    public static final float BIAS_VALUE = 1.0F;
-    public static final float CLOCK_VALUE = 1.0F;
-    public static final float NORM_VALUE = 1.0F;
+public class MlpSaveService {
 
     public static void runTrainOrder(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
         for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
@@ -67,6 +66,9 @@ public class MlpService {
         for (int outputNeuronPos = 0; outputNeuronPos < outputLayer.neuronArr.length; outputNeuronPos++) {
             final MlpNeuron outputNeuron = outputLayer.neuronArr[outputNeuronPos];
             outputNeuron.error = expectedOutputArr[outputNeuronPos] - outputNeuron.output;
+            if (Float.isNaN(outputNeuron.error)) {
+                throw new RuntimeException("trainWithOutput outputNeuron.error NaN:");
+            }
         }
 
         trainWithError(mlpNet, learningRate, momentum);
@@ -75,22 +77,36 @@ public class MlpService {
     public static void trainWithError(final MlpNet mlpNet, final float learningRate, final float momentum) {
         for (int layerPos = mlpNet.layers.length - 1; layerPos >= 0; layerPos--) {
             final MlpLayer mlpLayer = mlpNet.layers[layerPos];
-            MlpService.train(mlpLayer, learningRate, momentum);
+            train(mlpLayer, learningRate, momentum);
             //MlpService.train2(mlpLayer, learningRate, momentum);
         }
         for (int layerPos = mlpNet.layers.length - 1; layerPos >= 0; layerPos--) {
             final MlpLayer mlpLayer = mlpNet.layers[layerPos];
             //MlpService.train(mlpLayer, learningRate, momentum);
-            MlpService.train2(mlpLayer, learningRate, momentum);
+            train2(mlpLayer, learningRate, momentum);
         }
     }
 
     public static void train(final MlpLayer mlpLayer, final float learningRate, final float momentum) {
         for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
             final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
+            if (Float.isNaN(neuron.error)) {
+                throw new RuntimeException("train neuron.error NaN:");
+            }
+            if (Float.isInfinite(neuron.error)) {
+                throw new RuntimeException("train neuron.error Infinite:");
+            }
 
             if (!mlpLayer.isOutputLayer) {
-                neuron.error *= sigmoidDerivative(mlpLayer.neuronArr[outputPos].output);
+                final float sd = sigmoidDerivative(mlpLayer.neuronArr[outputPos].output);
+                final float oe = neuron.error;
+                neuron.error *= sd;
+                if (Float.isNaN(neuron.error)) {
+                    throw new RuntimeException("train neuron.error NaN:" + mlpLayer.neuronArr[outputPos].output + ", " + oe);
+                }
+                if (Float.isInfinite(neuron.error)) {
+                    throw new RuntimeException("train neuron.error Infinite:" + mlpLayer.neuronArr[outputPos].output + ", " + oe);
+                }
             }
 
             for (int inputPos = 0; inputPos < neuron.synapseList.size(); inputPos++) {
@@ -100,7 +116,14 @@ public class MlpService {
                     synapse.input.addLastError(synapse.weight * neuron.lastError);
                     synapse.input.addError(synapse.weight * neuron.lastError);
                 } else {
-                    synapse.input.addError(synapse.weight * neuron.error);
+                    final float e = synapse.weight * neuron.error;
+                    if (Float.isInfinite(e)) {
+                        throw new RuntimeException("train e Infinite:" + synapse.weight + ", " + neuron.error);
+                    }
+                    synapse.input.addError(e);
+                }
+                if (Float.isNaN(neuron.error)) {
+                    throw new RuntimeException("train neuron.error NaN:" + mlpLayer.neuronArr[outputPos].output + ", ");
                 }
             }
         }
@@ -128,6 +151,9 @@ public class MlpService {
                 float dw = input * error * learningRate;
 
                 synapse.weight += (synapse.dweight * momentum) + dw;
+                if (Float.isNaN(synapse.weight)) {
+                    throw new RuntimeException("train2 synapse.weight NaN:" + synapse.dweight + ", " + momentum + ", " + dw);
+                }
                 synapse.dweight = dw;
             }
         }
@@ -169,6 +195,9 @@ public class MlpService {
                 final float input = synapse.input.getInput();
 
                 neuron.output += synapse.weight * input;
+                if (Float.isNaN(neuron.output)) {
+                    throw new RuntimeException("runLayer neuron.output NaN:" + synapse.weight + ", " + input);
+                }
             }
             if (!mlpLayer.isOutputLayer) {
                 neuron.output = sigmoid(neuron.output);
@@ -177,84 +206,19 @@ public class MlpService {
     }
 
     static float sigmoidDerivative(final float x) {
-        return (x * (NORM_VALUE - x));
+        final float ret = (x * (NORM_VALUE - x));
+        if (Float.isInfinite(ret)) {
+            throw new RuntimeException("sigmoidDerivative Infinite:" + x);
+        }
+        return ret;
     }
+
 
     private static float sigmoid(final float x) {
-        return (float) (NORM_VALUE / (NORM_VALUE + Math.exp(-x)));
-    }
-
-    private static float digital(final float x) {
-        return x >= 0.0D ? NORM_VALUE : -NORM_VALUE;
-        //return x >= 0.5D ? NORM_VALUE : 0.0F;
-        //return x >= 0.0D ? NORM_VALUE : 0.0F;
-        //return x * 0.5F;
-    }
-
-    /**
-     * RNN
-     *
-     * Neuronales Netz · Seite · HOOU
-     * https://www.hoou.de/projects/neuronale-netze-kurz-erklart/pages/neuronales-netz
-     *
-     * Rekurrentes neuronales Netz – Wikipedia
-     * https://de.wikipedia.org/wiki/Rekurrentes_neuronales_Netz
-     *
-     * Long Short-Term Memory Units (kurz: LSTMs)
-     *
-     * Aufbau einer LSTM-Zelle
-     * https://www.bigdata-insider.de/was-ist-ein-long-short-term-memory-a-774848/
-     *
-     * // 0
-     * // 1 to   <---,
-     * // 2 from ----'
-     */
-    public static void addForwwardInputs(final MlpNet mlpNet, final int fromLayerPos, final int toLayerPos, final Random rnd) {
-        final MlpLayer fromLayer = mlpNet.getLayer(fromLayerPos);
-        final MlpLayer toLayer = mlpNet.getLayer(toLayerPos);
-
-        Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
-            Arrays.stream(fromLayer.neuronArr).forEach(fromNeuron -> {
-                final MlpSynapse synapse = new MlpSynapse();
-                synapse.input = new MlpInput(fromNeuron);
-                synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
-                synapse.forward = true;
-                toNeuron.synapseList.add(synapse);
-            });
-            if (mlpNet.getUseAdditionalBiasInput()) {
-                final MlpSynapse synapse = new MlpSynapse();
-                synapse.input = new MlpInput(mlpNet.biasNeuronArr[toLayerPos]);
-                synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
-                synapse.forward = true;
-                toNeuron.synapseList.add(synapse);
-            }
-        });
-    }
-
-    public static void addInternalInputs(final MlpNet mlpNet, final int layerPos, final Random rnd) {
-        final MlpLayer toLayer = mlpNet.getLayer(layerPos);
-
-        for (int toNeuronPos = 0; toNeuronPos < toLayer.neuronArr.length; toNeuronPos++) {
-            final MlpNeuron toNeuron = toLayer.neuronArr[toNeuronPos];
-
-            for (int fromNeuronPos = toNeuronPos; fromNeuronPos < toLayer.neuronArr.length; fromNeuronPos++) {
-                final MlpNeuron fromNeuron = toLayer.neuronArr[fromNeuronPos];
-
-                final MlpSynapse synapse = new MlpSynapse();
-                synapse.input = new MlpInput(fromNeuron);
-                synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
-                synapse.forward = true;
-                toNeuron.synapseList.add(synapse);
-            }
-
-            if (mlpNet.getUseAdditionalBiasInput()) {
-                final MlpSynapse synapse = new MlpSynapse();
-                synapse.input = new MlpInput(mlpNet.biasNeuronArr[layerPos]);
-                synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
-                synapse.forward = true;
-                toNeuron.synapseList.add(synapse);
-            }
+        final float ret = (float) (NORM_VALUE / (NORM_VALUE + Math.exp(-x)));
+        if (Float.isNaN(ret)) {
+            throw new RuntimeException("sigmoid NaN:" + x);
         }
+        return ret;
     }
-
 }

@@ -4,26 +4,27 @@ import java.util.Random;
 
 public class MlpNet {
     MlpLayer[] layers;
-
     final MlpNeuron[] biasNeuronArr;
     final MlpNeuron clockNeuron;
     private final MlpValueInput[] valueInputArr;
 
-    private boolean useAdditionalBiasInput;
-    private boolean useAdditionalClockInput;
+    private final MlpConfiguration config;
 
-    public MlpNet(int[] layersSize, final Random rnd) {
+    public MlpNet(final int[] layersSize, final Random rnd) {
         this(layersSize, false, false, rnd);
     }
 
-    public MlpNet(int[] layersSize, final boolean useAdditionalBiasInput, final Random rnd) {
+    public MlpNet(final int[] layersSize, final boolean useAdditionalBiasInput, final Random rnd) {
         this(layersSize, useAdditionalBiasInput, false, rnd);
     }
 
-    public MlpNet(int[] layersSize, final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput, final Random rnd) {
+    public MlpNet(final int[] layersSize, final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput, final Random rnd) {
+        this(new MlpConfiguration(useAdditionalBiasInput, useAdditionalClockInput), layersSize, rnd);
+    }
+
+    public MlpNet(final MlpConfiguration config, int[] layersSize, final Random rnd) {
+        this.config = config;
         this.layers = new MlpLayer[layersSize.length];
-        this.useAdditionalBiasInput = useAdditionalBiasInput;
-        this.useAdditionalClockInput = useAdditionalClockInput;
         this.biasNeuronArr = new MlpNeuron[layersSize.length];
         for (int biasNeuronPos = 0; biasNeuronPos < layersSize.length; biasNeuronPos++) {
             this.biasNeuronArr[biasNeuronPos] = new MlpNeuron(0);
@@ -42,8 +43,8 @@ public class MlpNet {
         for (int layerPos = 0; layerPos < layersSize.length; layerPos++) {
             final int sizeInputLayerPos = (layerPos == 0 ? layerPos : layerPos - 1);
             final int inputLayerSize = layersSize[sizeInputLayerPos];
-            final int additionalBiasInputSize = (this.useAdditionalBiasInput ? 1 : 0);
-            final int additionalClockInputSize = (this.useAdditionalClockInput ? 1 : 0);
+            final int additionalBiasInputSize = (this.config.useAdditionalBiasInput ? 1 : 0);
+            final int additionalClockInputSize = (this.config.useAdditionalClockInput ? 1 : 0);
             final int allInputLayerSize = (inputLayerSize + additionalBiasInputSize + additionalClockInputSize);
             final int layerOutputSize = layersSize[layerPos];
 
@@ -67,18 +68,18 @@ public class MlpNet {
                     synapse.input = input;
                     neuron.synapseList.add(synapse);
                 }
-                if (this.useAdditionalBiasInput) {
+                if (this.config.useAdditionalBiasInput) {
                     final MlpSynapse synapse = new MlpSynapse();
                     synapse.input = new MlpInput(this.biasNeuronArr[layerPos]);
                     neuron.synapseList.add(synapse);
                 }
-                if (this.useAdditionalClockInput) {
+                if (this.config.useAdditionalClockInput) {
                     final MlpSynapse synapse = new MlpSynapse();
                     synapse.input = new MlpInput(this.clockNeuron);
                     neuron.synapseList.add(synapse);
                 }
             }
-            mlpLayer.initWeights2(rnd);
+            mlpLayer.initWeights2(this.config.initialWeightValue, rnd);
 
             if (layerPos == (layersSize.length - 1)) {
                 mlpLayer.setOutputLayer(true);
@@ -103,10 +104,14 @@ public class MlpNet {
     }
 
     public boolean getUseAdditionalBiasInput() {
-        return this.useAdditionalBiasInput;
+        return this.config.useAdditionalBiasInput;
     }
 
     public boolean getUseAdditionalClockInput() {
-        return this.useAdditionalClockInput;
+        return this.config.useAdditionalClockInput;
+    }
+
+    public float getInitialWeightValue() {
+        return this.config.initialWeightValue;
     }
 }
