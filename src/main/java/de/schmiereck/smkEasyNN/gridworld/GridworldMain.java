@@ -67,11 +67,12 @@ public class GridworldMain {
             //printBoard(board);
 
             if ((epoche % 100 == 0) || (oldLevel != level)) {
-                System.out.printf("%9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, max-move:%6d]\r", epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.maxMoveCounter);
+                System.out.printf("%9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d]\r", epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter);
                 if (oldLevel != level) {
                     gameStatistic.moveCounter = 0;
                     gameStatistic.hitGoalCounter = 0;
                     gameStatistic.hitPitCounter = 0;
+                    gameStatistic.hitWallCounter = 0;
                     gameStatistic.maxMoveCounter = 0;
                     System.out.println();
                 }

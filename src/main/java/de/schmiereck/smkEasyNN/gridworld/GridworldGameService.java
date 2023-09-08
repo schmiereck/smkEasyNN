@@ -117,6 +117,11 @@ public class GridworldGameService {
                         gameStatistic.actionResult = actionResult;
                         retHitGoalCounter = 0;
                         break;
+                    } else {
+                        if (actionResult == ActionResult.HitWall) {
+                            gameStatistic.hitWallCounter++;
+                            gameStatistic.actionResult = actionResult;
+                        }
                     }
                 }
             }
