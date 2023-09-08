@@ -18,6 +18,8 @@ public class GridworldGameService {
     static final int MovePosRight = 3;
     public static final int MAX_MOVE_COUNT = 32;
 
+    public static final boolean useEndlessWorld = false;
+
     enum ActionResult {
         HitWall, MovedPit, MovedGoal, Moved
     }
@@ -63,35 +65,41 @@ public class GridworldGameService {
 
             // Train:
             final float[] expectedOutputArr = new float[4];
+            final boolean runTrain;
 
             switch (actionResult) {
                 case MovedGoal -> {
                     initializeExpectedOutput(expectedOutputArr, 0.0F); // All other actions are generating errors (+/-).
                     expectedOutputArr[action] = 1.0F; // Great.
+                    runTrain = true;
                 }
                 case Moved -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     //randomizeExpectedOutput(expectedOutputArr, rnd);
-                    normalizeExpectedOutput(expectedOutputArr, 0.5F);
+                    //normalizeExpectedOutput(expectedOutputArr, 0.5F);
                     expectedOutputArr[action] = 0.75F; // Good.
+                    runTrain = true;
                 }
                 case HitWall -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     randomizeExpectedOutput(expectedOutputArr, rnd);
                     expectedOutputArr[action] = -0.5F; // Not so good.
+                    runTrain = true;
                 }
                 case MovedPit -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     randomizeExpectedOutput(expectedOutputArr, rnd);
                     expectedOutputArr[action] = -0.75F; // Bad.
+                    runTrain = true;
                 }
                 default -> throw new RuntimeException("Unexpected actionResult \"%s\".".formatted(actionResult));
             }
-            normalizeExpectedOutput(expectedOutputArr);
+            if (runTrain) {
+                //normalizeExpectedOutput(expectedOutputArr);
 
-            //MlpSaveService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
-            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
-
+                //MlpSaveService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+                MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+            }
             if (actionResult == GridworldGameService.ActionResult.MovedGoal) {
                 gameStatistic.hitGoalCounter++;
                 gameStatistic.actionResult = actionResult;
@@ -164,14 +172,55 @@ public class GridworldGameService {
 
         final int playerPosX;
         final int playerPosY;
-        switch (actionPos) {
-            case MovePosUp -> { playerPosX = playerPos.x; playerPosY = wrapBoardPos(playerPos.y - 1); }
-            case MovePosDown -> { playerPosX = playerPos.x; playerPosY = wrapBoardPos(playerPos.y + 1); }
-            case MovePosLeft -> { playerPosX = wrapBoardPos(playerPos.x - 1); playerPosY = playerPos.y; }
-            case MovePosRight -> { playerPosX = wrapBoardPos(playerPos.x + 1); playerPosY = playerPos.y; }
-            default -> throw new RuntimeException("Unexpected actionPos \"%d\".".formatted(actionPos));
+        final boolean wallField;
+
+        if (useEndlessWorld) {
+            switch (actionPos) {
+                case MovePosUp -> {
+                    playerPosX = playerPos.x;
+                    playerPosY = wrapBoardPos(playerPos.y - 1);
+                }
+                case MovePosDown -> {
+                    playerPosX = playerPos.x;
+                    playerPosY = wrapBoardPos(playerPos.y + 1);
+                }
+                case MovePosLeft -> {
+                    playerPosX = wrapBoardPos(playerPos.x - 1);
+                    playerPosY = playerPos.y;
+                }
+                case MovePosRight -> {
+                    playerPosX = wrapBoardPos(playerPos.x + 1);
+                    playerPosY = playerPos.y;
+                }
+                default -> throw new RuntimeException("Unexpected actionPos \"%d\".".formatted(actionPos));
+            }
+            wallField = board.board[playerPosY][playerPosX][ElementPosWall];
+        } else {
+            switch (actionPos) {
+                case MovePosUp -> {
+                    playerPosX = playerPos.x;
+                    playerPosY = playerPos.y - 1;
+                }
+                case MovePosDown -> {
+                    playerPosX = playerPos.x;
+                    playerPosY = playerPos.y + 1;
+                }
+                case MovePosLeft -> {
+                    playerPosX = playerPos.x - 1;
+                    playerPosY = playerPos.y;
+                }
+                case MovePosRight -> {
+                    playerPosX = playerPos.x + 1;
+                    playerPosY = playerPos.y;
+                }
+                default -> throw new RuntimeException("Unexpected actionPos \"%d\".".formatted(actionPos));
+            }
+            if (checkBoardPosEnd(playerPosX) || checkBoardPosEnd(playerPosY)) {
+                wallField = true;
+            } else {
+                wallField = board.board[playerPosY][playerPosX][ElementPosWall];
+            }
         }
-        final boolean wallField = board.board[playerPosY][playerPosX][ElementPosWall];
         if (wallField) {
             actionResult = GridworldGameService.ActionResult.HitWall;
         } else {
@@ -231,5 +280,20 @@ public class GridworldGameService {
             }
         }
         return retPos;
+    }
+
+    static boolean checkBoardPosEnd(final int pos) {
+        final boolean ret;
+
+        if (pos >= 4) {
+            ret = true;
+        } else {
+            if (pos < 0) {
+                ret = true;
+            } else {
+                ret = false;
+            }
+        }
+        return ret;
     }
 }

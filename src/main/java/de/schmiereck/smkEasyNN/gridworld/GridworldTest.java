@@ -484,6 +484,50 @@ public class GridworldTest {
         }
     }
 
+    @Test
+    void GIVEN_level_1_THEN_test_Gridworld_End() {
+        final Random rnd = new Random(12345);
+
+        final Board board = new Board();
+
+        final int level = 1;
+        {
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
+        }
+        {
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
+        }
+        {
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
+        }
+    }
+
     private static class TestData {
         final int movePos;
         final GridworldGameService.ActionResult actionResult;
