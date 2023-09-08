@@ -34,7 +34,11 @@ public class GridworldMain {
         //final int[] layerSizeArr = new int[]{ 64 + 1, 32, 32, 4 };
         //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 4 };
         //final int[] layerSizeArr = new int[]{ 64 + 1, 128, 64, 64, 64, 4 };
-        final int[] layerSizeArr = new int[]{ 64 + 1, 164, 150, 64, 64, 4 };
+        //final int[] layerSizeArr = new int[]{ 64 + 1, 164, 150, 64, 64, 4 }; // Best.
+        //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 32, 32, 4 }; // No: 582900: level:  5  moves: 15420375 [goal: 51847, pit:    11, wall:   142, max-move:467282]
+        //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 64, 64, 64, 64, 4 }; // Best 2
+        //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 64, 64, 64, 4 }; // Best 3
+        final int[] layerSizeArr = new int[]{ 64 + 1, 64, 32, 32, 32, 32, 4 }; // Best 4
 
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
@@ -44,6 +48,9 @@ public class GridworldMain {
         final MlpNet net = new MlpNet(config, layerSizeArr, rnd);
 
         //addForwwardInputs(net, 2, 1, rnd);
+        //addForwwardInputs(net, 3, 2, rnd);
+        addForwwardInputs(net, 2, 4, rnd);
+        addForwwardInputs(net, 3, 5, rnd);
 
         final GameStatistic gameStatistic = new GameStatistic();
         int level = 0;

@@ -29,6 +29,11 @@ public class GridworldBoardService {
         }
     }
 
+    private static final Pos initPlayerPos = new Pos(2, 1);
+    private static final Pos initWallPos = new Pos(0, 1);
+    private static final Pos initPitPos = new Pos(2, 0);
+    private static final Pos initGoalPos = new Pos(2, 2);
+    
     static void initBoard(final Board board, final int level, final Random rnd) {
         for (int yBoardPos = 0; yBoardPos < 4; yBoardPos++) {
             for (int xBoardPos = 0; xBoardPos < 4; xBoardPos++) {
@@ -40,52 +45,52 @@ public class GridworldBoardService {
         }
 
         if (level == 0) {
-            board.board[2][3][ElementPosPlayer] = true;
-            board.board[2][1][ElementPosWall] = true;
-            board.board[1][3][ElementPosPit] = true;
-            board.board[3][3][ElementPosGoal] = true;
+            board.board[initPlayerPos.y][initPlayerPos.x][ElementPosPlayer] = true;
+            board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+            board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+            board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
         } else {
             if (level == 1) {
                 // init randomly player pos with distance 1
-                board.board[2][1][ElementPosWall] = true;
-                board.board[1][3][ElementPosPit] = true;
-                board.board[3][3][ElementPosGoal] = true;
-                initBoardField(board, ElementPosPlayer, new Pos(3, 3), 1, true, rnd);
+                board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+                board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+                board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
+                initBoardField(board, ElementPosPlayer, initGoalPos, 1, true, rnd);
             } else {
                 if (level == 2) {
                     // init randomly player pos with distance 2
-                    board.board[2][1][ElementPosWall] = true;
-                    board.board[1][3][ElementPosPit] = true;
-                    board.board[3][3][ElementPosGoal] = true;
-                    initBoardField(board, ElementPosPlayer, new Pos(3, 3), 2, true, rnd);
+                    board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+                    board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+                    board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
+                    initBoardField(board, ElementPosPlayer, initGoalPos, 2, true, rnd);
                 } else {
                     if (level == 3) {
                         // init randomly player pos with distance 3
-                        board.board[2][1][ElementPosWall] = true;
-                        board.board[1][3][ElementPosPit] = true;
-                        board.board[3][3][ElementPosGoal] = true;
-                        initBoardField(board, ElementPosPlayer, new Pos(3, 3), 3, true, rnd);
+                        board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+                        board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+                        board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
+                        initBoardField(board, ElementPosPlayer, initGoalPos, 3, true, rnd);
                     } else {
                         if (level == 4) {
                             // init randomly player on a not so easy pos with distance 1
-                            board.board[2][1][ElementPosWall] = true;
-                            board.board[1][3][ElementPosPit] = true;
-                            board.board[3][3][ElementPosGoal] = true;
-                            initBoardField(board, ElementPosPlayer, new Pos(3, 3), 1, false, rnd);
+                            board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+                            board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+                            board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
+                            initBoardField(board, ElementPosPlayer, initGoalPos, 1, false, rnd);
                         } else {
                             if (level == 5) {
                                 // init randomly player on a not so easy pos with distance 2
-                                board.board[2][1][ElementPosWall] = true;
-                                board.board[1][3][ElementPosPit] = true;
-                                board.board[3][3][ElementPosGoal] = true;
-                                initBoardField(board, ElementPosPlayer, new Pos(3, 3), 2, false, rnd);
+                                board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+                                board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+                                board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
+                                initBoardField(board, ElementPosPlayer, initGoalPos, 2, false, rnd);
                             } else {
                                 if (level == 6) {
                                     // init randomly player  on a not so easypos with distance 3
-                                    board.board[2][1][ElementPosWall] = true;
-                                    board.board[1][3][ElementPosPit] = true;
-                                    board.board[3][3][ElementPosGoal] = true;
-                                    initBoardField(board, ElementPosPlayer, new Pos(3, 3), 3, false, rnd);
+                                    board.board[initWallPos.y][initWallPos.x][ElementPosWall] = true;
+                                    board.board[initPitPos.y][initPitPos.x][ElementPosPit] = true;
+                                    board.board[initGoalPos.y][initGoalPos.x][ElementPosGoal] = true;
+                                    initBoardField(board, ElementPosPlayer, initGoalPos, 3, false, rnd);
                                 } else {
                                     if (level <= 9) {
                                         // init randomly fields with increasing distance between player and goal

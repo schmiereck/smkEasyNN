@@ -20,79 +20,17 @@ public class GridworldTest {
         final Board board = new Board();
 
         final int level = 0;
-        initBoard(board, level, rnd);
-
-        printBoard(board);
 
         {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosUp);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.MovedPit, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.HitWall, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosRight);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosRight);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosRight);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosUp);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.HitWall, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.HitWall, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-        }
-        {
-            final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-            printBoard(board);
-            Assertions.assertEquals(GridworldGameService.ActionResult.MovedPit, actionResult);
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.MovedPit),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.HitWall),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
     }
 
@@ -105,122 +43,72 @@ public class GridworldTest {
         final int level = 1;
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosRight);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosRight);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosRight);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosUp);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosDown);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
-            System.out.println();
-            {
-                initBoard(board, level, rnd);
-
-                printBoard(board);
-
-                {
-                    final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-                    printBoard(board);
-                    Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-                }
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
         System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosUp);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.MovedGoal),
+            });
+        }
+        System.out.println();
+        {
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
     }
 
@@ -271,51 +159,25 @@ public class GridworldTest {
                 Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
             }
         }
-        System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-            }
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
-        System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosUp);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
-        System.out.println();
         {
             initBoard(board, level, rnd);
-
-            printBoard(board);
-
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.Moved, actionResult);
-            }
-            {
-                final GridworldGameService.ActionResult actionResult = GridworldGameService.runPlayerAction(board, MovePosLeft);
-                printBoard(board);
-                Assertions.assertEquals(GridworldGameService.ActionResult.MovedGoal, actionResult);
-            }
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
+            });
         }
     }
 
@@ -337,13 +199,13 @@ public class GridworldTest {
         {
             initBoard(board, level, rnd);
             assertActionResults(board, new TestData[] {
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal)});
+                    new TestData(MovePosLeft, GridworldGameService.ActionResult.MovedGoal)});
         }
         {
             initBoard(board, level, rnd);
-            assertActionResults(board, new TestData[] { new TestData(MovePosUp, GridworldGameService.ActionResult.MovedGoal) });
+            assertActionResults(board, new TestData[] {
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.MovedGoal)
+            });
         }
     }
 
@@ -478,8 +340,12 @@ public class GridworldTest {
         {
             initBoard(board, level, rnd);
             assertActionResults(board, new TestData[]{
-                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosLeft, GridworldGameService.ActionResult.MovedGoal)
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal)
             });
         }
     }
@@ -494,35 +360,30 @@ public class GridworldTest {
         {
             initBoard(board, level, rnd);
             assertActionResults(board, new TestData[]{
-                    new TestData(MovePosDown, GridworldGameService.ActionResult.HitWall),
                     new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
             });
         }
         {
             initBoard(board, level, rnd);
             assertActionResults(board, new TestData[]{
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.HitWall),
                     new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
             });
         }
         {
             initBoard(board, level, rnd);
             assertActionResults(board, new TestData[]{
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.HitWall),
-                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosLeft, GridworldGameService.ActionResult.HitWall),
-                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosUp, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosUp, GridworldGameService.ActionResult.HitWall),
-                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosLeft, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosUp, GridworldGameService.ActionResult.HitWall),
-                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosDown, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosLeft, GridworldGameService.ActionResult.HitWall),
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
-                    new TestData(MovePosRight, GridworldGameService.ActionResult.Moved),
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
+        }
+        {
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
+                    new TestData(MovePosDown, GridworldGameService.ActionResult.MovedGoal),
+            });
+        }
+        {
+            initBoard(board, level, rnd);
+            assertActionResults(board, new TestData[]{
                     new TestData(MovePosRight, GridworldGameService.ActionResult.MovedGoal),
             });
         }
