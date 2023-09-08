@@ -43,51 +43,75 @@ public class GridworldMain {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
+        final int netCount = 3;
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
         final MlpConfiguration config = new MlpConfiguration(true, false, 1.0F);
-        final MlpNet net = new MlpNet(config, layerSizeArr, rnd);
 
-        //addForwwardInputs(net, 2, 1, rnd);
-        //addForwwardInputs(net, 3, 2, rnd);
-        addForwwardInputs(net, 2, 4, rnd);
-        addForwwardInputs(net, 3, 5, rnd);
+        final MlpNet[] netArr = new MlpNet[netCount];
+        final GameStatistic[] gameStatisticArr = new GameStatistic[netCount];
+        final int[] levelArr = new int[netCount];
+        final int[] fittnesCounterArr = new int[netCount];
+        final int[] hitGoalCounterArr = new int[netCount];
+        final int[] epocheArr = new int[netCount];
 
-        final GameStatistic gameStatistic = new GameStatistic();
-        int level = 0;
-        int fittnesCounter = 0;
-        int hitGoalCounter = 0;
-        int epoche = 0;
-        while (true) {
-            final Board board = new Board();
-            int oldLevel = level;
-            if (hitGoalCounter > 6) {
-                hitGoalCounter = 0;
-                fittnesCounter++;
-                if (fittnesCounter > 4) {
-                    fittnesCounter = 0;
-                    level++;
+        for (int netPos = 0; netPos < netArr.length; netPos++) {
+            netArr[netPos] = new MlpNet(config, layerSizeArr, rnd);
+            gameStatisticArr[netPos] = new GameStatistic();
+
+                    //addForwwardInputs(netArr[netPos], 2, 1, rnd);
+            //addForwwardInputs(netArr[netPos], 3, 2, rnd);
+            addForwwardInputs(netArr[netPos], 2, 4, rnd);
+            addForwwardInputs(netArr[netPos], 3, 5, rnd);
+
+            levelArr[netPos] = 0;
+            fittnesCounterArr[netPos] = 0;
+            hitGoalCounterArr[netPos] = 0;
+            epocheArr[netPos] = 0;
+        }
+
+        for (int runPos = 0; runPos < 20_000_000; runPos++) {
+            for (int netPos = 0; netPos < netArr.length; netPos++) {
+                final MlpNet net = netArr[netPos];
+                    final GameStatistic gameStatistic = gameStatisticArr[netPos];
+
+                while (true) {
+                    final Board board = new Board();
+                    int oldLevel = levelArr[netPos];
+                    if (hitGoalCounterArr[netPos] > 6) {
+                        hitGoalCounterArr[netPos] = 0;
+                        fittnesCounterArr[netPos]++;
+                        if (fittnesCounterArr[netPos] > 4) {
+                            fittnesCounterArr[netPos] = 0;
+                            levelArr[netPos]++;
+                        }
+                    }
+
+                    initBoard(board, levelArr[netPos], rnd);
+
+                    //printBoard(board);
+                    final boolean newLevel = (oldLevel != levelArr[netPos]);
+
+                    if ((epocheArr[netPos] % 100 == 0) || newLevel) {
+                        System.out.printf("%2d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d]\r", netPos, epocheArr[netPos], oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter);
+                        if (oldLevel != levelArr[netPos]) {
+                            gameStatistic.moveCounter = 0;
+                            gameStatistic.hitGoalCounter = 0;
+                            gameStatistic.hitPitCounter = 0;
+                            gameStatistic.hitWallCounter = 0;
+                            gameStatistic.maxMoveCounter = 0;
+                            System.out.println();
+                        }
+                    }
+
+                    if (newLevel) {
+                        break;
+                    }
+
+                    hitGoalCounterArr[netPos] = GridworldGameService.runPlayGame(net, board, levelArr[netPos], gameStatistic, hitGoalCounterArr[netPos], rnd);
+
+                    epocheArr[netPos]++;
                 }
             }
-
-            initBoard(board, level, rnd);
-
-            //printBoard(board);
-
-            if ((epoche % 100 == 0) || (oldLevel != level)) {
-                System.out.printf("%9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d]\r", epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter);
-                if (oldLevel != level) {
-                    gameStatistic.moveCounter = 0;
-                    gameStatistic.hitGoalCounter = 0;
-                    gameStatistic.hitPitCounter = 0;
-                    gameStatistic.hitWallCounter = 0;
-                    gameStatistic.maxMoveCounter = 0;
-                    System.out.println();
-                }
-            }
-
-            hitGoalCounter = GridworldGameService.runPlayGame(net, board, level, gameStatistic, hitGoalCounter, rnd);
-
-            epoche++;
         }
     }
 }
