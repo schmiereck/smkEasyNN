@@ -9,15 +9,16 @@ public class MlpValueInput implements MlpInputInterface {
     }
 
     @Override
-    public float getInput() {
+    public float getInputValue() {
         return this.value;
     }
 
     @Override
-    public float getLastInput() {
+    public float getLastInputValue() {
         return this.lastValue;
     }
 
+    @Override
     public void setValue(final float value) {
         this.lastValue = this.value;
         this.value = value;

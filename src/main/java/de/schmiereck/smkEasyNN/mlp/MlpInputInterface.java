@@ -1,6 +1,7 @@
 package de.schmiereck.smkEasyNN.mlp;
 
 public interface MlpInputInterface {
-    float getInput();
-    float getLastInput();
+    float getInputValue();
+    float getLastInputValue();
+    void setValue(final float value);
 }

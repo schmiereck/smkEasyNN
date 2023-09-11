@@ -68,7 +68,7 @@ public class MlpNetTestUtils {
         final float[] samplesOutputArr = new float[mlpLayer.neuronArr.length];
         for (int pos = 0; pos < mlpLayer.neuronArr.length; pos++) {
             final MlpNeuron mlpNeuron = mlpLayer.neuronArr[pos];
-            samplesOutputArr[pos] = mlpNeuron.output;
+            samplesOutputArr[pos] = mlpNeuron.outputValue;
         }
         return samplesOutputArr;
     }

@@ -2,14 +2,13 @@ package de.schmiereck.smkEasyNN.mlp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     List<MlpSynapse> synapseList;
-    float output;
-    float lastOutput;
-    float error;
-    float lastError;
+    float outputValue;
+    float lastOutputValue;
+    float errorValue;
+    float lastErrorValue;
 
     public MlpNeuron(final int inputSize) {
         //this.weightArr = new float[inputSize];
@@ -18,22 +17,27 @@ public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     }
 
     @Override
-    public float getInput() {
-        return this.output;
+    public float getInputValue() {
+        return this.outputValue;
     }
 
     @Override
-    public float getLastInput() {
-        return this.lastOutput;
+    public float getLastInputValue() {
+        return this.lastOutputValue;
     }
 
     @Override
-    public void addError(final float error) {
-        this.error += error;
+    public void setValue(final float value) {
+        this.outputValue = value;
     }
 
     @Override
-    public void addLastError(final float error) {
-        this.lastError += error;
+    public void addErrorValue(final float errorValue) {
+        this.errorValue += errorValue;
+    }
+
+    @Override
+    public void addLastErrorValue(final float errorValue) {
+        this.lastErrorValue += errorValue;
     }
 }

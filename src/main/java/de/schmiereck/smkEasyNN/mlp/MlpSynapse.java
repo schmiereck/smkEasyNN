@@ -1,8 +1,8 @@
 package de.schmiereck.smkEasyNN.mlp;
 
 public class MlpSynapse {
-    MlpInputInterface input;
-    MlpInputErrorInterface inputError;
+    private MlpInputInterface input;
+    private MlpInputErrorInterface inputError;
     float weight;
 
     /**
@@ -15,5 +15,13 @@ public class MlpSynapse {
         this.input = input;
         this.inputError = inputError;
         this.forward = forward;
+    }
+
+    public MlpInputInterface getInput() {
+        return this.input;
+    }
+
+    public MlpInputErrorInterface getInputError() {
+        return this.inputError;
     }
 }
