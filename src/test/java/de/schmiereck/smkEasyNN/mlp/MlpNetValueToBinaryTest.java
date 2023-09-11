@@ -38,12 +38,17 @@ public class MlpNetValueToBinaryTest {
                         new float[]{1, 1, 0},
                         new float[]{1, 1, 1},
                 };
-        final int[] layerSizeArr = new int[]{ 7, 7, 3 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[3];
+        layerConfigArr[0] = new MlpLayerConfig(7);
+        layerConfigArr[1] = new MlpLayerConfig(7);
+        layerConfigArr[2] = new MlpLayerConfig(3);
+
+        final MlpNet mlpNet = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
         final int epochMax = 300;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
