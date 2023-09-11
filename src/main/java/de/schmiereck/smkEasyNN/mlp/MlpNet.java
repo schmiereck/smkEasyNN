@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class MlpNet {
     MlpLayer[] layers;
-    final MlpValueInput[] biasInputArr;
+    final MlpInputInterface[] biasInputArr;
     final MlpInputInterface clockInput;
     private final MlpValueInput[] valueInputArr;
 
@@ -53,7 +53,7 @@ public class MlpNet {
 
     private static MlpLayer createFlatLayer(final boolean isOutputLayer, final int allInputLayerSize, final int layerOutputSize,
                                             final int layerPos, final int inputLayerPos, final int inputLayerSize,
-                                            final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpValueInput[] biasInputArr, final MlpInputInterface clockInput,
+                                            final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpInputInterface[] biasInputArr, final MlpInputInterface clockInput,
                                             final MlpConfiguration config, final Random rnd) {
         final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerOutputSize, rnd);
 
@@ -77,7 +77,7 @@ public class MlpNet {
                 neuron.synapseList.add(synapse);
             }
             if (config.useAdditionalBiasInput) {
-                final MlpValueInput biasInput = biasInputArr[layerPos];
+                final MlpInputInterface biasInput = biasInputArr[layerPos];
                 final MlpSynapse synapse = new MlpSynapse(biasInput, null, false);
                 neuron.synapseList.add(synapse);
             }
