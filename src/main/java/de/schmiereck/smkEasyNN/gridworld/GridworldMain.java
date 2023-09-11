@@ -5,6 +5,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.addForwwardInputs;
 
 import de.schmiereck.smkEasyNN.mlp.MlpConfiguration;
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
+import de.schmiereck.smkEasyNN.mlp.MlpNetService;
 
 import java.util.Random;
 
@@ -55,7 +56,7 @@ public class GridworldMain {
         final int[] epocheArr = new int[netCount];
 
         for (int netPos = 0; netPos < netArr.length; netPos++) {
-            netArr[netPos] = new MlpNet(config, layerSizeArr, rnd);
+            netArr[netPos] = MlpNetService.createNet(config, layerSizeArr, rnd);
             gameStatisticArr[netPos] = new GameStatistic();
 
                     //addForwwardInputs(netArr[netPos], 2, 1, rnd);

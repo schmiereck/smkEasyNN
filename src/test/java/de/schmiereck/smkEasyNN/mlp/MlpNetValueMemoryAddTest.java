@@ -225,7 +225,7 @@ public class MlpNetValueMemoryAddTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
 
         // 0
         // 1 to   <---,

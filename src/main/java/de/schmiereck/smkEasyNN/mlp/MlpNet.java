@@ -1,5 +1,7 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createFlatLayer;
+
 import java.util.Random;
 
 public class MlpNet {
@@ -9,18 +11,6 @@ public class MlpNet {
     private final MlpValueInput[] valueInputArr;
 
     private final MlpConfiguration config;
-
-    public MlpNet(final int[] layersSize, final Random rnd) {
-        this(layersSize, false, false, rnd);
-    }
-
-    public MlpNet(final int[] layersSize, final boolean useAdditionalBiasInput, final Random rnd) {
-        this(layersSize, useAdditionalBiasInput, false, rnd);
-    }
-
-    public MlpNet(final int[] layersSize, final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput, final Random rnd) {
-        this(new MlpConfiguration(useAdditionalBiasInput, useAdditionalClockInput), layersSize, rnd);
-    }
 
     public MlpNet(final MlpConfiguration config, int[] layersSize, final Random rnd) {
         this.config = config;
@@ -46,46 +36,6 @@ public class MlpNet {
                     this.layers, this.valueInputArr, this.biasInput, this.clockInput,
                     this.config, rnd);
         }
-    }
-
-    private static MlpLayer createFlatLayer(final boolean isOutputLayer, final int allInputLayerSize, final int layerOutputSize,
-                                            final int layerPos, final int inputLayerPos, final int inputLayerSize,
-                                            final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpInputInterface biasInput, final MlpInputInterface clockInput,
-                                            final MlpConfiguration config, final Random rnd) {
-        final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerOutputSize, rnd);
-
-        final MlpLayer inputLayer = layers[inputLayerPos];
-
-        for (int neuronPos = 0; neuronPos < mlpLayer.neuronArr.length; neuronPos++) {
-            final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
-
-            for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
-                final MlpInputInterface input;
-                final MlpInputErrorInterface inputError;
-                if (layerPos == 0) {
-                    input = valueInputArr[inputLayerNeuronPos];
-                    inputError = null;
-                } else {
-                    final MlpNeuron inputNeuron = inputLayer.neuronArr[inputLayerNeuronPos];
-                    input = inputNeuron;
-                    inputError = inputNeuron;
-                }
-                final MlpSynapse synapse = new MlpSynapse(input, inputError, false);
-                neuron.synapseList.add(synapse);
-            }
-            if (config.useAdditionalBiasInput) {
-                final MlpSynapse synapse = new MlpSynapse(biasInput, null, false);
-                neuron.synapseList.add(synapse);
-            }
-            if (config.useAdditionalClockInput) {
-                final MlpSynapse synapse = new MlpSynapse(clockInput, null, false);
-                neuron.synapseList.add(synapse);
-            }
-        }
-        mlpLayer.initWeights2(config.initialWeightValue, rnd);
-        mlpLayer.setOutputLayer(isOutputLayer);
-
-        return mlpLayer;
     }
 
     public void setInputValue(final int inputPos, final float inputValue) {

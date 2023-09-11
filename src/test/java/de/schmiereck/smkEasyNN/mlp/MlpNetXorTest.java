@@ -32,7 +32,7 @@ public class MlpNetXorTest {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
 
         final int epochMax = 500;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {

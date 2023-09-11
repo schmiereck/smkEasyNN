@@ -6,6 +6,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.train;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.trainWithOutput;
 
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
+import de.schmiereck.smkEasyNN.mlp.MlpNetService;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -26,7 +27,7 @@ public class TicTacToeMain {
 
         final MlpNet[] netArr = new MlpNet[2];
         for (int pos = 0; pos < netArr.length; pos++) {
-            netArr[pos] = new MlpNet(layerSizeArr, true, true, rnd);
+            netArr[pos] = MlpNetService.createNet(layerSizeArr, true, true, rnd);
 
             addForwwardInputs(netArr[pos], 2, 1, rnd);
             addForwwardInputs(netArr[pos], 3, 2, rnd);

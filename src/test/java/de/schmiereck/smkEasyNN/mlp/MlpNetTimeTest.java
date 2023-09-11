@@ -47,7 +47,7 @@ public class MlpNetTimeTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
 
         // 0
         // 1 to   <---,
@@ -107,7 +107,7 @@ public class MlpNetTimeTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = new MlpNet(layerSizeArr, true, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, true, rnd);
 
         final int epochMax = 100;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
@@ -167,7 +167,7 @@ public class MlpNetTimeTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = new MlpNet(layerSizeArr, true, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, true, rnd);
 
         // 0
         // 1 to   <---,

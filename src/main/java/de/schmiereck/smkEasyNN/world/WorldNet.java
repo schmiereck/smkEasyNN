@@ -1,6 +1,7 @@
 package de.schmiereck.smkEasyNN.world;
 
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
+import de.schmiereck.smkEasyNN.mlp.MlpNetService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class WorldNet {
                 (2*3*3),
                 (CellOutput2Size)
         };
-        this.mlpNet = new MlpNet(layerSizeArr, true, rnd);
+        this.mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
     }
 
     public void addWorldNode(WorldNode worldNode) {

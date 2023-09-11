@@ -43,7 +43,7 @@ public class MlpNetValueToBinaryTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = new MlpNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
 
         final int epochMax = 300;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
