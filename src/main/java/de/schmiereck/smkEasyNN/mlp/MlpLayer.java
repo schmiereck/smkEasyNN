@@ -7,8 +7,8 @@ public class MlpLayer {
     MlpNeuron[] neuronArr;
     boolean isOutputLayer = false;
 
-    public MlpLayer(final int inputSize, final int outputSize, final Random rnd) {
-        this.neuronArr = new MlpNeuron[outputSize];
+    public MlpLayer(final int inputSize, final int layerSize) {
+        this.neuronArr = new MlpNeuron[layerSize];
 
         for (int neuronPos = 0; neuronPos < this.neuronArr.length; neuronPos++) {
             this.neuronArr[neuronPos] = new MlpNeuron(inputSize);

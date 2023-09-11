@@ -1,41 +1,24 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createFlatLayer;
-
-import java.util.Random;
-
 public class MlpNet {
-    MlpLayer[] layers;
+    MlpLayer[] layerArr;
     final MlpInputInterface biasInput;
     final MlpInputInterface clockInput;
     private final MlpValueInput[] valueInputArr;
 
     private final MlpConfiguration config;
 
-    public MlpNet(final MlpConfiguration config, int[] layersSize, final Random rnd) {
+    public MlpNet(final MlpConfiguration config, final MlpLayerConfig[] layerConfigArr) {
         this.config = config;
-        this.layers = new MlpLayer[layersSize.length];
-         this.biasInput = new MlpValueInput(MlpService.BIAS_VALUE);
+
+        this.biasInput = new MlpValueInput(MlpService.BIAS_VALUE);
         this.clockInput = new MlpValueInput(MlpService.CLOCK_VALUE);
 
-        this.valueInputArr = new MlpValueInput[layersSize[0]];
+        this.valueInputArr = new MlpValueInput[layerConfigArr[0].getSize()];
         for (int neuronPos = 0; neuronPos < this.valueInputArr.length; neuronPos++) {
             this.valueInputArr[neuronPos] = new MlpValueInput(0.0F);
         }
 
-        for (int layerPos = 0; layerPos < layersSize.length; layerPos++) {
-            final int inputLayerPos = (layerPos == 0 ? layerPos : layerPos - 1);
-            final int inputLayerSize = layersSize[inputLayerPos];
-            final int additionalBiasInputSize = (this.config.useAdditionalBiasInput ? 1 : 0);
-            final int additionalClockInputSize = (this.config.useAdditionalClockInput ? 1 : 0);
-            final int allInputLayerSize = (inputLayerSize + additionalBiasInputSize + additionalClockInputSize);
-            final int layerOutputSize = layersSize[layerPos];
-            final boolean isOutputLayer = layerPos == (layersSize.length - 1);
-
-            this.layers[layerPos] = createFlatLayer(isOutputLayer, allInputLayerSize, layerOutputSize, layerPos, inputLayerPos, inputLayerSize,
-                    this.layers, this.valueInputArr, this.biasInput, this.clockInput,
-                    this.config, rnd);
-        }
     }
 
     public void setInputValue(final int inputPos, final float inputValue) {
@@ -46,12 +29,28 @@ public class MlpNet {
         return this.valueInputArr;
     }
 
+    public MlpLayer[] getLayerArr() {
+        return this.layerArr;
+    }
+
+    public void setLayerArr(MlpLayer[] layerArr) {
+        this.layerArr = layerArr;
+    }
+
+    public MlpInputInterface getBiasInput() {
+        return this.biasInput;
+    }
+
+    public MlpInputInterface getClockInput() {
+        return this.clockInput;
+    }
+
     public MlpLayer getLayer(final int layerPos) {
-        return this.layers[layerPos];
+        return this.layerArr[layerPos];
     }
 
     public MlpLayer getOutputLayer() {
-        return this.layers[this.layers.length - 1];
+        return this.layerArr[this.layerArr.length - 1];
     }
 
     public boolean getUseAdditionalBiasInput() {
@@ -64,5 +63,9 @@ public class MlpNet {
 
     public float getInitialWeightValue() {
         return this.config.initialWeightValue;
+    }
+
+    public MlpConfiguration getConfig() {
+        return this.config;
     }
 }

@@ -45,7 +45,7 @@ public class MlpService {
     }
 
     public static void trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr, final float learningRate, final float momentum) {
-        Arrays.stream(mlpNet.layers).forEach(layer -> {
+        Arrays.stream(mlpNet.layerArr).forEach(layer -> {
             Arrays.stream(layer.neuronArr).forEach(neuron -> {
                 neuron.lastErrorValue = 0.0F;
                 //neuron.lastError = neuron.error;
@@ -64,13 +64,13 @@ public class MlpService {
     }
 
     public static void trainWithError(final MlpNet mlpNet, final float learningRate, final float momentum) {
-        for (int layerPos = mlpNet.layers.length - 1; layerPos >= 0; layerPos--) {
-            final MlpLayer mlpLayer = mlpNet.layers[layerPos];
+        for (int layerPos = mlpNet.layerArr.length - 1; layerPos >= 0; layerPos--) {
+            final MlpLayer mlpLayer = mlpNet.layerArr[layerPos];
             MlpService.train(mlpLayer, learningRate, momentum);
             //MlpService.train2(mlpLayer, learningRate, momentum);
         }
-        for (int layerPos = mlpNet.layers.length - 1; layerPos >= 0; layerPos--) {
-            final MlpLayer mlpLayer = mlpNet.layers[layerPos];
+        for (int layerPos = mlpNet.layerArr.length - 1; layerPos >= 0; layerPos--) {
+            final MlpLayer mlpLayer = mlpNet.layerArr[layerPos];
             //MlpService.train(mlpLayer, learningRate, momentum);
             MlpService.train2(mlpLayer, learningRate, momentum);
         }
@@ -139,8 +139,8 @@ public class MlpService {
                 mlpNet.clockInput.setValue(CLOCK_VALUE);
             }
         }
-        for (int layerPos = 0; layerPos < mlpNet.layers.length; layerPos++) {
-            final MlpLayer mlpLayer = mlpNet.layers[layerPos];
+        for (int layerPos = 0; layerPos < mlpNet.layerArr.length; layerPos++) {
+            final MlpLayer mlpLayer = mlpNet.layerArr[layerPos];
             runLayer(mlpLayer);
         }
 
