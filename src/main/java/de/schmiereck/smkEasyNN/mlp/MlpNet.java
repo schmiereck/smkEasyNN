@@ -5,7 +5,6 @@ import java.util.Random;
 public class MlpNet {
     MlpLayer[] layers;
     final MlpValueInput[] biasInputArr;
-    //final MlpValueInput clockInput;
     final MlpInputInterface clockInput;
     private final MlpValueInput[] valueInputArr;
 
@@ -30,8 +29,7 @@ public class MlpNet {
         for (int biasNeuronPos = 0; biasNeuronPos < layersSize.length; biasNeuronPos++) {
             this.biasInputArr[biasNeuronPos] = new MlpValueInput(MlpService.BIAS_VALUE);
         }
-        //this.clockInput = new MlpValueInput(MlpService.CLOCK_VALUE);
-        this.clockInput = new MlpNeuron(0);
+        this.clockInput = new MlpValueInput(MlpService.CLOCK_VALUE);
 
         this.valueInputArr = new MlpValueInput[layersSize[0]];
         for (int neuronPos = 0; neuronPos < this.valueInputArr.length; neuronPos++) {
