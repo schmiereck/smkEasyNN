@@ -215,8 +215,7 @@ public class MlpService {
                 toNeuron.synapseList.add(synapse);
             });
             if (mlpNet.getUseAdditionalBiasInput()) {
-                final MlpInputInterface biasInput = mlpNet.biasInputArr[toLayerPos];
-                final MlpSynapse synapse = new MlpSynapse(biasInput, null, true);
+                final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, true);
                 synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
                 toNeuron.synapseList.add(synapse);
             }
@@ -238,8 +237,7 @@ public class MlpService {
             }
 
             if (mlpNet.getUseAdditionalBiasInput()) {
-                final MlpInputInterface biasInput = mlpNet.biasInputArr[layerPos];
-                final MlpSynapse synapse = new MlpSynapse(biasInput, null, true);
+                final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, true);
                 synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
                 toNeuron.synapseList.add(synapse);
             }
