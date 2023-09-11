@@ -41,50 +41,60 @@ public class MlpNet {
         }
 
         for (int layerPos = 0; layerPos < layersSize.length; layerPos++) {
-            final int sizeInputLayerPos = (layerPos == 0 ? layerPos : layerPos - 1);
-            final int inputLayerSize = layersSize[sizeInputLayerPos];
+            final int inputLayerPos = (layerPos == 0 ? layerPos : layerPos - 1);
+            final int inputLayerSize = layersSize[inputLayerPos];
             final int additionalBiasInputSize = (this.config.useAdditionalBiasInput ? 1 : 0);
             final int additionalClockInputSize = (this.config.useAdditionalClockInput ? 1 : 0);
             final int allInputLayerSize = (inputLayerSize + additionalBiasInputSize + additionalClockInputSize);
             final int layerOutputSize = layersSize[layerPos];
+            final boolean isOutputLayer = layerPos == (layersSize.length - 1);
 
-            final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerOutputSize, rnd);
-            this.layers[layerPos] = mlpLayer;
+            this.layers[layerPos] = createFlatLayer(isOutputLayer, allInputLayerSize, layerOutputSize, layerPos, inputLayerPos, inputLayerSize,
+                    this.layers, this.valueInputArr, this.biasNeuronArr, this.clockNeuron,
+                    this.config, rnd);
+        }
+    }
 
-            final MlpLayer inputLayer = this.layers[sizeInputLayerPos];
+    private static MlpLayer createFlatLayer(final boolean isOutputLayer, final int allInputLayerSize, final int layerOutputSize,
+                                            final int layerPos, final int inputLayerPos, final int inputLayerSize,
+                                            final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpNeuron[] biasNeuronArr, final MlpNeuron clockNeuron,
+                                            final MlpConfiguration config, final Random rnd) {
+        final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerOutputSize, rnd);
 
-            for (int neuronPos = 0; neuronPos < mlpLayer.neuronArr.length; neuronPos++) {
-                final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
+        final MlpLayer inputLayer = layers[inputLayerPos];
 
-                for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
-                    final MlpInputInterface input;
-                    if (layerPos == 0) {
-                        input = this.valueInputArr[inputLayerNeuronPos];
-                    } else {
-                        final MlpNeuron inputNeuron = inputLayer.neuronArr[inputLayerNeuronPos];
-                        input = new MlpInput(inputNeuron);
-                    }
-                    final MlpSynapse synapse = new MlpSynapse();
-                    synapse.input = input;
-                    neuron.synapseList.add(synapse);
+        for (int neuronPos = 0; neuronPos < mlpLayer.neuronArr.length; neuronPos++) {
+            final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
+
+            for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
+                final MlpInputInterface input;
+                final MlpInputErrorInterface inputError;
+                if (layerPos == 0) {
+                    input = valueInputArr[inputLayerNeuronPos];
+                    inputError = null;
+                } else {
+                    final MlpNeuron inputNeuron = inputLayer.neuronArr[inputLayerNeuronPos];
+                    input = inputNeuron;
+                    inputError = inputNeuron;
                 }
-                if (this.config.useAdditionalBiasInput) {
-                    final MlpSynapse synapse = new MlpSynapse();
-                    synapse.input = new MlpInput(this.biasNeuronArr[layerPos]);
-                    neuron.synapseList.add(synapse);
-                }
-                if (this.config.useAdditionalClockInput) {
-                    final MlpSynapse synapse = new MlpSynapse();
-                    synapse.input = new MlpInput(this.clockNeuron);
-                    neuron.synapseList.add(synapse);
-                }
+                final MlpSynapse synapse = new MlpSynapse(input, inputError, false);
+                synapse.input = input;
+                neuron.synapseList.add(synapse);
             }
-            mlpLayer.initWeights2(this.config.initialWeightValue, rnd);
-
-            if (layerPos == (layersSize.length - 1)) {
-                mlpLayer.setOutputLayer(true);
+            if (config.useAdditionalBiasInput) {
+                final MlpNeuron biasInput = biasNeuronArr[layerPos];
+                final MlpSynapse synapse = new MlpSynapse(biasInput, null, false);
+                neuron.synapseList.add(synapse);
+            }
+            if (config.useAdditionalClockInput) {
+                final MlpSynapse synapse = new MlpSynapse(clockNeuron, null, false);
+                neuron.synapseList.add(synapse);
             }
         }
+        mlpLayer.initWeights2(config.initialWeightValue, rnd);
+        mlpLayer.setOutputLayer(isOutputLayer);
+
+        return mlpLayer;
     }
 
     public void setInputValue(final int inputPos, final float inputValue) {

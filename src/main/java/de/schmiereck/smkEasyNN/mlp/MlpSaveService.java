@@ -6,6 +6,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.run;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.sigmoidDerivative;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 public class MlpSaveService {
@@ -57,9 +58,6 @@ public class MlpSaveService {
         });
         mlpNet.clockNeuron.lastError = 0.0F;
         mlpNet.clockNeuron.error = 0.0F;
-        Arrays.stream(mlpNet.getValueInputArr()).forEach(valueInput -> {
-            valueInput.setError(0.0F);
-        });
 
         final MlpLayer outputLayer = mlpNet.getOutputLayer();
 
@@ -113,14 +111,18 @@ public class MlpSaveService {
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
 
                 if (synapse.forward) {
-                    synapse.input.addLastError(synapse.weight * neuron.lastError);
-                    synapse.input.addError(synapse.weight * neuron.lastError);
-                } else {
-                    final float e = synapse.weight * neuron.error;
-                    if (Float.isInfinite(e)) {
-                        throw new RuntimeException("train e Infinite:" + synapse.weight + ", " + neuron.error);
+                    if (Objects.nonNull(synapse.inputError)) {
+                        synapse.inputError.addLastError(synapse.weight * neuron.lastError);
+                        synapse.inputError.addError(synapse.weight * neuron.lastError);
                     }
-                    synapse.input.addError(e);
+                } else {
+                    if (Objects.nonNull(synapse.inputError)) {
+                        final float e = synapse.weight * neuron.error;
+                        if (Float.isInfinite(e)) {
+                            throw new RuntimeException("train e Infinite:" + synapse.weight + ", " + neuron.error);
+                        }
+                        synapse.inputError.addError(e);
+                    }
                 }
                 if (Float.isNaN(neuron.error)) {
                     throw new RuntimeException("train neuron.error NaN:" + mlpLayer.neuronArr[outputPos].output + ", ");
