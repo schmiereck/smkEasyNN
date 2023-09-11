@@ -1,5 +1,9 @@
 package de.schmiereck.smkEasyNN;
 
+import de.schmiereck.smkEasyNN.DoubleNormNeuralNet;
+import de.schmiereck.smkEasyNN.IntegerNorm2NeuralNet;
+import de.schmiereck.smkEasyNN.IntegerNormNeuralNet;
+
 public class SigmoidTest {
     public static void main(String[] args) {
         // Double: output 0.0 to 1.0
