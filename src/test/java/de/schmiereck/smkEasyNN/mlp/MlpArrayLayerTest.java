@@ -221,11 +221,15 @@ public class MlpArrayLayerTest {
         layerConfigArr[3] = new MlpLayerConfig(8);
         layerConfigArr[4] = new MlpLayerConfig(5);
 
+        layerConfigArr[0].setIsArray(true);
+        layerConfigArr[1].setIsArray(true);
+
         final MlpNet mlpNet = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
         addForwwardInputs(mlpNet, 2, 1, rnd);
 
-        final int epochMax = 25000;
+        //final int epochMax = 25_000; // Flat
+        final int epochMax = 7_800; // Array
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
