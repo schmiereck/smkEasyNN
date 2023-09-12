@@ -354,7 +354,7 @@ public class MlpNetMemorySerializerTest {
                                 new float[]{ 1 },
                         },
                 };
-        final int[] layerSizeArr = new int[]{ 2+3, 12*2, 12, 12, 12, 12*2, 12, 12, 12, 1 };
+        final int[] layerSizeArr = new int[]{ 2+3, 12*2, 12, 12, 12, 12*2, 12, 12, 12, 12*2, 12, 12, 12, 1 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -362,12 +362,16 @@ public class MlpNetMemorySerializerTest {
         final MlpConfiguration configuration = new MlpConfiguration(true, false, 3.0F);
         final MlpNet mlpNet = MlpNetService.createNet(configuration, layerSizeArr, rnd);
 
-        addForwwardInputs(mlpNet, 7, 1, rnd);
-        //addForwwardInputs(mlpNet, 5, 4, rnd);
-        addForwwardInputs(mlpNet, 8, 5, rnd);
-        //addForwwardInputs(mlpNet, 7, 4, rnd);
+        addForwwardInputs(mlpNet, 12, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, rnd);
 
-        final int epochMax = 300_000;
+        addForwwardInputs(mlpNet, 13, 5, rnd);
+        addForwwardInputs(mlpNet, 6, 5, rnd);
+
+        addForwwardInputs(mlpNet, 13, 9, rnd);
+        //addForwwardInputs(mlpNet, 10, 9, rnd);
+
+        final int epochMax = 100_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
