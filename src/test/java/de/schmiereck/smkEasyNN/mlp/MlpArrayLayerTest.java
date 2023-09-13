@@ -1,10 +1,8 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResult;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
-import static de.schmiereck.smkEasyNN.mlp.MlpService.addForwwardInputs;
-import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandom;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
 import java.util.Random;

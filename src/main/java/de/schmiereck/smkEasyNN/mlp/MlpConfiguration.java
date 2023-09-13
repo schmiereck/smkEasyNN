@@ -18,4 +18,8 @@ public class MlpConfiguration {
         this.useAdditionalClockInput = useAdditionalClockInput;
         this.initialWeightValue = initialWeightValue;
     }
+
+    public float getInitialWeightValue() {
+        return this.initialWeightValue;
+    }
 }

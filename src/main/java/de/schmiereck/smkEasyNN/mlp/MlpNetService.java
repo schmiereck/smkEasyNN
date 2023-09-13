@@ -4,7 +4,9 @@ import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createLayers;
 
 import java.util.Random;
 
-public class MlpNetService {
+public final class MlpNetService {
+    private MlpNetService() {}
+
     public static MlpNet createNet(final int[] layersSize, final boolean useAdditionalBiasInput, final Random rnd) {
         return createNet(layersSize, useAdditionalBiasInput, false, rnd);
     }
@@ -28,7 +30,7 @@ public class MlpNetService {
 
         net.setLayerArr(createLayers(layerConfigArr,
                 net.getValueInputArr(), net.getBiasInput(), net.getClockInput(),
-                net.getConfig(), rnd));
+                net.getConfig(), true, rnd));
 
         return net;
     }

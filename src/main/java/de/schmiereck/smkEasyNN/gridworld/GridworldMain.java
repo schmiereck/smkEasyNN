@@ -1,7 +1,7 @@
 package de.schmiereck.smkEasyNN.gridworld;
 
 import static de.schmiereck.smkEasyNN.gridworld.GridworldBoardService.initBoard;
-import static de.schmiereck.smkEasyNN.mlp.MlpService.addForwwardInputs;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 
 import de.schmiereck.smkEasyNN.mlp.MlpConfiguration;
 import de.schmiereck.smkEasyNN.mlp.MlpNet;

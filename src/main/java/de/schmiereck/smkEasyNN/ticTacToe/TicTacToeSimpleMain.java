@@ -1,6 +1,5 @@
 package de.schmiereck.smkEasyNN.ticTacToe;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.run;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.trainWithOutput;
 
