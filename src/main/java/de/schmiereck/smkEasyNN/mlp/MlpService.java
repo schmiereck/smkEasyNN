@@ -4,6 +4,16 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * Learning Rate:
+ *  A traditional default value for the learning rate is 0.1 or 0.01
+ *  less than 1 and greater than 10^−6
+ *  It is common to grid search learning rates on a log scale from 0.1 to 10^-5 or 10^-6.
+ *
+ * Momentum:
+ *  Momentum is set to a value greater than 0.0 and less than one, where common values such as 0.9 and 0.99 are used in practice.
+ *  Common values of [momentum] used in practice include .5, .9, and .99.
+ */
 public final class MlpService {
 
     public static final float BIAS_VALUE = 1.0F;
@@ -12,39 +22,48 @@ public final class MlpService {
 
     private MlpService() {}
 
-    public static void runTrainOrder(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+    public static float runTrainOrder(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+        float mainOutputMseErrorValue = 0.0F;
+        int mainOutputCount = 0;
         for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
             int idx = expectedResultPos;
-            train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+            mainOutputMseErrorValue += train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+            mainOutputCount++;
         }
+        return mainOutputMseErrorValue / mainOutputCount;
     }
 
-    public static void runTrainRandom(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+    public static float runTrainRandom(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+        float mainOutputMseErrorValue = 0.0F;
+        int mainOutputCount = 0;
         for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
             int idx = rnd.nextInt(expectedOutputArrArr.length);
             //int idx = expectedResultPos;
-            train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+            mainOutputMseErrorValue += train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+            mainOutputCount++;
         }
+        return mainOutputMseErrorValue / mainOutputCount;
     }
 
-    public static void runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr, final Random rnd) {
-        runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
+    public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr, final Random rnd) {
+        return runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
     }
 
-
-    public static void runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+    public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
                                             final float learningRate, final float momentum, final Random rnd) {
         final float[][] expectedOutputArrArr = expectedOutputArrArrArr[0];
         final int expectedOutputTrainSize = Integer.MAX_VALUE;//expectedOutputArrArr.length;
 
-        runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
+        return runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
                 expectedOutputTrainSize,
                 learningRate, momentum, rnd);
     }
 
-    public static void runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+    public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
                                            final int expectedOutputTrainSize,
                                            final float learningRate, final float momentum, final Random rnd) {
+        float mainOutputMseErrorValue = 0.0F;
+        int mainOutputCount = 0;
         for (int expectedResultArrPos = 0; expectedResultArrPos < expectedOutputArrArrArr.length; expectedResultArrPos++) {
             final int idx = rnd.nextInt(expectedOutputArrArrArr.length);
             final float[][] trainInputArrArr = trainInputArrArrArr[idx];
@@ -60,15 +79,21 @@ public final class MlpService {
                 train(mlpNet, trainInputArrArr[pos], expectedOutputArrArr[pos], learningRate, momentum);
             }
         }
+        return mainOutputMseErrorValue / mainOutputCount;
     }
 
-    public static void train(final MlpNet mlpNet, final float[] trainInputArr, final float[] expectedOutputArr, final float learningRate, final float momentum) {
+    public static float train(final MlpNet mlpNet, final float[] trainInputArr, final float[] expectedOutputArr, final float learningRate, final float momentum) {
         float[] calcOutputArr = run(mlpNet, trainInputArr);
 
-        trainWithOutput(mlpNet, expectedOutputArr, calcOutputArr, learningRate, momentum);
+        return trainWithOutput(mlpNet, expectedOutputArr, calcOutputArr, learningRate, momentum);
     }
 
-    public static void trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr, final float learningRate, final float momentum) {
+    /**
+     * @return mittlerer quadratischen Fehler (MSE).
+     */
+    public static float trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr, final float learningRate, final float momentum) {
+        float mainOutputMseErrorValue = 0.0F;
+
         Arrays.stream(mlpNet.layerArr).forEach(layer -> {
             Arrays.stream(layer.neuronArr).forEach(neuron -> {
                 neuron.lastErrorValue = 0.0F;
@@ -82,9 +107,12 @@ public final class MlpService {
         for (int outputNeuronPos = 0; outputNeuronPos < outputLayer.neuronArr.length; outputNeuronPos++) {
             final MlpNeuron outputNeuron = outputLayer.neuronArr[outputNeuronPos];
             outputNeuron.errorValue = expectedOutputArr[outputNeuronPos] - outputNeuron.outputValue;
+            mainOutputMseErrorValue += (outputNeuron.errorValue * outputNeuron.errorValue);
         }
 
         trainWithError(mlpNet, learningRate, momentum);
+
+        return mainOutputMseErrorValue / outputLayer.neuronArr.length;
     }
 
     public static void trainWithError(final MlpNet mlpNet, final float learningRate, final float momentum) {

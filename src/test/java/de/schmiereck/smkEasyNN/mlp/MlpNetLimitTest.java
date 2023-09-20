@@ -1,6 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpoch;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 
 import java.util.Random;
@@ -53,10 +53,10 @@ public class MlpNetLimitTest {
         final int epochMax = 100;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            MlpService.runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = MlpService.runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 

@@ -5,8 +5,15 @@ import java.util.Formatter;
 
 public class MlpNetPrintUtils {
 
-    public static void printResultForEpoch(final MlpNet mlpNet, final float[][][] trainInputArrArrArr, final float[][] expectedOutputArrArrArr[], final int epochPos) {
-        printEpoch(epochPos);
+    public static void printResultForEpochWithTrainSize(final int epochPos, final float mainOutputMseErrorValue, final int expectedOutputTrainSize) {
+        printEpoch(epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
+    }
+
+    public static void printFullResultForEpochWithTrainSize(final MlpNet mlpNet,
+                                                            final float[][][] trainInputArrArrArr, final float[][][] expectedOutputArrArrArr,
+                                                            final int epochPos, final float mainOutputMseErrorValue, final int expectedOutputTrainSize) {
+        System.out.println();
+        printEpoch(epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
         for (int pos = 0; pos < trainInputArrArrArr.length; pos++) {
             final float[][] trainInputArrArr = trainInputArrArrArr[pos];
             final float[][] expectedOutputArrArr = expectedOutputArrArrArr[pos];
@@ -14,12 +21,29 @@ public class MlpNetPrintUtils {
         }
     }
 
-    public static void printResultForEpoch(final MlpNet mlpNet, final float[][][] trainInputArrArrArr, final float[][] expectedOutputArrArrArr[], final int epochPos, final int samplesLayerPos) {
-        printEpoch(epochPos);
+    public static void printFullResultForEpoch(final MlpNet mlpNet,
+                                               final float[][][] trainInputArrArrArr, final float[][][] expectedOutputArrArrArr,
+                                               final int epochPos, final float mainOutputMseErrorValue) {
+        System.out.println();
+        printEpoch(epochPos, mainOutputMseErrorValue);
         for (int pos = 0; pos < trainInputArrArrArr.length; pos++) {
             final float[][] trainInputArrArr = trainInputArrArrArr[pos];
             final float[][] expectedOutputArrArr = expectedOutputArrArrArr[pos];
             printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+        }
+    }
+
+    public static void printFullResultForEpoch(final MlpNet mlpNet,
+                                               final float[][][] trainInputArrArrArr, final float[][][] expectedOutputArrArrArr,
+                                               final int epochPos, final float mainOutputMseErrorValue, final int samplesLayerPos) {
+        System.out.println();
+        printEpoch(epochPos, mainOutputMseErrorValue);
+        for (int pos = 0; pos < trainInputArrArrArr.length; pos++) {
+            final float[][] trainInputArrArr = trainInputArrArrArr[pos];
+            final float[][] expectedOutputArrArr = expectedOutputArrArrArr[pos];
+            printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+            printMse(mainOutputMseErrorValue);
+            System.out.println();
 
             System.out.println("samplesOutput:");
             printSamplesOutput(mlpNet, trainInputArrArr, expectedOutputArrArr, samplesLayerPos);
@@ -27,14 +51,38 @@ public class MlpNetPrintUtils {
         }
     }
 
-    public static void printResultForEpoch(final MlpNet mlpNet, final float[][] trainInputArrArr, final float[][] expectedOutputArrArr, final int epochPos) {
-        printEpoch(epochPos);
-        printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+    private static void printMse(float mainOutputMseErrorValue) {
+        System.out.printf(" (mse:%.6f)", mainOutputMseErrorValue);
     }
 
-    private static void printEpoch(int epochPos) {
+    public static void printFullResultForEpoch(final MlpNet mlpNet,
+                                               final float[][] trainInputArrArr, final float[][] expectedOutputArrArr,
+                                               final int epochPos, final float mainOutputMseErrorValue) {
         System.out.println();
-        System.out.printf("%d epoch\n", epochPos + 1);
+        printEpoch(epochPos, mainOutputMseErrorValue);
+        printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+        System.out.println();
+    }
+
+    private static void printEpoch(final int epochPos, final float mainOutputMseErrorValue, final int expectedOutputTrainSize) {
+        printEpochPos(epochPos);
+        printTrainSize(expectedOutputTrainSize);
+        printMse(mainOutputMseErrorValue);
+        System.out.println();
+    }
+
+    private static void printEpoch(final int epochPos, final float mainOutputMseErrorValue) {
+        printEpochPos(epochPos);
+        printMse(mainOutputMseErrorValue);
+        System.out.println();
+    }
+
+    private static void printTrainSize(final int expectedOutputTrainSize) {
+        System.out.printf("TrainSize:%d ", expectedOutputTrainSize);
+    }
+
+    private static void printEpochPos(final int epochPos) {
+        System.out.printf("%d epoch ", epochPos + 1);
     }
 
     static void printResult(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr) {
@@ -45,6 +93,7 @@ public class MlpNetPrintUtils {
             final float[] outputArr = MlpService.run(mlpNet, trainInputArr);
 
             printResultLine(trainInputArr, outputArr, expectedOutputArr);
+            System.out.println();
         }
     }
 
@@ -57,6 +106,7 @@ public class MlpNetPrintUtils {
             final float[] samplesOutputArr = collectSamplesOutputArr(mlpNet, layerPos);
 
             printResultLine(trainInputArr, samplesOutputArr, expectedOutputArr);
+            System.out.println();
         }
     }
 
@@ -72,7 +122,7 @@ public class MlpNetPrintUtils {
     }
 
     public static void printResultLine(float[] inputArr, float[] outputArr, final float[] expectedOutputArr) {
-        System.out.println(formatResultLine(inputArr, outputArr, expectedOutputArr));
+        System.out.print(formatResultLine(inputArr, outputArr, expectedOutputArr));
     }
 
     public static String formatResultLine(float[] inputArr, float[] outputArr, final float[] expectedOutputArr) {

@@ -1,6 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -131,7 +130,7 @@ public class MlpNetMemoryTest {
             runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                MlpNetPrintUtils.printResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, 1, 1);
             }
         }
 
@@ -140,102 +139,15 @@ public class MlpNetMemoryTest {
     }
 
     @Test
-    void GIVEN_1_input_bits_in_sequence_THEN_output_is_input_in_sequence_before() {
+    void GIVEN_many2one_1_input_bits_in_sequence_THEN_output_is_input_in_sequence_before() {
         // Arrange
-        final float[][][] trainInputArrArrArr = new float[][][]
-                {
-                        //                          1
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, // = 0, 0, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, // = 1, 0, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, // = 0, 1, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, // = 1, 1, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, // = 0, 1, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, // = 0, 1, 0
-                        },
-                };
-        final float[][][] expectedOutputArrArrArr = new float[][][]
-                {
-                        //                   1
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, // = 0, 0, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, // = 1, 0, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, // = 0, 1, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 1 }, // = 1, 1, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, // = 0, 1, 0
-                        },
-                        {
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 0 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 1 }, //
-                                new float[]{ 0 }, // = 0, 1, 0
-                        },
-                };
+        final Result result = arrangeResult();
         final int[] layerSizeArr = new int[]{ 1, 4, 8, 1 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
 
         // 0
         // 1 to   <---,
@@ -246,15 +158,47 @@ public class MlpNetMemoryTest {
         final int epochMax = 26_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, 1, 1);
             }
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.05F);
+        actAssertExpectedOutput(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), 0.05F);
+    }
+
+    @Test
+    void GIVEN_one2one_1_input_bits_in_sequence_THEN_output_is_input_in_sequence_before() {
+        // Arrange
+        final Result result = arrangeResult();
+        final int[] layerSizeArr = new int[]{ 1, 4, 8, 1 };
+
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
+
+        // 0
+        // 1 to   <---,
+        // 2 from ----'
+        //addForwwardInputs(mlpNet, 2, 1, rnd);
+        //addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
+        addForwwardInputs(mlpNet, 2, 1, false, false, true, rnd);
+
+        final int epochMax = 20_000;
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
+
+            runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
+
+            if ((epochPos + 1) % 100 == 0) {
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, 1, 1);
+            }
+        }
+
+        // Act & Assert
+        actAssertExpectedOutput(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), 0.05F);
     }
 
     @Test
@@ -319,10 +263,10 @@ public class MlpNetMemoryTest {
         final int epochMax = 20_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 
@@ -419,7 +363,7 @@ public class MlpNetMemoryTest {
             runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, 1);
             }
         }
 

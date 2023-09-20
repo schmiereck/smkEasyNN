@@ -1,6 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpoch;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandom;
 
@@ -37,10 +37,10 @@ public class MlpNetXorTest {
         final int epochMax = 500;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandom(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandom(mlpNet, expectedOutputArrArr, trainInputArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, epochPos);
+                printFullResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 
