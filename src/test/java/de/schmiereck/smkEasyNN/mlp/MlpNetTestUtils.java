@@ -1,16 +1,51 @@
 package de.schmiereck.smkEasyNN.mlp;
 
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.formatResultLine;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpochWithTrainSize;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpochWithTrainSize;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
-import de.schmiereck.smkEasyNN.mlp.MlpNet;
-import de.schmiereck.smkEasyNN.mlp.MlpService;
-
-import java.util.Arrays;
-import java.util.Formatter;
+import java.util.Random;
 
 import org.junit.jupiter.api.Assertions;
 
 public class MlpNetTestUtils {
+
+    public static void runTrainWithGrowingTrainSize(final MlpNet mlpNet,
+                                                    final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+                                                    final int epochMax, final int successfulCounterMax, final boolean printFullResult,
+                                                    final float learningRate, final float momentum,
+                                                    final Random rnd) {
+        int successfulCounter = 0;
+        int expectedOutputTrainSize = 1;
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
+
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
+                    expectedOutputTrainSize, learningRate, momentum, rnd);
+
+            if ((epochPos + 1) % 100 == 0) {
+                if (printFullResult) {
+                    printFullResultForEpochWithTrainSize(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
+                } else {
+                    printResultForEpochWithTrainSize(epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
+                }
+            }
+            if (mainOutputMseErrorValue < 0.001F) {
+                successfulCounter++;
+                if (successfulCounter > successfulCounterMax) {
+                    if (expectedOutputTrainSize < 3) {
+                        expectedOutputTrainSize++;
+                    } else {
+                        printFullResultForEpochWithTrainSize(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
+                        break;
+                    }
+                    successfulCounter = 0;
+                }
+            } else {
+                successfulCounter = 0;
+            }
+        }
+    }
 
     static void actAssertExpectedOutput(final MlpNet mlpNet, final float[][][] inputArrArrArr, final float[][][] expectedOutputArrArrArr, final float delta) {
         int offPos = 0;

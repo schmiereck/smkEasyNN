@@ -1,6 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpoch;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -60,10 +60,10 @@ public class MlpNetTimeTest {
         final int epochMax = 6_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 
@@ -112,10 +112,10 @@ public class MlpNetTimeTest {
         final int epochMax = 100;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 
@@ -178,10 +178,10 @@ public class MlpNetTimeTest {
         final int epochMax = 7_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 

@@ -172,7 +172,15 @@ public final class MlpLayerService {
                 }
             });
         } else {
+            for (int toNeuronPos = 0; toNeuronPos < toLayer.neuronArr.length; toNeuronPos++) {
+                final MlpNeuron toNeuron = toLayer.neuronArr[toNeuronPos];
 
+                final int inputNeuronPos = (toNeuronPos * inputLayer.neuronArr.length) / toLayer.neuronArr.length;
+                final MlpNeuron inputNeuron = inputLayer.neuronArr[inputNeuronPos];
+
+                final MlpSynapse synapse = createSynapse(calcInitWeight2(mlpNet.getInitialWeightValue(), rnd), useError, forward, inputNeuron, rnd);
+                toNeuron.synapseList.add(synapse);
+            }
         }
     }
 
@@ -208,12 +216,6 @@ public final class MlpLayerService {
                 final MlpNeuron inputNeuron = toLayer.neuronArr[inputNeuronPos];
 
                 final MlpSynapse synapse = createSynapse(calcInitWeight2(mlpNet.getInitialWeightValue(), rnd), useError, forward, inputNeuron, rnd);
-                toNeuron.synapseList.add(synapse);
-            }
-
-            if (mlpNet.getUseAdditionalBiasInput()) {
-                final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, forward);
-                synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
                 toNeuron.synapseList.add(synapse);
             }
         }
