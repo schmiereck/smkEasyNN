@@ -72,6 +72,8 @@ Architecture:
 * Long Short-Term Memory Units (kurz: LSTMs)
   * Aufbau einer LSTM-Zelle
     * https://www.bigdata-insider.de/was-ist-ein-long-short-term-memory-a-774848/
+  * Keras LSTM to Java
+    * https://alexrachnog.medium.com/keras-lstm-to-java-a3124402d69
 * Simple neural network implementation in C
     * https://towardsdatascience.com/simple-neural-network-implementation-in-c-663f51447547
 * Trouble Understanding the Backpropagation Algorithm in Neural Network

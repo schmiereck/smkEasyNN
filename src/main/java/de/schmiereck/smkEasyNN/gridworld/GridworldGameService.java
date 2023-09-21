@@ -35,6 +35,8 @@ public class GridworldGameService {
     static int runPlayGame(final MlpNet net, final Board board, final int level, final GameStatistic gameStatistic, final int hitGoalCounter, final Random rnd) {
         int retHitGoalCounter = hitGoalCounter;
         final float[] inputArr = new float[4 * 4 * 4 + 1];
+        float mse = 0.0F;
+        int trainCount = 0;
 
         // New Game Reset:
         inputArr[4 * 4 * 4] = 1.0F;
@@ -70,7 +72,7 @@ public class GridworldGameService {
             switch (actionResult) {
                 case MovedGoal -> {
                     initializeExpectedOutput(expectedOutputArr, 0.0F); // All other actions are generating errors (+/-).
-                    expectedOutputArr[action] = 1.0F; // Great.
+                    expectedOutputArr[action] = 2.0F; // Great.
                     runTrain = true;
                 }
                 case Moved -> {
@@ -81,15 +83,15 @@ public class GridworldGameService {
                     runTrain = true;
                 }
                 case HitWall -> {
-                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    //System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = -0.5F; // Not so good.
+                    expectedOutputArr[action] = -1.5F; // Not so good.
                     runTrain = true;
                 }
                 case MovedPit -> {
-                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    //System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = -0.75F; // Bad.
+                    expectedOutputArr[action] = -2.75F; // Bad.
                     runTrain = true;
                 }
                 default -> throw new RuntimeException("Unexpected actionResult \"%s\".".formatted(actionResult));
@@ -98,7 +100,8 @@ public class GridworldGameService {
                 //normalizeExpectedOutput(expectedOutputArr);
 
                 //MlpSaveService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
-                MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+                mse += MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+                trainCount++;
             }
             if (actionResult == GridworldGameService.ActionResult.MovedGoal) {
                 gameStatistic.hitGoalCounter++;
@@ -128,6 +131,7 @@ public class GridworldGameService {
             move++;
         }
         gameStatistic.moveCounter += move;
+        gameStatistic.mse = mse / trainCount;
         return retHitGoalCounter;
     }
 
@@ -145,7 +149,19 @@ public class GridworldGameService {
 
     private static void randomizeExpectedOutput(final float[] expectedOutputArr, final Random rnd) {
         for (int pos = 0; pos < expectedOutputArr.length; pos++) {
-            expectedOutputArr[pos] = rnd.nextFloat(0.5F);
+            expectedOutputArr[pos] = (rnd.nextFloat(0.5F));
+        }
+    }
+
+    private static void randomizeExpectedOutput1(final float[] expectedOutputArr, final Random rnd) {
+        for (int pos = 0; pos < expectedOutputArr.length; pos++) {
+            expectedOutputArr[pos] = (rnd.nextFloat(0.5F) - 0.25F);
+        }
+    }
+
+    private static void randomizeExpectedOutput2(final float[] expectedOutputArr, final Random rnd) {
+        for (int pos = 0; pos < expectedOutputArr.length; pos++) {
+            expectedOutputArr[pos] += (rnd.nextFloat(0.25F) - 0.125F);
         }
     }
 

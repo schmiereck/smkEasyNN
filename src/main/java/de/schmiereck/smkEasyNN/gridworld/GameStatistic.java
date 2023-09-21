@@ -7,4 +7,5 @@ public class GameStatistic {
     public int hitWallCounter = 0;
     public GridworldGameService.ActionResult actionResult = null;
     public int moveCounter = 0;
+    public float mse = 0.0F;
 }

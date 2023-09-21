@@ -111,7 +111,8 @@ public class GridworldMain {
                     final boolean newLevel = (oldLevel != levelArr[netPos]);
 
                     if ((epocheArr[netPos] % 100 == 0) || newLevel) {
-                        System.out.printf("%2d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d]\r", netPos, epocheArr[netPos], oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter);
+                        System.out.printf("%2d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f\r",
+                                netPos, epocheArr[netPos], oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter, gameStatistic.mse);
                         if (oldLevel != levelArr[netPos]) {
                             gameStatistic.moveCounter = 0;
                             gameStatistic.hitGoalCounter = 0;
