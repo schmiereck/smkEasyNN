@@ -226,3 +226,42 @@ run   740700: level:  6  moves: 20286402 [goal:103276, pit:  2851, wall: 30462, 
         ...
 
 ```
+
+```
+            final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[7]; // 64 + 1, 64, 32, 32, 32, 32, 4
+            layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+            layerConfigArr[1] = new MlpLayerConfig(64);
+            layerConfigArr[2] = new MlpLayerConfig(32);
+            layerConfigArr[3] = new MlpLayerConfig(32);
+            layerConfigArr[4] = new MlpLayerConfig(32);
+            layerConfigArr[5] = new MlpLayerConfig(32);
+            layerConfigArr[6] = new MlpLayerConfig(4);
+
+            layerConfigArr[0].setIsArray(true);
+            layerConfigArr[1].setIsArray(true);
+            addForwwardInputs(netArr[netPos], 2, 4, true, false, true, rnd);
+            addForwwardInputs(netArr[netPos], 3, 5, true, false, true, rnd);
+
+C:\Users\scmj178\.jdks\openjdk-20.0.1\bin\java.exe "-javaagent:C:\Users\scmj178\AppData\Local\Programs\IntelliJ IDEA Ultimate\lib\idea_rt.jar=52175:C:\Users\scmj178\AppData\Local\Programs\IntelliJ IDEA Ultimate\bin" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath C:\Users\scmj178\IdeaProjects\smkEasyNN\target\classes;C:\Users\scmj178\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\scmj178\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\scmj178\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\scmj178\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar de.schmiereck.smkEasyNN.gridworld.GridworldMain
+ 0 -        38: level:  0  moves:       19 [goal:    36, pit:     2, wall:    11, max-move:     0]
+ 1 -        36: level:  0  moves:       33 [goal:    35, pit:     0, wall:    14, max-move:     1]
+ 2 -        39: level:  0  moves:       31 [goal:    36, pit:     3, wall:    17, max-move:     0]
+ 0 -      1337: level:  1  moves:    15487 [goal:   632, pit:   514, wall:  7644, max-move:   153]
+ 1 -       586: level:  1  moves:     6908 [goal:   277, pit:   201, wall:  3395, max-move:    72]
+ 2 -      1070: level:  1  moves:    12147 [goal:   500, pit:   420, wall:  5983, max-move:   111]
+ 0 -      1573: level:  2  moves:     2282 [goal:   145, pit:    70, wall:  1101, max-move:    21]
+ 1 -       986: level:  2  moves:     3999 [goal:   246, pit:   108, wall:  1942, max-move:    46]
+ 2 -      1337: level:  2  moves:     2548 [goal:   169, pit:    75, wall:  1238, max-move:    23]
+ 0 -      1822: level:  3  moves:     2460 [goal:   143, pit:    89, wall:  1205, max-move:    17]
+ 1 -      1220: level:  3  moves:     2218 [goal:   143, pit:    75, wall:  1093, max-move:    16]
+ 2 -      1668: level:  3  moves:     3525 [goal:   197, pit:   102, wall:  1725, max-move:    32]
+ 0 -      6193: level:  4  moves:    64474 [goal:  1628, pit:  2115, wall: 31098, max-move:   628]
+ 1 -      7145: level:  4  moves:    87230 [goal:  2213, pit:  2877, wall: 42104, max-move:   835]
+ 2 -      5114: level:  4  moves:    51347 [goal:  1277, pit:  1636, wall: 24726, max-move:   533]
+ 0 -     37184: level:  5  moves:   339070 [goal:  9465, pit: 18399, wall:163669, max-move:  3127]
+ 1 -     25228: level:  5  moves:   194905 [goal:  5409, pit: 10948, wall: 94271, max-move:  1726]
+ 2 -     17595: level:  5  moves:   133546 [goal:  3845, pit:  7458, wall: 64616, max-move:  1178]
+ 0 -     88872: level:  6  moves:   677107 [goal: 15310, pit: 29975, wall:324193, max-move:  6403]
+ 1 -     63342: level:  6  moves:   496568 [goal: 11406, pit: 21997, wall:237863, max-move:  4711]
+
+```

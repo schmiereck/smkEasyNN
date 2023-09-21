@@ -4,6 +4,7 @@ import static de.schmiereck.smkEasyNN.gridworld.GridworldBoardService.initBoard;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 
 import de.schmiereck.smkEasyNN.mlp.MlpConfiguration;
+import de.schmiereck.smkEasyNN.mlp.MlpLayerConfig;
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
 import de.schmiereck.smkEasyNN.mlp.MlpNetService;
 
@@ -39,7 +40,7 @@ public class GridworldMain {
         //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 32, 32, 4 }; // No: 582900: level:  5  moves: 15420375 [goal: 51847, pit:    11, wall:   142, max-move:467282]
         //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 64, 64, 64, 64, 4 }; // Best 2
         //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 64, 64, 64, 4 }; // Best 3
-        final int[] layerSizeArr = new int[]{ 64 + 1, 64, 32, 32, 32, 32, 4 }; // Best 4
+        //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 32, 32, 32, 32, 4 }; // Best 4
 
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
@@ -56,13 +57,30 @@ public class GridworldMain {
         final int[] epocheArr = new int[netCount];
 
         for (int netPos = 0; netPos < netArr.length; netPos++) {
-            netArr[netPos] = MlpNetService.createNet(config, layerSizeArr, rnd);
+            final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[9];
+            layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+            layerConfigArr[1] = new MlpLayerConfig(64);
+            layerConfigArr[2] = new MlpLayerConfig(32);
+            layerConfigArr[3] = new MlpLayerConfig(32);
+
+            layerConfigArr[4] = new MlpLayerConfig(32);
+            layerConfigArr[5] = new MlpLayerConfig(32);
+            layerConfigArr[6] = new MlpLayerConfig(32);
+            layerConfigArr[7] = new MlpLayerConfig(32);
+            layerConfigArr[8] = new MlpLayerConfig(4);
+
+            layerConfigArr[0].setIsArray(true);
+            layerConfigArr[1].setIsArray(true);
+            layerConfigArr[2].setIsArray(true);
+            layerConfigArr[3].setIsArray(true);
+
+            netArr[netPos] = MlpNetService.createNet(config, layerConfigArr, rnd);
             gameStatisticArr[netPos] = new GameStatistic();
 
                     //addForwwardInputs(netArr[netPos], 2, 1, rnd);
             //addForwwardInputs(netArr[netPos], 3, 2, rnd);
-            addForwwardInputs(netArr[netPos], 2, 4, rnd);
-            addForwwardInputs(netArr[netPos], 3, 5, rnd);
+            addForwwardInputs(netArr[netPos], 5, 4, false, false, true, rnd);
+            addForwwardInputs(netArr[netPos], 6, 5, false, false, true, rnd);
 
             levelArr[netPos] = 0;
             fittnesCounterArr[netPos] = 0;
