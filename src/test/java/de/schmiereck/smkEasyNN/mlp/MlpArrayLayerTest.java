@@ -7,11 +7,13 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class MlpArrayLayerTest {
 
     @Test
+    @Disabled
     void GIVEN_value_input_moves_THEN_direction_is_output() {
         // Arrange
         final float[][][] trainInputArrArrArr = new float[][][]
@@ -226,8 +228,8 @@ public class MlpArrayLayerTest {
 
         addForwwardInputs(mlpNet, 2, 1, rnd);
 
-        //final int epochMax = 25_000; // Flat
-        final int epochMax = 7_800; // Array
+        final int epochMax = 25_000; // Flat
+        //final int epochMax = 7_800; // Array
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);

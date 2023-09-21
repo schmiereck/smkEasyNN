@@ -1,4 +1,4 @@
-package de.schmiereck.smkEasyNN;
+package de.schmiereck.smkEasyNN.mlp.original;
 
 public class IntegerNormNeuralNet {
     private int[] layers;

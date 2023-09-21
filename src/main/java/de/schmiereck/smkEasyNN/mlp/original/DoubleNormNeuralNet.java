@@ -1,4 +1,4 @@
-package de.schmiereck.smkEasyNN;
+package de.schmiereck.smkEasyNN.mlp.original;
 
 /**
  * Norm: neurons use values between 0.0 to 1.0

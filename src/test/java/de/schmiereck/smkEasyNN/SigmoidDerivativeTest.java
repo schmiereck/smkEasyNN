@@ -1,8 +1,8 @@
 package de.schmiereck.smkEasyNN;
 
-import de.schmiereck.smkEasyNN.DoubleNormNeuralNet;
-import de.schmiereck.smkEasyNN.IntegerNorm2NeuralNet;
-import de.schmiereck.smkEasyNN.IntegerNormNeuralNet;
+import de.schmiereck.smkEasyNN.mlp.original.DoubleNormNeuralNet;
+import de.schmiereck.smkEasyNN.mlp.original.IntegerNorm2NeuralNet;
+import de.schmiereck.smkEasyNN.mlp.original.IntegerNormNeuralNet;
 
 public class SigmoidDerivativeTest {
     public static void main(String[] args) {

@@ -1,9 +1,9 @@
-package de.schmiereck.smkEasyNN;
+package de.schmiereck.smkEasyNN.mlp.original;
 
 import java.util.Arrays;
 import java.util.Random;
 
-public class MLP2 {
+public class MLP {
     public static class MLPLayer {
 
         float[] output;
@@ -14,8 +14,8 @@ public class MLP2 {
 
         public MLPLayer(int inputSize, int outputSize, Random r) {
             output = new float[outputSize];
-            input = new float[inputSize];
-            weights = new float[(inputSize) * outputSize];
+            input = new float[inputSize + 1];
+            weights = new float[(1 + inputSize) * outputSize];
             dweights = new float[weights.length];
             initWeights(r);
         }
@@ -34,9 +34,8 @@ public class MLP2 {
             System.arraycopy(in, 0, input, 0, in.length);
             input[input.length - 1] = 1;
             int offs = 0;
-            //Arrays.fill(output, 0);
+            Arrays.fill(output, 0);
             for (int i = 0; i < output.length; i++) {
-                output[i] = 0;
                 for (int j = 0; j < input.length; j++) {
                     output[i] += weights[offs + j] * input[j];
                 }
@@ -68,18 +67,18 @@ public class MLP2 {
             return nextError;
         }
     }
-    MLP2.MLPLayer[] layers;
+    MLPLayer[] layers;
 
-    public MLP2(int inputSize, int[] layersSize) {
-        layers = new MLP2.MLPLayer[layersSize.length];
+    public MLP(int inputSize, int[] layersSize) {
+        layers = new MLPLayer[layersSize.length];
         Random r = new Random(1234);
         for (int i = 0; i < layersSize.length; i++) {
             int inSize = i == 0 ? inputSize : layersSize[i - 1];
-            layers[i] = new MLP2.MLPLayer(inSize + 1, layersSize[i], r);
+            layers[i] = new MLPLayer(inSize, layersSize[i], r);
         }
     }
 
-    public MLP2.MLPLayer getLayer(int idx) {
+    public MLPLayer getLayer(int idx) {
         return layers[idx];
     }
 
@@ -105,7 +104,7 @@ public class MLP2 {
     public static void main(String[] args) throws Exception {
         float[][] train = new float[][]{new float[]{0, 0}, new float[]{0, 1}, new float[]{1, 0}, new float[]{1, 1}};
         float[][] res = new float[][]{new float[]{0}, new float[]{1}, new float[]{1}, new float[]{0}};
-        MLP2 mlp = new MLP2(2, new int[]{2, 1});
+        MLP mlp = new MLP(2, new int[]{2, 1});
         mlp.getLayer(1).setIsSigmoid(false);
         Random r = new Random();
         int en = 500;

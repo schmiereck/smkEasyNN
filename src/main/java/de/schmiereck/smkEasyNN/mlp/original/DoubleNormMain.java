@@ -1,4 +1,4 @@
-package de.schmiereck.smkEasyNN;
+package de.schmiereck.smkEasyNN.mlp.original;
 
 import java.util.Arrays;
 

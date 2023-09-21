@@ -68,8 +68,15 @@ public final class MlpService {
             final int idx = rnd.nextInt(expectedOutputArrArrArr.length);
             final float[][] trainInputArrArr = trainInputArrArrArr[idx];
             final float[][] expectedOutputArrArr = expectedOutputArrArrArr[idx];
+            final int trainSize;
+            if (expectedOutputTrainSize > expectedOutputArrArr.length) {
+                trainSize = expectedOutputArrArr.length;
+            } else {
+                trainSize = expectedOutputTrainSize;
+            }
             //for (int pos = 0; pos < expectedOutputArrArr.length; pos++) {
-            for (int pos = 0; pos < expectedOutputTrainSize; pos++) {
+            //for (int pos = 0; pos < expectedOutputTrainSize; pos++) {
+            for (int pos = 0; pos < trainSize; pos++) {
                 mainOutputMseErrorValue += train(mlpNet, trainInputArrArr[pos], expectedOutputArrArr[pos], learningRate, momentum);
                 mainOutputCount++;
             }
