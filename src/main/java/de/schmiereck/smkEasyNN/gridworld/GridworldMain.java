@@ -135,18 +135,23 @@ public class GridworldMain {
                 }
 
                 // epoch <
-                // 1: more of this results 0: no results
+                // moves (100 goals / 200 moves = 0.5, 100 goals / 100 moves = 1.0)
+                final float m = (gameStatistic.hitGoalCounter +
+                        gameStatistic.hitPitCounter +
+                        gameStatistic.maxMoveCounter +
+                        gameStatistic.hitWallCounter) / gameStatistic.moveCounter;
+                // 1: more of these results, 0: no results
                 // moves / goal
-                final float mg = calcFit(gameStatistic.hitGoalCounter, gameStatistic);
+                final float mg = calcFit(gameStatistic.hitGoalCounter, gameStatistic.moveCounter);
                 // moves / pit
-                final float mp = calcFit(gameStatistic.hitPitCounter, gameStatistic);
+                final float mp = calcFit(gameStatistic.hitPitCounter, gameStatistic.moveCounter);
                 // moves / maxMove
-                final float mm = calcFit(gameStatistic.maxMoveCounter, gameStatistic);
+                final float mm = calcFit(gameStatistic.maxMoveCounter, gameStatistic.moveCounter);
                 // moves / wall
-                final float mw = calcFit(gameStatistic.hitWallCounter, gameStatistic);
+                final float mw = calcFit(gameStatistic.hitWallCounter, gameStatistic.moveCounter);
 
                 // bigger is fitter.
-                gameStatistic.fitness = (mg * 2.0F) + (1.0F - (mp * 1.0F)) + (0.5F - (mm * 0.5F)) + (0.25F - (mw * 0.25F));
+                gameStatistic.fitness = m + (mg * 2.0F) + (1.0F - (mp * 1.0F)) + (0.5F - (mm * 0.5F)) + (0.25F - (mw * 0.25F));
 
                 System.out.printf(" fit:%.6f", gameStatistic.fitness);
                 System.out.println();
@@ -194,8 +199,8 @@ public class GridworldMain {
         return MlpNetService.duplicateNet(fittestNet);
     }
 
-    private static float calcFit(int gameStatistic, GameStatistic gameStatistic1) {
-        final float mg = gameStatistic1.moveCounter > 0 ? (float) gameStatistic / gameStatistic1.moveCounter : 0.0F;
+    private static float calcFit(final int counter, final int moveCounter) {
+        final float mg = moveCounter > 0 ? (float) counter / moveCounter : 0.0F;
         return mg;
     }
 
