@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
+    final int layerNr;
+    final int neuronNr;
     List<MlpSynapse> synapseList;
     float outputValue;
     float lastOutputValue;
     float errorValue;
     float lastErrorValue;
 
-    public MlpNeuron(final int inputSize) {
+    public MlpNeuron(final int layerNr, final int neuronNr, final int inputSize) {
+        this.layerNr = layerNr;
+        this.neuronNr = neuronNr;
         //this.weightArr = new float[inputSize];
         //this.dweightArr = new float[inputSize];
         this.synapseList = new ArrayList<>(inputSize + 1);
@@ -29,6 +33,16 @@ public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     @Override
     public void setValue(final float value) {
         this.outputValue = value;
+    }
+
+    @Override
+    public int getLayerNr() {
+        return this.layerNr;
+    }
+
+    @Override
+    public int getNeuronNr() {
+        return this.neuronNr;
     }
 
     @Override

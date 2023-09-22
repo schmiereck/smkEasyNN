@@ -46,7 +46,7 @@ public class MlpNetValueToValueBottleneckTest {
         final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
 
         final int bottleneckLayerPos = 3;
-        mlpNet.getLayer(bottleneckLayerPos).setOutputLayer(true);
+        mlpNet.getLayer(bottleneckLayerPos).setIsOutputLayer(true);
 
         //final int epochMax = 2200;
         final int epochMax = 8000;

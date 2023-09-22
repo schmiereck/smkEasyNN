@@ -1,6 +1,7 @@
 package de.schmiereck.smkEasyNN.gridworld;
 
 public class GameStatistic {
+    public final int netPos;
     public int hitGoalCounter = 0;
     public int hitPitCounter = 0;
     public int maxMoveCounter = 0;
@@ -8,4 +9,14 @@ public class GameStatistic {
     public GridworldGameService.ActionResult actionResult = null;
     public int moveCounter = 0;
     public float mse = 0.0F;
+    public int epoche = 0;
+    public int level = 0;
+    public float fitness = 0.0F;
+
+    public int fittnesCounter = 0;
+    public int fittnesHitGoalCounter = 0;
+
+    GameStatistic(final int netPos) {
+        this.netPos = netPos;
+    }
 }

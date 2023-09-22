@@ -43,8 +43,15 @@ public class MlpNetXorTest {
                 printFullResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
+        final MlpNet mlpNet2 = MlpNetService.duplicateNet(mlpNet);
 
         // Act & Assert
+        System.out.println("Act & Assert 1");
+        printFullResultForEpoch(mlpNet, trainInputArrArr, expectedOutputArrArr, 1, 2);
         actAssertExpectedOutput(mlpNet, trainInputArrArr, expectedOutputArrArr, 0.05F);
+
+        System.out.println("Act & Assert 2");
+        printFullResultForEpoch(mlpNet2, trainInputArrArr, expectedOutputArrArr, 2, 2);
+        actAssertExpectedOutput(mlpNet2, trainInputArrArr, expectedOutputArrArr, 0.05F);
     }
 }

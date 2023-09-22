@@ -8,6 +8,9 @@ import de.schmiereck.smkEasyNN.mlp.MlpLayerConfig;
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
 import de.schmiereck.smkEasyNN.mlp.MlpNetService;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -45,18 +48,19 @@ public class GridworldMain {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        final int netCount = 3;
+        final int netCount = 6;
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
         final MlpConfiguration config = new MlpConfiguration(true, false, 1.0F);
 
-        final MlpNet[] netArr = new MlpNet[netCount];
-        final GameStatistic[] gameStatisticArr = new GameStatistic[netCount];
-        final int[] levelArr = new int[netCount];
-        final int[] fittnesCounterArr = new int[netCount];
-        final int[] hitGoalCounterArr = new int[netCount];
-        final int[] epocheArr = new int[netCount];
+        //final MlpNet[] netArr = new MlpNet[netCount];
+        final HashMap<GameStatistic, MlpNet> netArr = new HashMap<>();
+        //final GameStatistic[] gameStatisticArr = new GameStatistic[netCount];
+        //final int[] levelArr = new int[netCount];
+        //final int[] fittnesCounterArr = new int[netCount];
+        //final int[] fittnesHitGoalCounterArr = new int[netCount];
+        //final int[] epocheArr = new int[netCount];
 
-        for (int netPos = 0; netPos < netArr.length; netPos++) {
+        for (int netPos = 0; netPos < netCount; netPos++) {
             final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[9];
             layerConfigArr[0] = new MlpLayerConfig(64 + 1);
             layerConfigArr[1] = new MlpLayerConfig(64);
@@ -74,52 +78,50 @@ public class GridworldMain {
             layerConfigArr[2].setIsArray(true);
             layerConfigArr[3].setIsArray(true);
 
-            netArr[netPos] = MlpNetService.createNet(config, layerConfigArr, rnd);
-            gameStatisticArr[netPos] = new GameStatistic();
+            final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
+            //gameStatisticArr[netPos] = new GameStatistic(netPos);
+            final GameStatistic gameStatistic = new GameStatistic(netPos);
 
                     //addForwwardInputs(netArr[netPos], 2, 1, rnd);
             //addForwwardInputs(netArr[netPos], 3, 2, rnd);
-            addForwwardInputs(netArr[netPos], 5, 4, false, false, true, rnd);
-            addForwwardInputs(netArr[netPos], 6, 5, false, false, true, rnd);
+            addForwwardInputs(net, 5, 4, false, false, true, rnd);
+            addForwwardInputs(net, 6, 5, false, false, true, rnd);
 
-            levelArr[netPos] = 0;
-            fittnesCounterArr[netPos] = 0;
-            hitGoalCounterArr[netPos] = 0;
-            epocheArr[netPos] = 0;
+            netArr.put(gameStatistic, net);
         }
+        int newNetPos = netCount;
 
         for (int runPos = 0; runPos < 20_000_000; runPos++) {
-            for (int netPos = 0; netPos < netArr.length; netPos++) {
-                final MlpNet net = netArr[netPos];
-                    final GameStatistic gameStatistic = gameStatisticArr[netPos];
+            //for (int netPos = 0; netPos < netArr.length; netPos++) {
+            for (final Map.Entry<GameStatistic, MlpNet> netEntry : netArr.entrySet()) {
+                final GameStatistic gameStatistic = netEntry.getKey();
+                final MlpNet net = netEntry.getValue();
+
+                resetGameStatistic(gameStatistic);
 
                 while (true) {
                     final Board board = new Board();
-                    int oldLevel = levelArr[netPos];
-                    if (hitGoalCounterArr[netPos] > 6) {
-                        hitGoalCounterArr[netPos] = 0;
-                        fittnesCounterArr[netPos]++;
-                        if (fittnesCounterArr[netPos] > 4) {
-                            fittnesCounterArr[netPos] = 0;
-                            levelArr[netPos]++;
+                    int oldLevel = gameStatistic.level;
+
+                    if (gameStatistic.fittnesHitGoalCounter > 6) {
+                        gameStatistic.fittnesHitGoalCounter = 0;
+                        gameStatistic.fittnesCounter++;
+                        if (gameStatistic.fittnesCounter > 4) {
+                            gameStatistic.fittnesCounter = 0;
+                            gameStatistic.level++;
                         }
                     }
 
-                    initBoard(board, levelArr[netPos], rnd);
+                    initBoard(board, gameStatistic.level, rnd);
 
                     //printBoard(board);
-                    final boolean newLevel = (oldLevel != levelArr[netPos]);
+                    final boolean newLevel = (oldLevel != gameStatistic.level);
 
-                    if ((epocheArr[netPos] % 100 == 0) || newLevel) {
-                        System.out.printf("%2d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f\r",
-                                netPos, epocheArr[netPos], oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter, gameStatistic.mse);
-                        if (oldLevel != levelArr[netPos]) {
-                            gameStatistic.moveCounter = 0;
-                            gameStatistic.hitGoalCounter = 0;
-                            gameStatistic.hitPitCounter = 0;
-                            gameStatistic.hitWallCounter = 0;
-                            gameStatistic.maxMoveCounter = 0;
-                            System.out.println();
+                    if ((gameStatistic.epoche % 100 == 0) || newLevel) {
+                        System.out.printf("%2d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f",
+                                gameStatistic.netPos, gameStatistic.epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter, gameStatistic.mse);
+                        if (!newLevel) {
+                            System.out.print('\r');
                         }
                     }
 
@@ -127,11 +129,82 @@ public class GridworldMain {
                         break;
                     }
 
-                    hitGoalCounterArr[netPos] = GridworldGameService.runPlayGame(net, board, levelArr[netPos], gameStatistic, hitGoalCounterArr[netPos], rnd);
+                    gameStatistic.fittnesHitGoalCounter = GridworldGameService.runPlayGame(net, board, gameStatistic.level, gameStatistic, gameStatistic.fittnesHitGoalCounter, rnd);
 
-                    epocheArr[netPos]++;
+                    gameStatistic.epoche++;
                 }
+
+                // epoch <
+                // 1: more of this results 0: no results
+                // moves / goal
+                final float mg = calcFit(gameStatistic.hitGoalCounter, gameStatistic);
+                // moves / pit
+                final float mp = calcFit(gameStatistic.hitPitCounter, gameStatistic);
+                // moves / maxMove
+                final float mm = calcFit(gameStatistic.maxMoveCounter, gameStatistic);
+                // moves / wall
+                final float mw = calcFit(gameStatistic.hitWallCounter, gameStatistic);
+
+                // bigger is fitter.
+                gameStatistic.fitness = (mg * 2.0F) + (1.0F - (mp * 1.0F)) + (0.5F - (mm * 0.5F)) + (0.25F - (mw * 0.25F));
+
+                System.out.printf(" fit:%.6f", gameStatistic.fitness);
+                System.out.println();
             }
+            // Found fittest (fittest first):
+            final List<GameStatistic> sortedGameStatisticList =
+                    netArr.keySet().stream()
+                            .sorted((aGameStatistic, bGameStatistic) -> Float.compare(bGameStatistic.fitness, aGameStatistic.fitness)).toList();
+
+            final GameStatistic fittestGameStatistic = sortedGameStatisticList.get(0);
+            final GameStatistic worstGameStatistic = sortedGameStatisticList.get(sortedGameStatisticList.size() - 1);
+
+            final MlpNet fittestNet = netArr.get(fittestGameStatistic);
+            final MlpNet newNet = copyNet(fittestNet);
+            final GameStatistic newGameStatistic = copyGameStatistic(newNetPos, fittestGameStatistic);
+            newNetPos++;
+
+            netArr.remove(worstGameStatistic);
+            netArr.put(newGameStatistic, newNet);
         }
+    }
+
+    private static GameStatistic copyGameStatistic(final int newNetPos, final GameStatistic gameStatistic) {
+        final GameStatistic newGameStatistic = new GameStatistic(newNetPos);
+
+        newGameStatistic.moveCounter = gameStatistic.moveCounter;
+        newGameStatistic.hitGoalCounter = gameStatistic.hitGoalCounter;
+        newGameStatistic.hitPitCounter = gameStatistic.hitPitCounter;
+        newGameStatistic.hitWallCounter = gameStatistic.hitWallCounter;
+        newGameStatistic.maxMoveCounter = gameStatistic.maxMoveCounter;
+        newGameStatistic.fitness = gameStatistic.fitness;
+
+        newGameStatistic.actionResult = gameStatistic.actionResult;
+        newGameStatistic.mse = gameStatistic.mse;
+        newGameStatistic.epoche = gameStatistic.epoche;
+        newGameStatistic.level = gameStatistic.level;
+
+        newGameStatistic.fittnesCounter = gameStatistic.fittnesCounter;
+        newGameStatistic.fittnesHitGoalCounter = gameStatistic.fittnesHitGoalCounter;
+
+        return newGameStatistic;
+    }
+
+    private static MlpNet copyNet(final MlpNet fittestNet) {
+        return MlpNetService.duplicateNet(fittestNet);
+    }
+
+    private static float calcFit(int gameStatistic, GameStatistic gameStatistic1) {
+        final float mg = gameStatistic1.moveCounter > 0 ? (float) gameStatistic / gameStatistic1.moveCounter : 0.0F;
+        return mg;
+    }
+
+    private static void resetGameStatistic(final GameStatistic gameStatistic) {
+        gameStatistic.moveCounter = 0;
+        gameStatistic.hitGoalCounter = 0;
+        gameStatistic.hitPitCounter = 0;
+        gameStatistic.hitWallCounter = 0;
+        gameStatistic.maxMoveCounter = 0;
+        gameStatistic.fitness = 0.0F;
     }
 }

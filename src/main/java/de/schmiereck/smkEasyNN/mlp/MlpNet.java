@@ -4,21 +4,15 @@ public class MlpNet {
     MlpLayer[] layerArr;
     final MlpInputInterface biasInput;
     final MlpInputInterface clockInput;
-    private final MlpValueInput[] valueInputArr;
+    private MlpValueInput[] valueInputArr;
 
     private final MlpConfiguration config;
 
-    public MlpNet(final MlpConfiguration config, final MlpLayerConfig[] layerConfigArr) {
+    public MlpNet(final MlpConfiguration config) {
         this.config = config;
 
-        this.biasInput = new MlpValueInput(MlpService.BIAS_VALUE);
-        this.clockInput = new MlpValueInput(MlpService.CLOCK_VALUE);
-
-        this.valueInputArr = new MlpValueInput[layerConfigArr[0].getSize()];
-        for (int neuronPos = 0; neuronPos < this.valueInputArr.length; neuronPos++) {
-            this.valueInputArr[neuronPos] = new MlpValueInput(0.0F);
-        }
-
+        this.biasInput = new MlpValueInput(MlpService.INTERNAL_LAYER_NR, MlpService.INTERNAL_BIAS_INPUT_NR, MlpService.BIAS_VALUE);
+        this.clockInput = new MlpValueInput(MlpService.INTERNAL_LAYER_NR, MlpService.INTERNAL_CLOCK_INPUT_NR, MlpService.CLOCK_VALUE);
     }
 
     public void setInputValue(final int inputPos, final float inputValue) {
@@ -27,6 +21,10 @@ public class MlpNet {
 
     public MlpValueInput[] getValueInputArr() {
         return this.valueInputArr;
+    }
+
+    public void setValueInputArr(MlpValueInput[] valueInputArr) {
+        this.valueInputArr = valueInputArr;
     }
 
     public MlpLayer[] getLayerArr() {

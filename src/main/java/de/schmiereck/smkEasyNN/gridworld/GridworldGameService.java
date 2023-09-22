@@ -103,6 +103,8 @@ public class GridworldGameService {
                 mse += MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
                 trainCount++;
             }
+            move++;
+
             if (actionResult == GridworldGameService.ActionResult.MovedGoal) {
                 gameStatistic.hitGoalCounter++;
                 gameStatistic.actionResult = actionResult;
@@ -128,7 +130,6 @@ public class GridworldGameService {
                     }
                 }
             }
-            move++;
         }
         gameStatistic.moveCounter += move;
         gameStatistic.mse = mse / trainCount;

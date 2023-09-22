@@ -25,11 +25,11 @@ public final class MlpLayerService {
             final boolean isOutputLayer = layerPos == (layerConfigArr.length - 1);
 
             if (layerConfig.getIsArray()) {
-                layerArr[layerPos] = createArrayLayer(isOutputLayer, allInputLayerSize, layerSize, layerPos, inputLayerPos,
+                layerArr[layerPos] = createArrayLayer(layerPos, isOutputLayer, allInputLayerSize, layerSize, layerPos, inputLayerPos,
                         layerArr, valueInputArr, biasInput, clockInput,
                         config, useError, rnd);
             } else {
-                layerArr[layerPos] = createFlatLayer(isOutputLayer, allInputLayerSize, layerSize, layerPos, inputLayerPos, inputLayerSize,
+                layerArr[layerPos] = createFlatLayer(layerPos, isOutputLayer, allInputLayerSize, layerSize, layerPos, inputLayerPos, inputLayerSize,
                         layerArr, valueInputArr, biasInput, clockInput,
                         config, useError, rnd);
             }
@@ -37,11 +37,11 @@ public final class MlpLayerService {
         return layerArr;
     }
 
-    static MlpLayer createFlatLayer(final boolean isOutputLayer, final int allInputLayerSize, final int layerSize,
+    static MlpLayer createFlatLayer(final int layerNr, final boolean isOutputLayer, final int allInputLayerSize, final int layerSize,
                                     final int layerPos, final int inputLayerPos, final int inputLayerSize,
                                     final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpInputInterface biasInput, final MlpInputInterface clockInput,
                                     final MlpConfiguration config, final boolean useError, final Random rnd) {
-        final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerSize);
+        final MlpLayer mlpLayer = new MlpLayer(layerNr, allInputLayerSize, layerSize);
 
         final MlpLayer inputLayer = layers[inputLayerPos];
 
@@ -54,16 +54,16 @@ public final class MlpLayerService {
             addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
         }
         mlpLayer.initWeights2(config.initialWeightValue, rnd);
-        mlpLayer.setOutputLayer(isOutputLayer);
+        mlpLayer.setIsOutputLayer(isOutputLayer);
 
         return mlpLayer;
     }
 
-    static MlpLayer createArrayLayer(final boolean isOutputLayer, final int allInputLayerSize, final int layerSize,
+    static MlpLayer createArrayLayer(final int layerNr, final boolean isOutputLayer, final int allInputLayerSize, final int layerSize,
                                      final int layerPos, final int inputLayerPos,
                                      final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpInputInterface biasInput, final MlpInputInterface clockInput,
                                      final MlpConfiguration config, final boolean useError, final Random rnd) {
-        final MlpLayer mlpLayer = new MlpLayer(allInputLayerSize, layerSize);
+        final MlpLayer mlpLayer = new MlpLayer(layerNr, allInputLayerSize, layerSize);
         final int xCellSize = 1;
         final int yCellSize = 1;
         final int xArraySize = 4;
@@ -91,7 +91,7 @@ public final class MlpLayerService {
             }
         }
         mlpLayer.initWeights2(config.initialWeightValue, rnd);
-        mlpLayer.setOutputLayer(isOutputLayer);
+        mlpLayer.setIsOutputLayer(isOutputLayer);
 
         return mlpLayer;
     }
@@ -192,8 +192,6 @@ public final class MlpLayerService {
         } else {
             inputError = null;
         }
-        final MlpSynapse synapse = new MlpSynapse(input, inputError, forward);
-        synapse.weight = initWeight;
         return createSynapse(initWeight, forward, input, inputError);
     }
 

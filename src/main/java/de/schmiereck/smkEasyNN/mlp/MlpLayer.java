@@ -1,22 +1,27 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import java.util.List;
 import java.util.Random;
 
 public class MlpLayer {
+    final int layerNr;
     MlpNeuron[] neuronArr;
     boolean isOutputLayer = false;
 
-    public MlpLayer(final int inputSize, final int layerSize) {
+    public MlpLayer(final int layerNr, final int inputSize, final int layerSize) {
+        this.layerNr = layerNr;
         this.neuronArr = new MlpNeuron[layerSize];
 
         for (int neuronPos = 0; neuronPos < this.neuronArr.length; neuronPos++) {
-            this.neuronArr[neuronPos] = new MlpNeuron(inputSize);
+            this.neuronArr[neuronPos] = new MlpNeuron(this.layerNr, neuronPos, inputSize);
         }
     }
 
-    public void setOutputLayer(final boolean isSigmoid) {
-        this.isOutputLayer = isSigmoid;
+    public void setIsOutputLayer(final boolean isOutputLayer) {
+        this.isOutputLayer = isOutputLayer;
+    }
+
+    public boolean getIsOutputLayer() {
+        return this.isOutputLayer;
     }
 
     public void initWeights2(final float initialWeightValue, final Random rnd) {

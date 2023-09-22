@@ -1,7 +1,13 @@
 package de.schmiereck.smkEasyNN.mlp;
 
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createLayers;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.INPUT_LAYER_NR;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_BIAS_INPUT_NR;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_CLOCK_INPUT_NR;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_LAYER_NR;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public final class MlpNetService {
@@ -26,12 +32,125 @@ public final class MlpNetService {
     }
 
     public static MlpNet createNet(final MlpConfiguration config, final MlpLayerConfig[] layerConfigArr, final Random rnd) {
-        final MlpNet net = new MlpNet(config, layerConfigArr);
+        final MlpNet net = new MlpNet(config);
+
+        final MlpValueInput[] valueInputArr = new MlpValueInput[layerConfigArr[0].getSize()];
+        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
+            valueInputArr[neuronPos] = new MlpValueInput(INPUT_LAYER_NR, neuronPos, 0.0F);
+        }
+        net.setValueInputArr(valueInputArr);
 
         net.setLayerArr(createLayers(layerConfigArr,
                 net.getValueInputArr(), net.getBiasInput(), net.getClockInput(),
                 net.getConfig(), true, rnd));
 
         return net;
+    }
+
+    public static MlpNet duplicateNet(final MlpNet net) {
+        final MlpNet newNet = new MlpNet(net.getConfig());
+
+        newNet.setValueInputArr(duplicateValueInputArr(net.getValueInputArr()));
+        newNet.setLayerArr(duplicateNeuronLayers(newNet, net.getLayerArr()));
+        duplicateSynapses(newNet, net.getLayerArr());
+
+        return newNet;
+    }
+
+    private static MlpValueInput[] duplicateValueInputArr(MlpValueInput[] valueInputArr) {
+        final MlpValueInput[] newValueInputArr = new MlpValueInput[valueInputArr.length];
+        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
+            final MlpValueInput valueInput = valueInputArr[neuronPos];
+            newValueInputArr[neuronPos] = new MlpValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
+        }
+        return newValueInputArr;
+    }
+
+    private static MlpLayer[] duplicateNeuronLayers(final MlpNet newNet, final MlpLayer[] layerArr) {
+        final MlpLayer[] newLayerArr = new MlpLayer[layerArr.length];
+
+        for (int layerPos = 0; layerPos < layerArr.length; layerPos++) {
+            final MlpLayer layer = layerArr[layerPos];
+            newLayerArr[layerPos] = duplicateLayer(layer);
+        }
+        return newLayerArr;
+    }
+
+    private static MlpLayer[] duplicateSynapses(final MlpNet newNet, final MlpLayer[] layerArr) {
+        final MlpLayer[] newLayerArr = newNet.getLayerArr();
+
+        for (int layerPos = 0; layerPos < layerArr.length; layerPos++) {
+            final MlpLayer layer = layerArr[layerPos];
+            final MlpLayer newLayer = newLayerArr[layerPos];
+
+            for (int neuronPos = 0; neuronPos < layer.neuronArr.length; neuronPos++) {
+                final MlpNeuron neuron = layer.neuronArr[neuronPos];
+                final MlpNeuron newNeuron = newLayer.neuronArr[neuronPos];
+
+                final List<MlpSynapse> synapseList = neuron.synapseList;
+                for (final MlpSynapse synapse : synapseList) {
+                    final MlpSynapse newSynapse = duplicateSynapse(newNet, synapse);
+                    newNeuron.synapseList.add(newSynapse);
+                }
+            }
+        }
+        return newLayerArr;
+    }
+
+    private static MlpSynapse duplicateSynapse(final MlpNet newNet, final MlpSynapse synapse) {
+        final MlpInputInterface input = searchInputNeuron(newNet, synapse.getInput().getLayerNr(), synapse.getInput().getNeuronNr());
+
+        final MlpInputErrorInterface inputError;
+        if (Objects.nonNull(synapse.getInputError())) {
+            inputError = searchErrorNeuron(newNet, synapse.getInputError().getLayerNr(), synapse.getInputError().getNeuronNr());
+        } else {
+            inputError = null;
+        }
+
+        final MlpSynapse newSynapse = new MlpSynapse(input, inputError, synapse.forward);
+        newSynapse.weight = synapse.weight;
+        newSynapse.dweight = synapse.dweight;
+        return newSynapse;
+    }
+
+    private static MlpInputInterface searchInputNeuron(final MlpNet newNet, final int layerNr, final int neuronNr) {
+        final MlpInputInterface input;
+        if (layerNr == INTERNAL_LAYER_NR) {
+            input =
+                switch (neuronNr) {
+                    case INTERNAL_BIAS_INPUT_NR -> newNet.getBiasInput();
+                    case INTERNAL_CLOCK_INPUT_NR -> newNet.getClockInput();
+                    default -> throw new RuntimeException("Unexpected neuronNr \"%d\".".formatted(neuronNr));
+                };
+        } else {
+            if (layerNr == INPUT_LAYER_NR) {
+                input = newNet.getValueInputArr()[neuronNr];
+            } else {
+                final MlpLayer newInputLayer = newNet.getLayerArr()[layerNr];
+                input = newInputLayer.neuronArr[neuronNr];
+            }
+        }
+        return input;
+    }
+
+    private static MlpInputErrorInterface searchErrorNeuron(final MlpNet newNet, final int layerNr, final int neuronNr) {
+        return newNet.getLayerArr()[layerNr].neuronArr[neuronNr];
+    }
+
+    private static MlpLayer duplicateLayer(final MlpLayer layer) {
+        final MlpLayer newLayer = new MlpLayer(layer.layerNr, 0, layer.neuronArr.length);
+        newLayer.setIsOutputLayer(layer.getIsOutputLayer());
+
+        for (int neuronPos = 0; neuronPos < layer.neuronArr.length; neuronPos++) {
+            final MlpNeuron neuron = layer.neuronArr[neuronPos];
+            final MlpNeuron newNeuron = newLayer.neuronArr[neuronPos];
+
+            newNeuron.outputValue = neuron.outputValue;
+            newNeuron.lastOutputValue = neuron.lastOutputValue;
+            newNeuron.errorValue = neuron.errorValue;
+            newNeuron.lastErrorValue = neuron.lastErrorValue;
+        }
+
+        return newLayer;
     }
 }
