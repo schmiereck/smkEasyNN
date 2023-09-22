@@ -151,7 +151,7 @@ public class GridworldMain {
                 final float mw = calcFit(gameStatistic.hitWallCounter, gameStatistic.moveCounter);
 
                 // bigger is fitter.
-                gameStatistic.fitness = m + (mg * 2.0F) + (1.0F - (mp * 1.0F)) + (0.5F - (mm * 0.5F)) + (0.25F - (mw * 0.25F));
+                gameStatistic.fitness = m + (mg * 2.0F) + (2.0F - (mp * 2.0F)) + (0.5F - (mm * 0.5F)) + (0.25F - (mw * 0.25F));
 
                 System.out.printf(" fit:%.6f", gameStatistic.fitness);
                 System.out.println();
