@@ -50,6 +50,14 @@ public class MlpNetMemoryTest {
                                 new float[]{ 0 }, //
                                 new float[]{ 0 }, // = 0, 1, 0
                         },
+                        {
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, // = 0, 1, 0
+                        },
                 };
         final float[][][] expectedOutputArrArrArr = new float[][][]
                 {
@@ -86,6 +94,14 @@ public class MlpNetMemoryTest {
                                 new float[]{ 1 }, //
                                 new float[]{ 0 }, // = 0, 1, 0
                         },
+                        {
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 0 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 1 }, //
+                                new float[]{ 0 }, // = 0, 1, 0
+                        },
                 };
         return new Result(trainInputArrArrArr, expectedOutputArrArrArr);
     }
@@ -110,13 +126,13 @@ public class MlpNetMemoryTest {
         //addForwwardInputs(mlpNet, 1, 1, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 2, 2, true, false, true, rnd);
 
-        final int epochMax = 66_000;
+        final int epochMax = 26_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
             }
         }
 
@@ -144,13 +160,13 @@ public class MlpNetMemoryTest {
         //addForwwardInputs(mlpNet, 3, 1, false, false, true, rnd);
         //addForwwardInputs(mlpNet, 3, 1, false, false, true, rnd);
 
-        final int epochMax = 60_000;
+        final int epochMax = 26_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
             }
         }
 
