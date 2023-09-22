@@ -31,13 +31,32 @@ public final class MlpService {
         runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
     }
 
+
     public static void runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+                                            final float learningRate, final float momentum, final Random rnd) {
+        final float[][] expectedOutputArrArr = expectedOutputArrArrArr[0];
+        final int expectedOutputTrainSize = Integer.MAX_VALUE;//expectedOutputArrArr.length;
+
+        runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
+                expectedOutputTrainSize,
+                learningRate, momentum, rnd);
+    }
+
+    public static void runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+                                           final int expectedOutputTrainSize,
                                            final float learningRate, final float momentum, final Random rnd) {
         for (int expectedResultArrPos = 0; expectedResultArrPos < expectedOutputArrArrArr.length; expectedResultArrPos++) {
             final int idx = rnd.nextInt(expectedOutputArrArrArr.length);
             final float[][] trainInputArrArr = trainInputArrArrArr[idx];
             final float[][] expectedOutputArrArr = expectedOutputArrArrArr[idx];
-            for (int pos = 0; pos < expectedOutputArrArr.length; pos++) {
+            final int trainSize;
+            if (expectedOutputTrainSize > expectedOutputArrArr.length) {
+                trainSize = expectedOutputArrArr.length;
+            } else {
+                trainSize = expectedOutputTrainSize;
+            }
+            //for (int pos = 0; pos < expectedOutputArrArr.length; pos++) {
+            for (int pos = 0; pos < trainSize; pos++) {
                 train(mlpNet, trainInputArrArr[pos], expectedOutputArrArr[pos], learningRate, momentum);
             }
         }
