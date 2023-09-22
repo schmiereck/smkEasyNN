@@ -1,16 +1,35 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
 public class MlpNetMemory2Test {
 
+    public static void addForwwardInputs2(final MlpNet mlpNet, final int inputLayerPos, final int toLayerPos, final Random rnd) {
+        final MlpLayer inputLayer = mlpNet.getLayer(inputLayerPos);
+        final MlpLayer toLayer = mlpNet.getLayer(toLayerPos);
+
+        Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
+            Arrays.stream(inputLayer.neuronArr).forEach(inputNeuron -> {
+                final MlpSynapse synapse = new MlpSynapse(inputNeuron, inputNeuron, true);
+                synapse.weight = 0.025F;//calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
+                toNeuron.synapseList.add(synapse);
+            });
+            if (mlpNet.getUseAdditionalBiasInput()) {
+                final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, true);
+                synapse.weight = 0.025F;//calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
+                toNeuron.synapseList.add(synapse);
+            }
+        });
+    }
 
     // hat funktioniert:
     // MlpNetMemoryTest    b1a1f7dc Thomas Schmiereck <thomas@schmiereck.de> on 13.09.2023 at 08:33
@@ -110,21 +129,21 @@ public class MlpNetMemory2Test {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
 
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs2(mlpNet, 2, 1, rnd);
         //addInternalInputs(mlpNet, 1, rnd);
 
         final int epochMax = 26_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mse = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, 1);
+                printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mse);
             }
         }
 

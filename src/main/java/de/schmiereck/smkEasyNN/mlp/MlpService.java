@@ -51,11 +51,11 @@ public final class MlpService {
 
     public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
                                            final float learningRate, final float momentum, final Random rnd) {
-        final float[][] expectedOutputArrArr = expectedOutputArrArrArr[0];
-        final int expectedOutputTrainSize = expectedOutputArrArr.length;
+        //final float[][] expectedOutputArrArr = expectedOutputArrArrArr[0];
+        //final int expectedOutputTrainSize = expectedOutputArrArr.length;
 
         return runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
-                                    expectedOutputTrainSize,
+                                    Integer.MAX_VALUE,
                                     learningRate, momentum, rnd);
     }
 
