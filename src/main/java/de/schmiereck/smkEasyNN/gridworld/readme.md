@@ -362,3 +362,90 @@ C:\Users\scmj178\.jdks\openjdk-20.0.1\bin\java.exe "-javaagent:C:\Users\scmj178\
  2 -     92578: level: 20  moves:    17263 [goal:   721, pit:   654, wall:  7986, max-move:   167]
 
 ```
+
+```
+un/expected Output
+
+ 0 -        37: level:  0  moves:       37 [goal:    35, pit:     2, wall:     0, max-move:     0] mse:0,619733 fit:5,533784
+ 5 -        39: level:  0  moves:       96 [goal:    35, pit:     3, wall:    20, max-move:     1] mse:0,622081 fit:3,359375
+ 1 -        37: level:  0  moves:       37 [goal:    36, pit:     1, wall:     0, max-move:     0] mse:0,616407 fit:5,641892
+ 4 -        39: level:  0  moves:       60 [goal:    36, pit:     3, wall:     7, max-move:     0] mse:0,615399 fit:3,820833
+ 2 -        38: level:  0  moves:       82 [goal:    35, pit:     2, wall:    16, max-move:     1] mse:0,615474 fit:3,500000
+ 3 -        39: level:  0  moves:       63 [goal:    35, pit:     4, wall:     8, max-move:     0] mse:0,616319 fit:3,702381
+ 6 -       358: level:  1  moves:     3128 [goal:   175, pit:   120, wall:  1031, max-move:    26] mse:0,491129 fit:2,698609
+ 0 -      1103: level:  1  moves:    10897 [goal:   522, pit:   438, wall:  3585, max-move:   106] mse:0,614950 fit:2,678306
+ 1 -      1113: level:  1  moves:    10734 [goal:   533, pit:   453, wall:  3567, max-move:    90] mse:0,494660 fit:2,677636
+ 4 -      1659: level:  1  moves:    16011 [goal:   760, pit:   719, wall:  5292, max-move:   141] mse:0,613487 fit:2,668087
+ 2 -      1052: level:  1  moves:     9746 [goal:   492, pit:   447, wall:  3246, max-move:    75] mse:0,977834 fit:2,672122
+ 3 -       554: level:  1  moves:     4999 [goal:   264, pit:   213, wall:  1665, max-move:    38] mse:0,456368 fit:2,683337
+ 6 -       595: level:  2  moves:     1773 [goal:   160, pit:    69, wall:   531, max-move:     8] mse:0,444037 fit:2,775522
+ 0 -      1406: level:  2  moves:     2769 [goal:   185, pit:    93, wall:   877, max-move:    25] mse:0,325634 fit:2,732755
+ 1 -      1292: level:  2  moves:     1639 [goal:   104, pit:    62, wall:   515, max-move:    13] mse:0,989994 fit:2,718731
+ 2 -      1242: level:  2  moves:     1672 [goal:   124, pit:    54, wall:   537, max-move:    12] mse:0,341244 fit:2,749851
+ 3 -       802: level:  2  moves:     2430 [goal:   145, pit:    84, wall:   781, max-move:    19] mse:0,328679 fit:2,715946
+ 7 -       673: level:  2  moves:     2599 [goal:   196, pit:   104, wall:   827, max-move:    15] mse:0,616078 fit:2,738361
+ 6 -      1070: level:  3  moves:     4824 [goal:   249, pit:   182, wall:  1569, max-move:    44] mse:0,616255 fit:2,691905
+ 0 -      2043: level:  3  moves:     5853 [goal:   359, pit:   229, wall:  1882, max-move:    49] mse:0,340212 fit:2,709850
+ 1 -      1718: level:  3  moves:     4302 [goal:   242, pit:   142, wall:  1403, max-move:    42] mse:0,571184 fit:2,710077
+ 2 -      2014: level:  3  moves:     7509 [goal:   423, pit:   289, wall:  2434, max-move:    60] mse:0,325943 fit:2,700659
+ 7 -      1040: level:  3  moves:     3330 [goal:   204, pit:   141, wall:  1110, max-move:    22] mse:0,340971 fit:2,701201
+ 8 -      1213: level:  3  moves:     5868 [goal:   331, pit:   234, wall:  1915, max-move:    53] mse:0,329100 fit:2,696958
+ 0 -      3607: level:  4  moves:    19046 [goal:   563, pit:   838, wall:  6367, max-move:   163] mse:0,561990 fit:2,633270
+ 1 -      5253: level:  4  moves:    43325 [goal:  1283, pit:  1857, wall: 14423, max-move:   395] mse:0,462638 fit:2,635718
+ 2 -      5067: level:  4  moves:    38243 [goal:  1097, pit:  1620, wall: 12738, max-move:   336] mse:0,616188 fit:2,634986
+ 7 -      3339: level:  4  moves:    28076 [goal:   838, pit:  1217, wall:  9365, max-move:   244] mse:0,540251 fit:2,635267
+ 8 -      4139: level:  4  moves:    35731 [goal:  1057, pit:  1585, wall: 11925, max-move:   284] mse:0,564052 fit:2,633036
+ 9 -      7996: level:  4  moves:    78331 [goal:  2179, pit:  3423, wall: 26138, max-move:   676] mse:0,558543 fit:2,630501
+ 0 -     30690: level:  5  moves:   271207 [goal:  8120, pit: 16768, wall: 91214, max-move:  2195] mse:0,569754 fit:2,598098
+ 1 -     16362: level:  5  moves:   110992 [goal:  3352, pit:  6807, wall: 37193, max-move:   950] mse:0,437349 fit:2,599689
+ 2 -     12687: level:  5  moves:    76443 [goal:  2310, pit:  4665, wall: 25592, max-move:   645] mse:0,325888 fit:2,600470
+ 7 -     34816: level:  5  moves:   313330 [goal:  9313, pit: 19573, wall:105458, max-move:  2591] mse:0,952578 fit:2,596232
+ 8 -     27353: level:  5  moves:   230446 [goal:  6812, pit: 14521, wall: 77447, max-move:  1881] mse:0,558338 fit:2,594995
+10 -     23031: level:  5  moves:   177268 [goal:  5311, pit: 11008, wall: 59543, max-move:  1459] mse:0,437551 fit:2,597636
+ 0 -     60140: level:  6  moves:   337846 [goal:  8566, pit: 18040, wall:111929, max-move:  2844] mse:0,483140 fit:2,606881
+ 1 -     49472: level:  6  moves:   380062 [goal:  9627, pit: 20264, wall:126038, max-move:  3219] mse:0,983921 fit:2,606884
+ 2 -     44362: level:  6  moves:   360444 [goal:  9117, pit: 19469, wall:119826, max-move:  3089] mse:0,556554 fit:2,605165
+ 7 -     56850: level:  6  moves:   254738 [goal:  6244, pit: 13614, wall: 84575, max-move:  2176] mse:0,445150 fit:2,604864
+10 -     42127: level:  6  moves:   218510 [goal:  5456, pit: 11765, wall: 72398, max-move:  1875] mse:0,510546 fit:2,605133
+11 -     42439: level:  6  moves:   342289 [goal:  8601, pit: 18206, wall:113295, max-move:  2945] mse:0,325576 fit:2,606828
+ 0 -     60455: level:  7  moves:     2729 [goal:   185, pit:   103, wall:   818, max-move:    27] mse:0,353048 fit:2,730212
+12 -     49787: level:  7  moves:     2670 [goal:   196, pit:    89, wall:   832, max-move:    30] mse:0,911762 fit:2,746629
+ 1 -     49796: level:  7  moves:     2751 [goal:   196, pit:    95, wall:   851, max-move:    33] mse:0,949376 fit:2,740094
+ 2 -     45183: level:  7  moves:     6969 [goal:   493, pit:   263, wall:  2163, max-move:    65] mse:0,947967 fit:2,733750
+10 -     42713: level:  7  moves:     5182 [goal:   326, pit:   201, wall:  1617, max-move:    59] mse:0,303068 fit:2,714541
+11 -     42852: level:  7  moves:     3999 [goal:   231, pit:   136, wall:  1260, max-move:    46] mse:0,445323 fit:2,712991
+13 -     50233: level:  8  moves:     4232 [goal:   253, pit:   152, wall:  1363, max-move:    41] mse:0,420535 fit:2,712370
+ 0 -     61556: level:  8  moves:    10368 [goal:   629, pit:   356, wall:  3267, max-move:   116] mse:0,561082 fit:2,718292
+12 -     50284: level:  8  moves:     4616 [goal:   293, pit:   150, wall:  1431, max-move:    54] mse:0,480116 fit:2,728607
+ 1 -     50413: level:  8  moves:     6001 [goal:   328, pit:   220, wall:  1909, max-move:    69] mse:0,384119 fit:2,700717
+ 2 -     45688: level:  8  moves:     5080 [goal:   276, pit:   175, wall:  1601, max-move:    54] mse:0,497734 fit:2,705660
+10 -     43568: level:  8  moves:     8165 [goal:   467, pit:   296, wall:  2538, max-move:    92] mse:0,332447 fit:2,708543
+14 -     50895: level:  9  moves:     5488 [goal:   319, pit:   231, wall:  1731, max-move:    61] mse:0,559134 fit:2,697659
+13 -     50530: level:  9  moves:     2888 [goal:   165, pit:   100, wall:   943, max-move:    32] mse:0,395164 fit:2,707843
+ 0 -     62113: level:  9  moves:     5192 [goal:   294, pit:   210, wall:  1645, max-move:    53] mse:0,534577 fit:2,698045
+12 -     50898: level:  9  moves:     5885 [goal:   335, pit:   217, wall:  1829, max-move:    62] mse:0,301844 fit:2,707137
+ 2 -     46077: level:  9  moves:     3153 [goal:   222, pit:   142, wall:   954, max-move:    25] mse:0,487964 fit:2,721138
+10 -     44306: level:  9  moves:     7031 [goal:   384, pit:   272, wall:  2239, max-move:    82] mse:0,487661 fit:2,696416
+15 -     46700: level: 10  moves:     6764 [goal:   288, pit:   262, wall:  2165, max-move:    73] mse:0,464573 fit:2,672272
+14 -     51952: level: 10  moves:    11741 [goal:   521, pit:   404, wall:  3796, max-move:   132] mse:0,452973 fit:2,683481
+13 -     52345: level: 10  moves:    19792 [goal:   840, pit:   750, wall:  6309, max-move:   225] mse:0,432428 fit:2,673719
+ 0 -     64488: level: 10  moves:    26431 [goal:  1105, pit:   970, wall:  8480, max-move:   300] mse:0,418291 fit:2,674331
+12 -     54123: level: 10  moves:    35605 [goal:  1469, pit:  1354, wall: 11371, max-move:   402] mse:0,553341 fit:2,670973
+ 2 -     48767: level: 10  moves:    29951 [goal:  1280, pit:  1050, wall:  9680, max-move:   360] mse:0,599027 fit:2,678550
+15 -     50203: level: 11  moves:    41263 [goal:  1425, pit:  1601, wall: 13391, max-move:   477] mse:0,325907 fit:2,654557
+14 -     54393: level: 11  moves:    28155 [goal:  1028, pit:  1094, wall:  9019, max-move:   319] mse:0,419846 fit:2,659563
+13 -     55982: level: 11  moves:    42330 [goal:  1548, pit:  1609, wall: 13669, max-move:   480] mse:0,335528 fit:2,660719
+ 0 -     69535: level: 11  moves:    59377 [goal:  2090, pit:  2301, wall: 19193, max-move:   656] mse:0,531396 fit:2,656559
+ 2 -     51668: level: 11  moves:    34694 [goal:  1239, pit:  1262, wall: 11203, max-move:   400] mse:0,409912 fit:2,662182
+16 -     56535: level: 11  moves:    53655 [goal:  1892, pit:  2089, wall: 17280, max-move:   602] mse:0,425074 fit:2,656533
+14 -     57662: level: 12  moves:    38655 [goal:  1344, pit:  1470, wall: 12513, max-move:   455] mse:0,427005 fit:2,656668
+13 -     58101: level: 12  moves:    25095 [goal:   888, pit:   943, wall:  8147, max-move:   288] mse:0,581624 fit:2,658717
+ 0 -     74583: level: 12  moves:    59877 [goal:  2028, pit:  2358, wall: 19333, max-move:   662] mse:0,465900 fit:2,652730
+17 -     56263: level: 12  moves:    54161 [goal:  1880, pit:  2120, wall: 17420, max-move:   595] mse:0,353939 fit:2,655236
+ 2 -     58254: level: 12  moves:    79182 [goal:  2609, pit:  3072, wall: 25546, max-move:   905] mse:0,647037 fit:2,651935
+16 -     58799: level: 12  moves:    27257 [goal:   869, pit:  1088, wall:  8811, max-move:   307] mse:0,648647 fit:2,647485
+
+```
+
+```
+```

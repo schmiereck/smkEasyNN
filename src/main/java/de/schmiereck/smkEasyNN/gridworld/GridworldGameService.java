@@ -72,26 +72,28 @@ public class GridworldGameService {
             switch (actionResult) {
                 case MovedGoal -> {
                     initializeExpectedOutput(expectedOutputArr, 0.0F); // All other actions are generating errors (+/-).
-                    expectedOutputArr[action] = 2.0F; // Great.
+                    expectedOutputArr[action] = calcExpectedOutput(outputArr[action], 2.0F); // Great.
                     runTrain = true;
                 }
                 case Moved -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
                     //randomizeExpectedOutput(expectedOutputArr, rnd);
                     //normalizeExpectedOutput(expectedOutputArr, 0.5F);
-                    expectedOutputArr[action] = 0.75F; // Good.
+                    expectedOutputArr[action] = calcExpectedOutput(outputArr[action], 1.00F); // Good.
                     runTrain = true;
+                    //runTrain = false;
                 }
                 case HitWall -> {
-                    //System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
-                    randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = -1.5F; // Not so good.
+                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    //randomizeExpectedOutput(expectedOutputArr, rnd);
+                    expectedOutputArr[action] = calcUnexpectedOutput(outputArr[action], -1.5F); // Not so good.
                     runTrain = true;
+                    //runTrain = false;
                 }
                 case MovedPit -> {
-                    //System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
-                    randomizeExpectedOutput(expectedOutputArr, rnd);
-                    expectedOutputArr[action] = -2.75F; // Bad.
+                    System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.
+                    //randomizeExpectedOutput(expectedOutputArr, rnd);
+                    expectedOutputArr[action] = calcUnexpectedOutput(outputArr[action], -2.75F); // Bad.
                     runTrain = true;
                 }
                 default -> throw new RuntimeException("Unexpected actionResult \"%s\".".formatted(actionResult));
@@ -134,6 +136,14 @@ public class GridworldGameService {
         gameStatistic.moveCounter += move;
         gameStatistic.mse = mse / trainCount;
         return retHitGoalCounter;
+    }
+
+    private static float calcExpectedOutput(final float output, final float expectedOutput) {
+        return output > expectedOutput ? output : expectedOutput;
+    }
+
+    private static float calcUnexpectedOutput(final float output, final float unexpectedOutput) {
+        return output < unexpectedOutput ? output : unexpectedOutput;
     }
 
     private static void initializeExpectedOutput(final float[] expectedOutputArr, final float value) {

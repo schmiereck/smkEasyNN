@@ -48,9 +48,10 @@ public class GridworldMain {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        final int netCount = 6;
+        final int netCount = 10;
+        final int killSize = 4;
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
-        final MlpConfiguration config = new MlpConfiguration(true, false, 1.0F, 0.0F);
+        final MlpConfiguration config = new MlpConfiguration(true, false, 0.1F, 0.01F);
 
         //final MlpNet[] netArr = new MlpNet[netCount];
         final HashMap<GameStatistic, MlpNet> netArr = new HashMap<>();
@@ -64,7 +65,7 @@ public class GridworldMain {
             final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[9];
             layerConfigArr[0] = new MlpLayerConfig(64 + 1);
             layerConfigArr[1] = new MlpLayerConfig(64);
-            layerConfigArr[2] = new MlpLayerConfig(32);
+            layerConfigArr[2] = new MlpLayerConfig(64);
             layerConfigArr[3] = new MlpLayerConfig(32);
 
             layerConfigArr[4] = new MlpLayerConfig(32);
@@ -75,8 +76,10 @@ public class GridworldMain {
 
             layerConfigArr[0].setIsArray(true);
             layerConfigArr[1].setIsArray(true);
-            layerConfigArr[2].setIsArray(true);
-            layerConfigArr[3].setIsArray(true);
+            //layerConfigArr[2].setIsArray(true);
+            //layerConfigArr[3].setIsArray(true);
+
+            layerConfigArr[4].setIsArray(true);
 
             final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
             //gameStatisticArr[netPos] = new GameStatistic(netPos);
@@ -84,8 +87,8 @@ public class GridworldMain {
 
                     //addForwwardInputs(netArr[netPos], 2, 1, rnd);
             //addForwwardInputs(netArr[netPos], 3, 2, rnd);
-            addForwwardInputs(net, 5, 4, false, false, true, rnd);
-            addForwwardInputs(net, 6, 5, false, false, true, rnd);
+            //addForwwardInputs(net, 5, 4, false, false, true, rnd);
+            //addForwwardInputs(net, 6, 5, false, false, true, rnd);
 
             netArr.put(gameStatistic, net);
         }
@@ -161,16 +164,18 @@ public class GridworldMain {
                     netArr.keySet().stream()
                             .sorted((aGameStatistic, bGameStatistic) -> Float.compare(bGameStatistic.fitness, aGameStatistic.fitness)).toList();
 
-            final GameStatistic fittestGameStatistic = sortedGameStatisticList.get(0);
-            final GameStatistic worstGameStatistic = sortedGameStatisticList.get(sortedGameStatisticList.size() - 1);
+            for (int killPos = 0; killPos < killSize; killPos++) {
+                final GameStatistic fittestGameStatistic = sortedGameStatisticList.get(killPos);
+                final GameStatistic worstGameStatistic = sortedGameStatisticList.get(sortedGameStatisticList.size() - (1 + killPos));
 
-            final MlpNet fittestNet = netArr.get(fittestGameStatistic);
-            final MlpNet newNet = copyNet(fittestNet);
-            final GameStatistic newGameStatistic = copyGameStatistic(newNetPos, fittestGameStatistic);
-            newNetPos++;
+                final MlpNet fittestNet = netArr.get(fittestGameStatistic);
+                final MlpNet newNet = copyNet(fittestNet);
+                final GameStatistic newGameStatistic = copyGameStatistic(newNetPos, fittestGameStatistic);
+                newNetPos++;
 
-            netArr.remove(worstGameStatistic);
-            netArr.put(newGameStatistic, newNet);
+                netArr.remove(worstGameStatistic);
+                netArr.put(newGameStatistic, newNet);
+            }
         }
     }
 
