@@ -187,6 +187,23 @@ public final class MlpLayerService {
         }
     }
 
+    public static void addShortTermMemoryInputs(final MlpNet mlpNet,
+                                                final int layerPos, final int firstNeuronPos, final int lastNeuronPos,
+                                                final boolean useError, final boolean forward,
+                                                final Random rnd) {
+        final MlpLayer layer = mlpNet.getLayer(layerPos);
+
+        for (int toNeuronPos = firstNeuronPos + 1; toNeuronPos < lastNeuronPos; toNeuronPos++) {
+            final MlpNeuron toNeuron = layer.neuronArr[toNeuronPos];
+
+            final int inputNeuronPos = toNeuronPos - 1;
+            final MlpNeuron inputNeuron = layer.neuronArr[inputNeuronPos];
+
+            final MlpSynapse synapse = createSynapse(calcInitWeight2(mlpNet.getInitialWeightValue(), rnd), useError, forward, inputNeuron, rnd);
+            toNeuron.synapseList.add(synapse);
+        }
+    }
+
     private static MlpSynapse createSynapse(final float initWeight, final boolean useError, final boolean forward, final MlpNeuron inputNeuron, final Random rnd) {
         final MlpInputInterface input = inputNeuron;
         final MlpInputErrorInterface inputError;
