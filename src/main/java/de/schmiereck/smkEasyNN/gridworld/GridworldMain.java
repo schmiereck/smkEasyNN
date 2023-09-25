@@ -50,7 +50,7 @@ public class GridworldMain {
 
         final int netCount = 6;
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
-        final MlpConfiguration config = new MlpConfiguration(true, false, 1.0F);
+        final MlpConfiguration config = new MlpConfiguration(true, false, 1.0F, 0.0F);
 
         //final MlpNet[] netArr = new MlpNet[netCount];
         final HashMap<GameStatistic, MlpNet> netArr = new HashMap<>();

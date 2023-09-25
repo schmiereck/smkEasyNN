@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight3;
 
@@ -121,7 +122,9 @@ public final class MlpLayerService {
                                              final MlpConfiguration config, final Random rnd) {
         if (config.useAdditionalBiasInput) {
             final MlpSynapse synapse = new MlpSynapse(biasInput, null, false);
-            synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
+            //synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
+            //synapse.weight = calcInitWeight(config.getInitialBiasWeightValue(), rnd);
+            synapse.weight = config.getInitialBiasWeightValue();
             neuron.synapseList.add(synapse);
         }
         if (config.useAdditionalClockInput) {

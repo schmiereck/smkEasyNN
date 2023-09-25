@@ -42,7 +42,7 @@ public class MlpNetValueToBinaryTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false, 1.0F, 0.0F);
         final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[3];
         layerConfigArr[0] = new MlpLayerConfig(7);
         layerConfigArr[1] = new MlpLayerConfig(7);
