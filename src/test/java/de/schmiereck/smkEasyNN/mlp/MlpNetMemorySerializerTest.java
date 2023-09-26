@@ -103,7 +103,7 @@ public class MlpNetMemorySerializerTest {
 
         //addForwwardInputs(mlpNet, 2, 1, rnd);
         //addForwwardInputs(mlpNet, 4, 2, rnd);
-        addForwwardInputs(mlpNet, 4, 2, true, false, true, false, rnd);
+        addForwwardInputs(mlpNet, 4, 2, true, false, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 5, 2, rnd);
         //addForwwardInputs(mlpNet, 4, 3, rnd);
         //addForwwardInputs(mlpNet, 5, 3, rnd);

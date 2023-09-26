@@ -230,7 +230,7 @@ public class MlpNetValueMemoryAddTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 1, 0, rnd);
 
         final int epochMax = 13_000;

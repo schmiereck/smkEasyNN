@@ -52,7 +52,7 @@ public class MlpNetTimeTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, true, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
         //addForwwardInputs(mlpNet, 3, 1, rnd);
         //addForwwardInputs(mlpNet, 3, 2, rnd);
         //addInternalInputs(mlpNet, 2, rnd);
@@ -172,8 +172,8 @@ public class MlpNetTimeTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, rnd);
-        addForwwardInputs(mlpNet, 3, 2, true, false, true, false, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
+        addForwwardInputs(mlpNet, 3, 2, true, false, true, false, true, rnd);
 
         final int epochMax = 8_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {

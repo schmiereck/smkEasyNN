@@ -218,7 +218,7 @@ public class MlpNetMemoryTest {
         // 2 from ----'
         //addForwwardInputs(mlpNet, 2, 1, rnd);
         //addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 1, 1, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 2, 2, true, false, true, rnd);
 
@@ -286,7 +286,7 @@ public class MlpNetMemoryTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 2, 1, false, false, true, rnd);
         //addForwwardInputs(mlpNet, 3, 1, false, false, true, rnd);
@@ -457,7 +457,7 @@ public class MlpNetMemoryTest {
         // 1 to   <---,
         // 2 from ----'
         //addForwwardInputs(mlpNet, 1, 1, rnd);
-        addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 2, 2, rnd);
         //addForwwardInputs(mlpNet, 3, 2, rnd);
         //addInternalInputs(mlpNet, 1, rnd);
