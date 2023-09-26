@@ -171,11 +171,16 @@ public final class MlpService {
                 final float inputValue;
                 if (synapse.forward) {
                     errorValue = neuron.errorValue + neuron.lastErrorValue;
-                    //errorValue = neuron.lastError;
+                    //errorValue = neuron.lastErrorValue;
                     //errorValue = neuron.errorValue;
-                    inputValue = synapse.getInput().getLastInputValue();
+//                    inputValue = synapse.getInput().getLastInputValue();
                 } else {
                     errorValue = neuron.errorValue;
+//                    inputValue = synapse.getInput().getInputValue();
+                }
+                if (synapse.forward || synapse.useLastInput) {
+                    inputValue = synapse.getInput().getLastInputValue();
+                } else {
                     inputValue = synapse.getInput().getInputValue();
                 }
 
@@ -204,7 +209,7 @@ public final class MlpService {
         }
 
         final MlpLayer outputLayer = mlpNet.getOutputLayer();
-        final float[] layerOutputArr = new float[outputLayer.neuronArr.length];
+        final float[] layerOutputArr = mlpNet.getLayerOutputArr();
         for (int outputPos = 0; outputPos < outputLayer.neuronArr.length; outputPos++) {
             layerOutputArr[outputPos] = outputLayer.neuronArr[outputPos].outputValue;
         }
@@ -220,8 +225,12 @@ public final class MlpService {
             for (int inputPos = 0; inputPos < neuron.synapseList.size(); inputPos++) {
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
 
-                final float inputValue = synapse.getInput().getInputValue();
-
+                final float inputValue;
+                if (synapse.useLastInput) {
+                    inputValue = synapse.getInput().getLastInputValue();
+                } else {
+                    inputValue = synapse.getInput().getInputValue();
+                }
                 neuron.outputValue += synapse.weight * inputValue;
             }
             if (!mlpLayer.isOutputLayer) {

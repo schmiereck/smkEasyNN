@@ -47,17 +47,17 @@ public class MlpNetTimeTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
+        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
 
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 3, 1, rnd);
         //addForwwardInputs(mlpNet, 3, 2, rnd);
         //addInternalInputs(mlpNet, 2, rnd);
 
-        final int epochMax = 6_000;
+        final int epochMax = 7_500;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
@@ -172,10 +172,10 @@ public class MlpNetTimeTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, rnd);
-        addForwwardInputs(mlpNet, 3, 2, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, rnd);
+        addForwwardInputs(mlpNet, 3, 2, true, false, true, false, rnd);
 
-        final int epochMax = 7_000;
+        final int epochMax = 8_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);

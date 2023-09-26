@@ -4,6 +4,7 @@ public class MlpSynapse {
     private MlpInputInterface input;
     private MlpInputErrorInterface inputError;
     boolean forward = false;
+    boolean useLastInput = false;
 
     float weight;
 
@@ -12,10 +13,11 @@ public class MlpSynapse {
      */
     float dweight;
 
-    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean forward) {
+    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean forward, final boolean useLastInput) {
         this.input = input;
         this.inputError = inputError;
         this.forward = forward;
+        this.useLastInput = useLastInput;
     }
 
     public MlpInputInterface getInput() {

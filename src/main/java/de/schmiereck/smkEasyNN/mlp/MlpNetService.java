@@ -42,7 +42,10 @@ public final class MlpNetService {
 
         net.setLayerArr(createLayers(layerConfigArr,
                 net.getValueInputArr(), net.getBiasInput(), net.getClockInput(),
-                net.getConfig(), true, rnd));
+                net.getConfig(), true, false, rnd));
+
+        final MlpLayer outputLayer = net.getOutputLayer();
+        net.setLayerOutputArr(new float[outputLayer.neuronArr.length]);
 
         return net;
     }
@@ -53,6 +56,9 @@ public final class MlpNetService {
         newNet.setValueInputArr(duplicateValueInputArr(net.getValueInputArr()));
         newNet.setLayerArr(duplicateNeuronLayers(newNet, net.getLayerArr()));
         duplicateSynapses(newNet, net.getLayerArr());
+
+        final MlpLayer outputLayer = newNet.getOutputLayer();
+        newNet.setLayerOutputArr(new float[outputLayer.neuronArr.length]);
 
         return newNet;
     }
@@ -107,7 +113,7 @@ public final class MlpNetService {
             inputError = null;
         }
 
-        final MlpSynapse newSynapse = new MlpSynapse(input, inputError, synapse.forward);
+        final MlpSynapse newSynapse = new MlpSynapse(input, inputError, synapse.forward, synapse.useLastInput);
         newSynapse.weight = synapse.weight;
         newSynapse.dweight = synapse.dweight;
         return newSynapse;
@@ -145,6 +151,7 @@ public final class MlpNetService {
             final MlpNeuron neuron = layer.neuronArr[neuronPos];
             final MlpNeuron newNeuron = newLayer.neuronArr[neuronPos];
 
+            newNeuron.neuronNr = neuron.neuronNr;
             newNeuron.outputValue = neuron.outputValue;
             newNeuron.lastOutputValue = neuron.lastOutputValue;
             newNeuron.errorValue = neuron.errorValue;

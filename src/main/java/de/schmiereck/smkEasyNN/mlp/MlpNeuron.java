@@ -5,7 +5,7 @@ import java.util.List;
 
 public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     final int layerNr;
-    final int neuronNr;
+    int neuronNr;
     List<MlpSynapse> synapseList;
     float outputValue;
     float lastOutputValue;

@@ -5,7 +5,7 @@ public class MlpNet {
     final MlpInputInterface biasInput;
     final MlpInputInterface clockInput;
     private MlpValueInput[] valueInputArr;
-
+    private float[] layerOutputArr;
     private final MlpConfiguration config;
 
     public MlpNet(final MlpConfiguration config) {
@@ -41,6 +41,14 @@ public class MlpNet {
 
     public MlpInputInterface getClockInput() {
         return this.clockInput;
+    }
+
+    public float[] getLayerOutputArr() {
+        return this.layerOutputArr;
+    }
+
+    public void setLayerOutputArr(float[] layerOutputArr) {
+        this.layerOutputArr = layerOutputArr;
     }
 
     public MlpLayer getLayer(final int layerPos) {
