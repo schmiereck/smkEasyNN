@@ -113,7 +113,8 @@ public final class MlpNetService {
             inputError = null;
         }
 
-        final MlpSynapse newSynapse = new MlpSynapse(input, inputError, synapse.useLastError, synapse.useLastInput);
+        final MlpSynapse newSynapse = new MlpSynapse(input, inputError,
+                synapse.useLastError, synapse.useLastInput, synapse.useTrainLastInput);
         newSynapse.weight = synapse.weight;
         newSynapse.dweight = synapse.dweight;
         return newSynapse;

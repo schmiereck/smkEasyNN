@@ -1,6 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -225,10 +224,11 @@ public class MlpArrayLayerTest {
 
         final MlpNet mlpNet = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, false, rnd);
+        //addForwwardInputs2(mlpNet, 2, 1, true, false, true, false, false, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
+        //addAdditionalBiasInputToLayer(mlpNet, 2, false, rnd);
 
-        final int epochMax = 6_000; // Flat
-        //final int epochMax = 7_800; // Array
+        final int epochMax = 18_000; // Flat
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);

@@ -1,7 +1,7 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addAdditionalBiasInputToLayer;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addShortTermMemoryInputs;
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -208,7 +208,7 @@ public class MlpNetMemoryTest {
         final Result result = arrangeResult();
         final int[] layerSizeArr = new int[]{ 1, 4, 8, 1 };
 
-        final Random rnd = new Random(123456);
+        final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
         final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
@@ -218,17 +218,21 @@ public class MlpNetMemoryTest {
         // 2 from ----'
         //addForwwardInputs(mlpNet, 2, 1, rnd);
         //addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
+        //addForwwardInputs2(mlpNet, 2, 1, true, false, true, false, true, rnd);
         addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
+        addAdditionalBiasInputToLayer(mlpNet, 1, true, rnd);
+        //addShortTermMemoryInputs(mlpNet, 2, 2, 3, false, true, true, rnd);
         //addForwwardInputs(mlpNet, 1, 1, true, false, true, rnd);
         //addForwwardInputs(mlpNet, 2, 2, true, false, true, rnd);
 
-        final int epochMax = 26_000;
+        final int epochMax = 85_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
+                //MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue);
             }
         }
 
@@ -286,19 +290,19 @@ public class MlpNetMemoryTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
-        //addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
-        //addForwwardInputs(mlpNet, 2, 1, false, false, true, rnd);
-        //addForwwardInputs(mlpNet, 3, 1, false, false, true, rnd);
-        //addForwwardInputs(mlpNet, 3, 1, false, false, true, rnd);
+        //addForwwardInputs2(mlpNet, 2, 1, true, false, true, false, true, rnd);
+        //addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
+        //addAdditionalBiasInputToLayer(mlpNet, 1, true, rnd);
+        addShortTermMemoryInputs(mlpNet, 2, 4, 7, false, true, true, rnd);
 
-        final int epochMax = 26_000;
+        final int epochMax = 6_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.1F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
+                //MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue);
             }
         }
 

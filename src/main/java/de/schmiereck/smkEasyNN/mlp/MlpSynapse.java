@@ -14,10 +14,6 @@ public class MlpSynapse {
      */
     float dweight;
 
-    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean useLastError, final boolean useLastInput) {
-        this(input, inputError, useLastError, useLastInput, useLastInput);
-    }
-
     public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean useLastError, final boolean useLastInput, final boolean useTrainLastInput) {
         this.input = input;
         this.inputError = inputError;

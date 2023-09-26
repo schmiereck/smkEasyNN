@@ -1,6 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addShortTermMemoryInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.runTrainWithGrowingTrainSize;
@@ -93,24 +93,11 @@ public class MlpNetMemorySerializerTest {
 
         final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, true, rnd);
 
-        //addForwwardInputs(mlpNet, 3, 3, rnd);
-        //addForwwardInputs(mlpNet, 4, 4, rnd);
-        //addForwwardInputs(mlpNet, 5, 5, rnd);
-
-        //addForwwardInputs(mlpNet, 3, 2, rnd);
-        //addForwwardInputs(mlpNet, 4, 2, rnd);
-        //addForwwardInputs(mlpNet, 5, 2, rnd);
-
-        //addForwwardInputs(mlpNet, 2, 1, rnd);
-        //addForwwardInputs(mlpNet, 4, 2, rnd);
         addForwwardInputs(mlpNet, 4, 2, true, false, true, false, true, rnd);
-        //addForwwardInputs(mlpNet, 5, 2, rnd);
-        //addForwwardInputs(mlpNet, 4, 3, rnd);
-        //addForwwardInputs(mlpNet, 5, 3, rnd);
-        //addForwwardInputs(mlpNet, 6, 3, rnd);
-        //addForwwardInputs(mlpNet, 5, 3, rnd);
+        //addAdditionalBiasInputToLayer(mlpNet, 2, true, rnd);
+        addShortTermMemoryInputs(mlpNet, 2, 5, 9, false, true, true, rnd);
 
-        final int epochMax = 50_000;
+        final int epochMax = 25_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);

@@ -121,14 +121,15 @@ public final class MlpLayerService {
     private static void addAdditionalSynapse(final MlpNeuron neuron, final MlpInputInterface biasInput, final MlpInputInterface clockInput,
                                              final MlpConfiguration config, final Random rnd) {
         if (config.useAdditionalBiasInput) {
-            final MlpSynapse synapse = new MlpSynapse(biasInput, null, false, false);
+            final MlpSynapse synapse = new MlpSynapse(biasInput, null, false, false, false);
             //synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
             //synapse.weight = calcInitWeight(config.getInitialBiasWeightValue(), rnd);
-            synapse.weight = config.getInitialBiasWeightValue();
+            synapse.weight = config.getInitialBiasWeightValue(); // TODO XXX
+            // synapse.weight = calcInitWeight2(config.getInitialWeightValue(), rnd);
             neuron.synapseList.add(synapse);
         }
         if (config.useAdditionalClockInput) {
-            final MlpSynapse synapse = new MlpSynapse(clockInput, null, false, false);
+            final MlpSynapse synapse = new MlpSynapse(clockInput, null, false, false, false);
             synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
             neuron.synapseList.add(synapse);
         }
@@ -138,6 +139,14 @@ public final class MlpLayerService {
                                          final boolean createManyToMany, final boolean useError, final boolean useLastError,
                                          final Random rnd) {
         final boolean useLastInput = false;
+        addForwwardInputs(mlpNet, inputLayerPos, toLayerPos,
+                            createManyToMany, useError, useLastError, useLastInput, useLastInput,
+                            rnd);
+    }
+
+    public static void addForwwardInputs(final MlpNet mlpNet, final int inputLayerPos, final int toLayerPos,
+                                         final boolean createManyToMany, final boolean useError, final boolean useLastError, final boolean useLastInput,
+                                         final Random rnd) {
         addForwwardInputs(mlpNet, inputLayerPos, toLayerPos,
                             createManyToMany, useError, useLastError, useLastInput, useLastInput,
                             rnd);
@@ -173,11 +182,13 @@ public final class MlpLayerService {
                     final MlpSynapse synapse = createSynapse(calcInitWeight2(mlpNet.getInitialWeightValue(), rnd), useError, useLastError, useLastInput, useTrainLastInput, inputNeuron, rnd);
                     toNeuron.synapseList.add(synapse);
                 });
-                if (mlpNet.getUseAdditionalBiasInput()) {
-                    final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, useLastError, false);
+                /*
+                if (mlpNet.getUseAdditionalBiasInput()) {  // TODO XXX
+                    final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, useLastError, false, false);
                     synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
                     toNeuron.synapseList.add(synapse);
                 }
+                */
             });
         } else {
             for (int toNeuronPos = 0; toNeuronPos < toLayer.neuronArr.length; toNeuronPos++) {
@@ -190,6 +201,18 @@ public final class MlpLayerService {
                 toNeuron.synapseList.add(synapse);
             }
         }
+    }
+
+    public static void addAdditionalBiasInputToLayer(final MlpNet mlpNet, final int toLayerPos, final boolean useLastError, final Random rnd) {
+        final MlpLayer toLayer = mlpNet.getLayer(toLayerPos);
+
+        Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
+            if (mlpNet.getUseAdditionalBiasInput()) {  // TODO XXX
+                final MlpSynapse synapse = new MlpSynapse(mlpNet.biasInput, null, useLastError, false, false);
+                synapse.weight = calcInitWeight2(mlpNet.getInitialWeightValue(), rnd);
+                toNeuron.synapseList.add(synapse);
+            }
+        });
     }
 
     public static void addShortTermMemoryInputs(final MlpNet mlpNet,
