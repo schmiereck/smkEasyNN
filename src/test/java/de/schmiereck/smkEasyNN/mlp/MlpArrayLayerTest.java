@@ -6,10 +6,108 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class MlpArrayLayerTest {
+
+    @Test
+    void GIVEN_3x4_inputs_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false, 1.25F);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[2];
+        layerConfigArr[0] = new MlpLayerConfig(4*3);
+        layerConfigArr[1] = new MlpLayerConfig(4*3);
+
+        layerConfigArr[0].setIsArray(true,1, 1, 4, 3, 0);
+        layerConfigArr[1].setIsArray(true,1, 1, 4, 3, 0);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        Assertions.assertEquals(4*3, net.getValueInputArr().length);
+        Assertions.assertEquals(2, layerArr.length);
+        Assertions.assertEquals(4*3, layerArr[0].neuronArr.length);
+
+        //   | 1  2  3  4
+        // --+------------
+        // 1 | 0  1  2  3
+        // 2 | 4  5  6  7
+        // 3 | 8  9 10 11
+
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[3].synapseList.size());
+
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[4].synapseList.size());
+        Assertions.assertEquals(3*3 + 1, layerArr[0].neuronArr[5].synapseList.size());
+        Assertions.assertEquals(3*3 + 1, layerArr[0].neuronArr[6].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[7].synapseList.size());
+
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[8].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[9].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[10].synapseList.size());
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[11].synapseList.size());
+    }
+
+    @Test
+    void GIVEN_4x4x4p1_inputs_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false, 1.25F);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[2];
+        layerConfigArr[0] = new MlpLayerConfig(64+1);
+        layerConfigArr[1] = new MlpLayerConfig(64);
+
+        layerConfigArr[0].setIsArray(true,1, 1, 16, 4, 1);
+        layerConfigArr[1].setIsArray(true,1, 1, 16, 4, 0);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        Assertions.assertEquals(64+1, net.getValueInputArr().length);
+        Assertions.assertEquals(2, layerArr.length);
+        Assertions.assertEquals(64+1, layerArr[0].neuronArr.length);
+
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[3].synapseList.size());
+        // ...
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[14].synapseList.size());
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[15].synapseList.size());
+
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[16].synapseList.size());
+        Assertions.assertEquals(3*3 + 1, layerArr[0].neuronArr[17].synapseList.size());
+        // ...
+        Assertions.assertEquals(3*3 + 1, layerArr[0].neuronArr[30].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[31].synapseList.size());
+
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[32].synapseList.size());
+        Assertions.assertEquals(3*3 + 1, layerArr[0].neuronArr[33].synapseList.size());
+        // ...
+        Assertions.assertEquals(3*3 + 1, layerArr[0].neuronArr[46].synapseList.size());
+        Assertions.assertEquals(3*2 + 1, layerArr[0].neuronArr[47].synapseList.size());
+
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[48].synapseList.size());
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[49].synapseList.size());
+        // ...
+        Assertions.assertEquals(2*3 + 1, layerArr[0].neuronArr[62].synapseList.size());
+        Assertions.assertEquals(2*2 + 1, layerArr[0].neuronArr[63].synapseList.size());
+
+        Assertions.assertEquals(16*4+1 + 1, layerArr[0].neuronArr[64].synapseList.size());
+    }
 
     @Test
     void GIVEN_value_input_moves_THEN_direction_is_output() {
@@ -219,8 +317,8 @@ public class MlpArrayLayerTest {
         layerConfigArr[3] = new MlpLayerConfig(8);
         layerConfigArr[4] = new MlpLayerConfig(5);
 
-        layerConfigArr[0].setIsArray(true);
-        layerConfigArr[1].setIsArray(true);
+        layerConfigArr[0].setIsArray(true,4, 3, 4, 3, 0);
+        layerConfigArr[1].setIsArray(true,4, 3, 4, 3, 12);
 
         final MlpNet mlpNet = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
@@ -228,10 +326,10 @@ public class MlpArrayLayerTest {
         addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
         //addAdditionalBiasInputToLayer(mlpNet, 2, false, rnd);
 
-        final int epochMax = 18_000; // Flat
+        final int epochMax = 72_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);

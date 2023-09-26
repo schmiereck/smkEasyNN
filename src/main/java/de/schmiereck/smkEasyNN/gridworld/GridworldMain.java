@@ -61,24 +61,24 @@ public class GridworldMain {
         //final int[] epocheArr = new int[netCount];
 
         for (int netPos = 0; netPos < netCount; netPos++) {
-            final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[9];
+            final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[11];
             layerConfigArr[0] = new MlpLayerConfig(64 + 1);
-            layerConfigArr[1] = new MlpLayerConfig(64);
-            layerConfigArr[2] = new MlpLayerConfig(64);
-            layerConfigArr[3] = new MlpLayerConfig(32);
+            layerConfigArr[1] = new MlpLayerConfig(64 + 1);
+            layerConfigArr[2] = new MlpLayerConfig(64 + 1);
+            layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
 
-            layerConfigArr[4] = new MlpLayerConfig(32);
-            layerConfigArr[5] = new MlpLayerConfig(32);
-            layerConfigArr[6] = new MlpLayerConfig(32);
-            layerConfigArr[7] = new MlpLayerConfig(32);
-            layerConfigArr[8] = new MlpLayerConfig(4);
+            layerConfigArr[4] = new MlpLayerConfig(32 + rnd.nextInt(64));
+            layerConfigArr[5] = new MlpLayerConfig(32 + rnd.nextInt(64));
+            layerConfigArr[6] = new MlpLayerConfig(32 + rnd.nextInt(64));
+            layerConfigArr[7] = new MlpLayerConfig(32 + rnd.nextInt(64));
 
-            layerConfigArr[0].setIsArray(true);
-            layerConfigArr[1].setIsArray(true);
-            //layerConfigArr[2].setIsArray(true);
-            //layerConfigArr[3].setIsArray(true);
+            layerConfigArr[8] = new MlpLayerConfig(32);
+            layerConfigArr[9] = new MlpLayerConfig(32);
 
-            layerConfigArr[4].setIsArray(true);
+            layerConfigArr[10] = new MlpLayerConfig(4);
+
+            layerConfigArr[0].setIsArray(true,4, 4, 16, 4, 1);
+            layerConfigArr[1].setIsArray(true,4, 4, 16, 4, 1);
 
             final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
             //gameStatisticArr[netPos] = new GameStatistic(netPos);
