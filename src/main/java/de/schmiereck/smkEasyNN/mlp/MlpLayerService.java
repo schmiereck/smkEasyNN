@@ -134,10 +134,6 @@ public final class MlpLayerService {
         }
     }
 
-    public static void addForwwardInputs(final MlpNet mlpNet, final int inputLayerPos, final int toLayerPos, final Random rnd) {
-        addForwwardInputs(mlpNet, inputLayerPos, toLayerPos, true, false, true, false, false, rnd);
-    }
-
     public static void addForwwardInputs(final MlpNet mlpNet, final int inputLayerPos, final int toLayerPos,
                                          final boolean createManyToMany, final boolean useError, final boolean useLastError,
                                          final Random rnd) {

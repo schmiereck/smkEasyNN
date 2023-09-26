@@ -30,8 +30,8 @@ public class TicTacToeMain {
             final MlpConfiguration config = new MlpConfiguration(true, true, 3.0F);
             netArr[pos] = MlpNetService.createNet(config, layerSizeArr, rnd);
 
-            addForwwardInputs(netArr[pos], 2, 1, rnd);
-            addForwwardInputs(netArr[pos], 3, 2, rnd);
+            addForwwardInputs(netArr[pos], 2, 1, true, false, true, false, false, rnd);
+            addForwwardInputs(netArr[pos], 3, 2, true, false, true, false, false, rnd);
         }
 
         final int[] board = new int[3 * 3];

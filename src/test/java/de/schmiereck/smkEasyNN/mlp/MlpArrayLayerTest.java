@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 public class MlpArrayLayerTest {
 
     @Test
-    @Disabled
     void GIVEN_value_input_moves_THEN_direction_is_output() {
         // Arrange
         final float[][][] trainInputArrArrArr = new float[][][]
@@ -226,9 +225,9 @@ public class MlpArrayLayerTest {
 
         final MlpNet mlpNet = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
-        addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, false, rnd);
 
-        final int epochMax = 25_000; // Flat
+        final int epochMax = 6_000; // Flat
         //final int epochMax = 7_800; // Array
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
