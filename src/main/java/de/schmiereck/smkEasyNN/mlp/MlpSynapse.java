@@ -3,7 +3,7 @@ package de.schmiereck.smkEasyNN.mlp;
 public class MlpSynapse {
     private MlpInputInterface input;
     private MlpInputErrorInterface inputError;
-    boolean forward = false;
+    boolean useLastError = false;
     boolean useLastInput = false;
     boolean useTrainLastInput = false;
 
@@ -14,14 +14,14 @@ public class MlpSynapse {
      */
     float dweight;
 
-    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean forward, final boolean useLastInput) {
-        this(input, inputError, forward, useLastInput, useLastInput);
+    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean useLastError, final boolean useLastInput) {
+        this(input, inputError, useLastError, useLastInput, useLastInput);
     }
 
-    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean forward, final boolean useLastInput, final boolean useTrainLastInput) {
+    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean useLastError, final boolean useLastInput, final boolean useTrainLastInput) {
         this.input = input;
         this.inputError = inputError;
-        this.forward = forward;
+        this.useLastError = useLastError;
         this.useLastInput = useLastInput;
         this.useTrainLastInput = useTrainLastInput;
     }

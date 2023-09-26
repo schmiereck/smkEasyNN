@@ -146,10 +146,10 @@ public final class MlpService {
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
 
                 final MlpInputErrorInterface inputError = synapse.getInputError();
-                if (synapse.forward) {
+                if (synapse.useLastError) {
                     if (Objects.nonNull(inputError)) {
                         inputError.addLastErrorValue(synapse.weight * neuron.lastErrorValue);
-                        inputError.addErrorValue(synapse.weight * neuron.lastErrorValue);
+                        inputError.addErrorValue(synapse.weight * neuron.errorValue);
                     }
                 } else {
                     if (Objects.nonNull(inputError)) {
@@ -169,7 +169,7 @@ public final class MlpService {
 
                 final float errorValue;
                 final float inputValue;
-                if (synapse.forward) {
+                if (synapse.useLastError) {
                     errorValue = neuron.errorValue + neuron.lastErrorValue;
                     //errorValue = neuron.lastErrorValue;
                     //errorValue = neuron.errorValue;
