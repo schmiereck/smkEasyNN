@@ -230,13 +230,13 @@ public class MlpNetValueMemoryAddTest {
         // 0
         // 1 to   <---,
         // 2 from ----'
-        addForwwardInputs(mlpNet, 2, 1, rnd);
+        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, rnd);
         //addForwwardInputs(mlpNet, 1, 0, rnd);
 
-        final int epochMax = 3_000;
+        final int epochMax = 13_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.1F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
