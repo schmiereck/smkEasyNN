@@ -43,12 +43,12 @@ public class GridworldGameService {
         {
             final float[] expectedOutputArr = new float[4];
             final float[] outputArr = MlpSaveService.run(net, inputArr);
-            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, gameStatistic.learningRate, gameStatistic.momentum);
         }
         {
             final float[] expectedOutputArr = new float[4];
             final float[] outputArr = MlpSaveService.run(net, inputArr);
-            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+            MlpService.trainWithOutput(net, expectedOutputArr, outputArr, gameStatistic.learningRate, gameStatistic.momentum);
         }
         inputArr[4 * 4 * 4] = 0.0F;
 
@@ -102,7 +102,7 @@ public class GridworldGameService {
                 //normalizeExpectedOutput(expectedOutputArr);
 
                 //MlpSaveService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
-                mse += MlpService.trainWithOutput(net, expectedOutputArr, outputArr, 0.3F, 0.6F);
+                mse += MlpService.trainWithOutput(net, expectedOutputArr, outputArr, gameStatistic.learningRate, gameStatistic.momentum);
                 trainCount++;
             }
             move++;

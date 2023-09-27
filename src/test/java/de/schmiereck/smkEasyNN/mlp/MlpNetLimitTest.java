@@ -47,7 +47,7 @@ public class MlpNetLimitTest {
         //final Random rnd = new Random();
 
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
-        final MlpConfiguration config = new MlpConfiguration(true, false, 3.0F);
+        final MlpConfiguration config = new MlpConfiguration(true, false, 2.1F);
         final MlpNet mlpNet = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         final int epochMax = 100;

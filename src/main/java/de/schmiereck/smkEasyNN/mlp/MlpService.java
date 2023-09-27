@@ -97,7 +97,8 @@ public final class MlpService {
     /**
      * @return mittlerer quadratischen Fehler (MSE).
      */
-    public static float trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr, final float learningRate, final float momentum) {
+    public static float trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr,
+                                        final float learningRate, final float momentum) {
         float mainOutputMseErrorValue = 0.0F;
 
         Arrays.stream(mlpNet.layerArr).forEach(layer -> {

@@ -309,7 +309,7 @@ public class MlpArrayLayerTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false, 1.25F);
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false, 1.5F, 0.0F);
         final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[5];
         layerConfigArr[0] = new MlpLayerConfig(12);
         layerConfigArr[1] = new MlpLayerConfig(24);
@@ -326,10 +326,10 @@ public class MlpArrayLayerTest {
         addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
         //addAdditionalBiasInputToLayer(mlpNet, 2, false, rnd);
 
-        final int epochMax = 72_000;
+        final int epochMax = 96_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.9F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);

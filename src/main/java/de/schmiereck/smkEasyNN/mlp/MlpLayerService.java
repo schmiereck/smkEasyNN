@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight3;
 
@@ -54,11 +55,14 @@ public final class MlpLayerService {
             final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
 
             for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
-                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr, useError, useLastInput, useLastInput, config.getInitialWeightValue());
+                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr,
+                        useError, useLastInput, useLastInput,
+                        //config.getInitialWeightValue());
+                        calcInitWeight(config.getInitialWeightValue(), rnd));
             }
             addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
         }
-        mlpLayer.initWeights2(config.initialWeightValue, rnd);
+        //mlpLayer.initWeights2(config.initialWeightValue, rnd);
         mlpLayer.setIsOutputLayer(isOutputLayer);
 
         return mlpLayer;
@@ -94,7 +98,10 @@ public final class MlpLayerService {
                 for (int yPos = yMinPos; yPos <= yMaxPos; yPos++) {
                     for (int xPos = xMinPos; xPos <= xMaxPos; xPos++) {
                         final int inputLayerNeuronPos = ((yPos) * xArraySize) + (xPos);
-                        addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr, useError, useLastInput, useLastInput, config.getInitialWeightValue());
+                        addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr,
+                                useError, useLastInput, useLastInput,
+                                //config.getInitialWeightValue());
+                                calcInitWeight(config.getInitialWeightValue(), rnd));
                     }
                 }
                 addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
@@ -109,7 +116,7 @@ public final class MlpLayerService {
             addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
         }
 
-        mlpLayer.initWeights2(config.initialWeightValue, rnd);
+        //mlpLayer.initWeights2(config.initialWeightValue, rnd);
         mlpLayer.setIsOutputLayer(isOutputLayer);
 
         return mlpLayer;

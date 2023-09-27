@@ -44,13 +44,12 @@ public class GridworldMain {
         //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 64, 64, 64, 64, 4 }; // Best 3
         //final int[] layerSizeArr = new int[]{ 64 + 1, 64, 32, 32, 32, 32, 4 }; // Best 4
 
-        final Random rnd = new Random(12345);
+        final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
         final int netCount = 10;
         final int killSize = 4;
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
-        final MlpConfiguration config = new MlpConfiguration(true, false, 0.1F, 0.01F);
 
         //final MlpNet[] netArr = new MlpNet[netCount];
         final HashMap<GameStatistic, MlpNet> netArr = new HashMap<>();
@@ -61,29 +60,48 @@ public class GridworldMain {
         //final int[] epocheArr = new int[netCount];
 
         for (int netPos = 0; netPos < netCount; netPos++) {
-            final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[11];
-            layerConfigArr[0] = new MlpLayerConfig(64 + 1);
-            layerConfigArr[1] = new MlpLayerConfig(64 + 1);
-            layerConfigArr[2] = new MlpLayerConfig(64 + 1);
-            layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+            final MlpConfiguration config;
+            final MlpLayerConfig[] layerConfigArr;
+            switch (netPos % 2) {
+                case 0 -> {
+                    config = new MlpConfiguration(true, false, 0.2F, 0.0F);
+                    layerConfigArr = new MlpLayerConfig[6];
+                    layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+                    layerConfigArr[1] = new MlpLayerConfig(164 + 1);
+                    layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
 
-            layerConfigArr[4] = new MlpLayerConfig(32 + rnd.nextInt(64));
-            layerConfigArr[5] = new MlpLayerConfig(32 + rnd.nextInt(64));
-            layerConfigArr[6] = new MlpLayerConfig(32 + rnd.nextInt(64));
-            layerConfigArr[7] = new MlpLayerConfig(32 + rnd.nextInt(64));
+                    layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+                    layerConfigArr[4] = new MlpLayerConfig(32);
 
-            layerConfigArr[8] = new MlpLayerConfig(32);
-            layerConfigArr[9] = new MlpLayerConfig(32);
+                    layerConfigArr[5] = new MlpLayerConfig(4);
+                }
+                default -> {
+                    config = new MlpConfiguration(true, rnd.nextBoolean(), rnd.nextFloat(0.05F) + 0.1F, 0.0F);
+                    layerConfigArr = new MlpLayerConfig[8];
+                    layerConfigArr[0] = new MlpLayerConfig(64 + 1);
 
-            layerConfigArr[10] = new MlpLayerConfig(4);
+                    layerConfigArr[1] = new MlpLayerConfig(64 + 1);
+                    layerConfigArr[2] = new MlpLayerConfig(64 + rnd.nextInt(32));
 
-            layerConfigArr[0].setIsArray(true,4, 4, 16, 4, 1);
-            layerConfigArr[1].setIsArray(true,4, 4, 16, 4, 1);
+                    layerConfigArr[3] = new MlpLayerConfig(32 + rnd.nextInt(32));
+                    layerConfigArr[4] = new MlpLayerConfig(32 + rnd.nextInt(32));
+
+                    layerConfigArr[5] = new MlpLayerConfig(32);
+                    layerConfigArr[6] = new MlpLayerConfig(16);
+
+                    layerConfigArr[7] = new MlpLayerConfig(4);
+                }
+            }
+
+            //layerConfigArr[0].setIsArray(true,4, 4, 16, 4, 1);
+            //layerConfigArr[1].setIsArray(true,4, 4, 16, 4, 1);
 
             final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
             //gameStatisticArr[netPos] = new GameStatistic(netPos);
             final GameStatistic gameStatistic = new GameStatistic(netPos);
 
+            gameStatistic.learningRate = rnd.nextFloat( 0.6F) + 0.05F;
+            gameStatistic.momentum = rnd.nextFloat( 0.9F) + 0.05F;
                     //addForwwardInputs(netArr[netPos], 2, 1, rnd);
             //addForwwardInputs(netArr[netPos], 3, 2, rnd);
             //addForwwardInputs(net, 5, 4, false, false, true, rnd);
@@ -138,24 +156,25 @@ public class GridworldMain {
 
                 // epoch <
                 // moves (100 goals / 200 moves = 0.5, 100 goals / 100 moves = 1.0)
-                final float m = (gameStatistic.hitGoalCounter +
+                final int ma = (gameStatistic.hitGoalCounter +
                         gameStatistic.hitPitCounter +
                         gameStatistic.maxMoveCounter +
-                        gameStatistic.hitWallCounter) / gameStatistic.moveCounter;
+                        gameStatistic.hitWallCounter);
+                final float m = ((float)ma) / gameStatistic.moveCounter;
                 // 1: more of these results, 0: no results
                 // moves / goal
-                final float mg = calcFit(gameStatistic.hitGoalCounter, gameStatistic.moveCounter);
+                final float mg = (calcFit(gameStatistic.hitGoalCounter, ma) * 10.0F);
                 // moves / pit
-                final float mp = calcFit(gameStatistic.hitPitCounter, gameStatistic.moveCounter);
+                final float mp = (1.0F - (calcFit(gameStatistic.hitPitCounter, ma) * 1.0F));
                 // moves / maxMove
-                final float mm = calcFit(gameStatistic.maxMoveCounter, gameStatistic.moveCounter);
+                final float mm = (0.5F - (calcFit(gameStatistic.maxMoveCounter, ma) * 0.5F));
                 // moves / wall
-                final float mw = calcFit(gameStatistic.hitWallCounter, gameStatistic.moveCounter);
+                final float mw = (0.25F - (calcFit(gameStatistic.hitWallCounter, ma) * 0.25F));
 
                 // bigger is fitter.
-                gameStatistic.fitness = m + (mg * 2.0F) + (2.0F - (mp * 2.0F)) + (0.5F - (mm * 0.5F)) + (0.25F - (mw * 0.25F));
+                gameStatistic.fitness = m + (mg) + (mp) + (mm) + (mw);
 
-                System.out.printf(" fit:%.6f", gameStatistic.fitness);
+                System.out.printf(" (fit:%.3f m:%.2f g:%.2f p:%.2f mm:%.2f w:%.2f)", gameStatistic.fitness, m, mg, mp, mm, mw);
                 System.out.println();
             }
             // Found fittest (fittest first):
@@ -195,6 +214,9 @@ public class GridworldMain {
 
         newGameStatistic.fittnesCounter = gameStatistic.fittnesCounter;
         newGameStatistic.fittnesHitGoalCounter = gameStatistic.fittnesHitGoalCounter;
+
+        newGameStatistic.learningRate = gameStatistic.learningRate;
+        newGameStatistic.momentum = gameStatistic.momentum;
 
         return newGameStatistic;
     }

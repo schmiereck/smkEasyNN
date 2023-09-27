@@ -57,7 +57,7 @@ public class MlpNetTimeTest {
         //addForwwardInputs(mlpNet, 3, 2, rnd);
         //addInternalInputs(mlpNet, 2, rnd);
 
-        final int epochMax = 7_500;
+        final int epochMax = 8_500;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);

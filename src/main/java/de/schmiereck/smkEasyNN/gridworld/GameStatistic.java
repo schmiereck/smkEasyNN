@@ -16,6 +16,9 @@ public class GameStatistic {
     public int fittnesCounter = 0;
     public int fittnesHitGoalCounter = 0;
 
+    public float learningRate = 0.3F;
+    public float momentum = 0.6F;
+
     GameStatistic(final int netPos) {
         this.netPos = netPos;
     }

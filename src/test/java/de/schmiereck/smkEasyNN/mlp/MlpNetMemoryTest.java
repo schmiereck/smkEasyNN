@@ -208,7 +208,7 @@ public class MlpNetMemoryTest {
         final Result result = arrangeResult();
         final int[] layerSizeArr = new int[]{ 1, 4, 8, 1 };
 
-        final Random rnd = new Random(12345);
+        final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
         final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
@@ -262,7 +262,7 @@ public class MlpNetMemoryTest {
         //addShortTermMemoryInputs(mlpNet, 2, 3, 5, false, false, rnd);
         addShortTermMemoryInputs(mlpNet, 1, 0, 1, false, true, true, rnd);
 
-        final int epochMax = 190_000;
+        final int epochMax = 250_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.1F, 0.9F, rnd);
@@ -295,10 +295,10 @@ public class MlpNetMemoryTest {
         //addAdditionalBiasInputToLayer(mlpNet, 1, true, rnd);
         addShortTermMemoryInputs(mlpNet, 2, 4, 7, false, true, true, rnd);
 
-        final int epochMax = 6_000;
+        final int epochMax = 22_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.1F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.01F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 //MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
