@@ -55,10 +55,10 @@ public class MlpNetTestUtils {
     static void actAssertExpectedOutput(final MlpNet mlpNet,
                                         final float[][][] inputArrArrArr, final float[][][] expectedOutputArrArrArr,
                                         final float delta, final boolean withResetOutputs) {
-        int offPos = 0;
+        int offLinePos = 0;
         for (int pos = 0; pos < inputArrArrArr.length; pos++) {
-            actAssertExpectedOutput(mlpNet, offPos, inputArrArrArr[pos], expectedOutputArrArrArr[pos], delta);
-            offPos += inputArrArrArr[pos].length;
+            actAssertExpectedOutput(mlpNet, offLinePos, inputArrArrArr[pos], expectedOutputArrArrArr[pos], delta, withResetOutputs);
+            offLinePos += inputArrArrArr[pos].length;
         }
     }
 
@@ -70,7 +70,7 @@ public class MlpNetTestUtils {
         actAssertExpectedOutput(mlpNet, outputPos, inputArrArr, expectedOutputArrArr, delta, false);
     }
 
-    static void actAssertExpectedOutput(final MlpNet mlpNet, final int outputPos, final float[][] inputArrArr, final float[][] expectedOutputArrArr,
+    static void actAssertExpectedOutput(final MlpNet mlpNet, final int outputLinePos, final float[][] inputArrArr, final float[][] expectedOutputArrArr,
                                         final float delta, final boolean withResetOutputs) {
         if (withResetOutputs) {
             resetNetOutputs(mlpNet);
@@ -83,7 +83,7 @@ public class MlpNetTestUtils {
 
             for (int expectedOutputPos = 0; expectedOutputPos < expectedOutputArr.length; expectedOutputPos++) {
                 Assertions.assertEquals(expectedOutputArr[expectedOutputPos], outputArr[expectedOutputPos], delta,
-                        "expectedOutput line %d: expectedOutputPos %d\n%s".formatted(outputPos + resultPos, expectedOutputPos,
+                        "expectedOutput line %d: expectedOutputPos %d\n%s".formatted(outputLinePos + resultPos, expectedOutputPos,
                                 formatResultLine(inputArr, outputArr, expectedOutputArr)));
             }
         }

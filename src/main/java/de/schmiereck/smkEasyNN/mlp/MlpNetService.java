@@ -68,6 +68,10 @@ public final class MlpNetService {
         for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
             final MlpValueInput valueInput = valueInputArr[neuronPos];
             newValueInputArr[neuronPos] = new MlpValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
+
+            newValueInputArr[neuronPos].internalInput = valueInput.internalInput;
+            newValueInputArr[neuronPos].inputLayerNr = valueInput.inputLayerNr;
+            newValueInputArr[neuronPos].inputNeuronNr = valueInput.inputNeuronNr;
         }
         return newValueInputArr;
     }
@@ -163,6 +167,11 @@ public final class MlpNetService {
     }
 
     public static void resetNetOutputs(final MlpNet net) {
+        final MlpValueInput[] valueInputArr = net.getValueInputArr();
+        for (final MlpValueInput valueInput : valueInputArr) {
+            valueInput.setValue(0.0F);
+        }
+
         final MlpLayer[] layerArr = net.getLayerArr();
 
         for (int layerPos = 0; layerPos < layerArr.length; layerPos++) {
@@ -179,5 +188,13 @@ public final class MlpNetService {
         }
 
         net.getClockInput().setValue(MlpService.CLOCK_VALUE);
+    }
+
+    public static void makeInternalInput(final MlpNet net, int inputPos, int inputLayerNr, int inputNeuronNr) {
+        final MlpValueInput[] valueInputArr = net.getValueInputArr();
+
+        valueInputArr[inputPos].internalInput = true;
+        valueInputArr[inputPos].inputLayerNr = inputLayerNr;
+        valueInputArr[inputPos].inputNeuronNr = inputNeuronNr;
     }
 }

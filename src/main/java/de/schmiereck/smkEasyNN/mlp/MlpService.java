@@ -196,7 +196,13 @@ public final class MlpService {
 
     public static float[] run(final MlpNet mlpNet, final float[] inputArr) {
         for (int inputPos = 0; inputPos < inputArr.length; inputPos++) {
-            mlpNet.setInputValue(inputPos, inputArr[inputPos]);
+            final MlpValueInput valueInput = mlpNet.getInputValue(inputPos);
+            if (valueInput.internalInput) {
+                final MlpNeuron neuron = getNeuron(mlpNet, valueInput.inputLayerNr, valueInput.inputNeuronNr);
+                mlpNet.setInputValue(inputPos, neuron.getInputValue());
+            } else {
+                mlpNet.setInputValue(inputPos, inputArr[inputPos]);
+            }
         }
         if (mlpNet.getUseAdditionalClockInput()) {
             if (mlpNet.clockInput.getInputValue() == CLOCK_VALUE) {
@@ -216,6 +222,10 @@ public final class MlpService {
             layerOutputArr[outputPos] = outputLayer.neuronArr[outputPos].outputValue;
         }
         return layerOutputArr;
+    }
+
+    private static MlpNeuron getNeuron(final MlpNet mlpNet, final int inputLayerNr, final int inputNeuronNr) {
+        return mlpNet.getLayerArr()[inputLayerNr].neuronArr[inputNeuronNr];
     }
 
     public static void runLayer(final MlpLayer mlpLayer) {

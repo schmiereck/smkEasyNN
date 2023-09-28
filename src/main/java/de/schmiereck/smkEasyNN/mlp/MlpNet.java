@@ -27,6 +27,10 @@ public class MlpNet {
         this.valueInputArr = valueInputArr;
     }
 
+    public MlpValueInput getInputValue(final int inputPos) {
+        return this.valueInputArr[inputPos];
+    }
+
     public MlpLayer[] getLayerArr() {
         return this.layerArr;
     }
