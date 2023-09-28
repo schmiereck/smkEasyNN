@@ -34,6 +34,15 @@ public class MlpNetPrintUtils {
     }
 
     public static void printFullResultForEpoch(final MlpNet mlpNet,
+                                               final float[] trainInputArr, float[] outputArr, final float[] expectedOutputArr,
+                                               final int epochPos, final float mainOutputMseErrorValue) {
+        printEpochPos(epochPos);
+        printResultLine(trainInputArr, outputArr, expectedOutputArr);
+        printMse(mainOutputMseErrorValue);
+        System.out.println();
+    }
+
+    public static void printFullResultForEpoch(final MlpNet mlpNet,
                                                final float[][][] trainInputArrArrArr, final float[][][] expectedOutputArrArrArr,
                                                final int epochPos, final float mainOutputMseErrorValue, final int samplesLayerPos) {
         System.out.println();
@@ -82,7 +91,7 @@ public class MlpNetPrintUtils {
     }
 
     private static void printEpochPos(final int epochPos) {
-        System.out.printf("%d epoch ", epochPos + 1);
+        System.out.printf("%7d epoch ", epochPos + 1);
     }
 
     static void printResult(final MlpNet mlpNet, final float[][] inputArrArr, final float[][] expectedOutputArrArr) {

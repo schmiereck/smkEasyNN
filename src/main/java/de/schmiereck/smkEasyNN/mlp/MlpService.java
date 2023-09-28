@@ -1,5 +1,7 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpNetService.resetNetOutputs;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -78,6 +80,7 @@ public final class MlpService {
             } else {
                 trainSize = expectedOutputTrainSize;
             }
+            //resetNetOutputs(mlpNet);
             //for (int pos = 0; pos < expectedOutputArrArr.length; pos++) {
             //for (int pos = 0; pos < expectedOutputTrainSize; pos++) {
             for (int pos = 0; pos < trainSize; pos++) {

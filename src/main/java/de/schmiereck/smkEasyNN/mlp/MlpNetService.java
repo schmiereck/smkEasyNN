@@ -161,4 +161,23 @@ public final class MlpNetService {
 
         return newLayer;
     }
+
+    public static void resetNetOutputs(final MlpNet net) {
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        for (int layerPos = 0; layerPos < layerArr.length; layerPos++) {
+            final MlpLayer layer = layerArr[layerPos];
+
+            for (int neuronPos = 0; neuronPos < layer.neuronArr.length; neuronPos++) {
+                final MlpNeuron neuron = layer.neuronArr[neuronPos];
+
+                neuron.setOutputValue(0.0F);
+                neuron.setLastOutputValue(0.0F);
+                neuron.setErrorValue(0.0F);
+                neuron.setLastErrorValue(0.0F);
+            }
+        }
+
+        net.getClockInput().setValue(MlpService.CLOCK_VALUE);
+    }
 }

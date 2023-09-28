@@ -3,6 +3,7 @@ package de.schmiereck.smkEasyNN.mlp;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.formatResultLine;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpochWithTrainSize;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printResultForEpochWithTrainSize;
+import static de.schmiereck.smkEasyNN.mlp.MlpNetService.resetNetOutputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 
 import java.util.Random;
@@ -48,6 +49,12 @@ public class MlpNetTestUtils {
     }
 
     static void actAssertExpectedOutput(final MlpNet mlpNet, final float[][][] inputArrArrArr, final float[][][] expectedOutputArrArrArr, final float delta) {
+        actAssertExpectedOutput(mlpNet, inputArrArrArr, expectedOutputArrArrArr, delta, false);
+    }
+
+    static void actAssertExpectedOutput(final MlpNet mlpNet,
+                                        final float[][][] inputArrArrArr, final float[][][] expectedOutputArrArrArr,
+                                        final float delta, final boolean withResetOutputs) {
         int offPos = 0;
         for (int pos = 0; pos < inputArrArrArr.length; pos++) {
             actAssertExpectedOutput(mlpNet, offPos, inputArrArrArr[pos], expectedOutputArrArrArr[pos], delta);
@@ -60,6 +67,14 @@ public class MlpNetTestUtils {
     }
 
     static void actAssertExpectedOutput(final MlpNet mlpNet, final int outputPos, final float[][] inputArrArr, final float[][] expectedOutputArrArr, final float delta) {
+        actAssertExpectedOutput(mlpNet, outputPos, inputArrArr, expectedOutputArrArr, delta, false);
+    }
+
+    static void actAssertExpectedOutput(final MlpNet mlpNet, final int outputPos, final float[][] inputArrArr, final float[][] expectedOutputArrArr,
+                                        final float delta, final boolean withResetOutputs) {
+        if (withResetOutputs) {
+            resetNetOutputs(mlpNet);
+        }
         for (int resultPos = 0; resultPos < expectedOutputArrArr.length; resultPos++) {
             final float[] expectedOutputArr = expectedOutputArrArr[resultPos];
             final float[] inputArr = inputArrArr[resultPos];

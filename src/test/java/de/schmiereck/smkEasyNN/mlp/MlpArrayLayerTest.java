@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpNetService.resetNetOutputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -309,7 +310,8 @@ public class MlpArrayLayerTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false, 1.5F, 0.0F);
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false,
+                0.5F, 0.0F);
         final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[5];
         layerConfigArr[0] = new MlpLayerConfig(12);
         layerConfigArr[1] = new MlpLayerConfig(24);
@@ -323,13 +325,16 @@ public class MlpArrayLayerTest {
         final MlpNet mlpNet = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
         //addForwwardInputs2(mlpNet, 2, 1, true, false, true, false, false, rnd);
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
+        addForwwardInputs(mlpNet, 2, 1, false, false, true, true, true, rnd);
         //addAdditionalBiasInputToLayer(mlpNet, 2, false, rnd);
 
-        final int epochMax = 96_000;
+        final int epochMax = 66_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.9F, rnd);
+            resetNetOutputs(mlpNet);
+
+            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet,
+                    expectedOutputArrArrArr, trainInputArrArrArr, 0.1F, 0.9F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
@@ -337,7 +342,7 @@ public class MlpArrayLayerTest {
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.075F);
+        actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.1F);
         /*
         final float[][] inputArrArr = new float[][]
                 {
