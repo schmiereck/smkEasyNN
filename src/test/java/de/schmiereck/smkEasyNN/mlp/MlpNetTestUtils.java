@@ -79,13 +79,22 @@ public class MlpNetTestUtils {
             final float[] expectedOutputArr = expectedOutputArrArr[resultPos];
             final float[] inputArr = inputArrArr[resultPos];
 
-            final float[] outputArr = MlpService.run(mlpNet, inputArr);
+            actAssertExpectedOutput(mlpNet, outputLinePos + resultPos, delta, inputArr, expectedOutputArr);
+        }
+    }
 
-            for (int expectedOutputPos = 0; expectedOutputPos < expectedOutputArr.length; expectedOutputPos++) {
-                Assertions.assertEquals(expectedOutputArr[expectedOutputPos], outputArr[expectedOutputPos], delta,
-                        "expectedOutput line %d: expectedOutputPos %d\n%s".formatted(outputLinePos + resultPos, expectedOutputPos,
-                                formatResultLine(inputArr, outputArr, expectedOutputArr)));
-            }
+    private static void actAssertExpectedOutput(final MlpNet mlpNet, final int outputLinePos, final float delta, final float[] inputArr, final float[] expectedOutputArr) {
+        final float[] outputArr = MlpService.run(mlpNet, inputArr);
+
+        assertExpectedOutput("expectedOutput line %d: ".formatted(outputLinePos), delta, inputArr, expectedOutputArr, outputArr);
+    }
+
+    public static void assertExpectedOutput(final String infoStr, final float delta,
+                                            final float[] inputArr, final float[] expectedOutputArr, final float[] outputArr) {
+        for (int expectedOutputPos = 0; expectedOutputPos < expectedOutputArr.length; expectedOutputPos++) {
+            Assertions.assertEquals(expectedOutputArr[expectedOutputPos], outputArr[expectedOutputPos], delta,
+                    "%s expectedOutputPos %d\n%s".formatted(infoStr, expectedOutputPos,
+                            formatResultLine(inputArr, outputArr, expectedOutputArr)));
         }
     }
 

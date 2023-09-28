@@ -8,7 +8,6 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
 import java.util.Random;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class MlpArrayLayerTest {
