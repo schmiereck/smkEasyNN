@@ -22,11 +22,69 @@ public final class MlpService {
     public static final float CLOCK_VALUE = 1.0F;
     public static final float NORM_VALUE = 1.0F;
     public static final int INPUT_LAYER_NR = -1;
+    public static final int FIRST_LAYER_NR = 0;
     public static final int INTERNAL_LAYER_NR = -2;
+    public static final int INTERNAL_INPUT_LAYER_NR = -3;
     public static final int INTERNAL_BIAS_INPUT_NR = 0;
     public static final int INTERNAL_CLOCK_INPUT_NR = 1;
 
     private MlpService() {}
+
+    public static float[] run(final MlpNet net, final float[] inputArr) {
+        for (int inputPos = 0; inputPos < inputArr.length; inputPos++) {
+            net.setInputValue(inputPos, inputArr[inputPos]);
+        }
+
+        final MlpInternalValueInput[] internalValueInputArr = net.getInternalValueInputArr();
+        if (Objects.nonNull(internalValueInputArr)) {
+            for (int inputPos = 0; inputPos < internalValueInputArr.length; inputPos++) {
+                final MlpInternalValueInput valueInput = net.getInternalInputValue(inputPos);
+                final MlpNeuron neuron = getNeuron(net, valueInput.inputLayerNr, valueInput.inputNeuronNr);
+                net.setInternalInputValue(inputPos, neuron.getInputValue());
+            }
+        }
+        if (net.getUseAdditionalClockInput()) {
+            if (net.clockInput.getInputValue() == CLOCK_VALUE) {
+                net.clockInput.setValue(-CLOCK_VALUE);
+            } else {
+                net.clockInput.setValue(CLOCK_VALUE);
+            }
+        }
+        for (int layerPos = 0; layerPos < net.layerArr.length; layerPos++) {
+            final MlpLayer mlpLayer = net.layerArr[layerPos];
+            runLayer(mlpLayer);
+        }
+
+        final MlpLayer outputLayer = net.getOutputLayer();
+        final float[] layerOutputArr = net.getLayerOutputArr();
+        for (int outputPos = 0; outputPos < outputLayer.neuronArr.length; outputPos++) {
+            layerOutputArr[outputPos] = outputLayer.neuronArr[outputPos].outputValue;
+        }
+        return layerOutputArr;
+    }
+
+    public static void runLayer(final MlpLayer mlpLayer) {
+        for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
+            final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
+            neuron.lastOutputValue = neuron.outputValue;
+            neuron.outputValue = 0.0F;
+
+            for (int inputPos = 0; inputPos < neuron.synapseList.size(); inputPos++) {
+                final MlpSynapse synapse = neuron.synapseList.get(inputPos);
+
+                final float inputValue;
+                if (synapse.useLastInput) {
+                    inputValue = synapse.getInput().getLastInputValue();
+                } else {
+                    inputValue = synapse.getInput().getInputValue();
+                }
+                neuron.outputValue += synapse.weight * inputValue;
+            }
+            if (!mlpLayer.isOutputLayer) {
+                neuron.outputValue = sigmoid(neuron.outputValue);
+            }
+        }
+    }
 
     public static float runTrainOrder(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
         float mainOutputMseErrorValue = 0.0F;
@@ -194,61 +252,8 @@ public final class MlpService {
         }
     }
 
-    public static float[] run(final MlpNet mlpNet, final float[] inputArr) {
-        for (int inputPos = 0; inputPos < inputArr.length; inputPos++) {
-            final MlpValueInput valueInput = mlpNet.getInputValue(inputPos);
-            if (valueInput.internalInput) {
-                final MlpNeuron neuron = getNeuron(mlpNet, valueInput.inputLayerNr, valueInput.inputNeuronNr);
-                mlpNet.setInputValue(inputPos, neuron.getInputValue());
-            } else {
-                mlpNet.setInputValue(inputPos, inputArr[inputPos]);
-            }
-        }
-        if (mlpNet.getUseAdditionalClockInput()) {
-            if (mlpNet.clockInput.getInputValue() == CLOCK_VALUE) {
-                mlpNet.clockInput.setValue(-CLOCK_VALUE);
-            } else {
-                mlpNet.clockInput.setValue(CLOCK_VALUE);
-            }
-        }
-        for (int layerPos = 0; layerPos < mlpNet.layerArr.length; layerPos++) {
-            final MlpLayer mlpLayer = mlpNet.layerArr[layerPos];
-            runLayer(mlpLayer);
-        }
-
-        final MlpLayer outputLayer = mlpNet.getOutputLayer();
-        final float[] layerOutputArr = mlpNet.getLayerOutputArr();
-        for (int outputPos = 0; outputPos < outputLayer.neuronArr.length; outputPos++) {
-            layerOutputArr[outputPos] = outputLayer.neuronArr[outputPos].outputValue;
-        }
-        return layerOutputArr;
-    }
-
     private static MlpNeuron getNeuron(final MlpNet mlpNet, final int inputLayerNr, final int inputNeuronNr) {
         return mlpNet.getLayerArr()[inputLayerNr].neuronArr[inputNeuronNr];
-    }
-
-    public static void runLayer(final MlpLayer mlpLayer) {
-        for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
-            final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
-            neuron.lastOutputValue = neuron.outputValue;
-            neuron.outputValue = 0.0F;
-
-            for (int inputPos = 0; inputPos < neuron.synapseList.size(); inputPos++) {
-                final MlpSynapse synapse = neuron.synapseList.get(inputPos);
-
-                final float inputValue;
-                if (synapse.useLastInput) {
-                    inputValue = synapse.getInput().getLastInputValue();
-                } else {
-                    inputValue = synapse.getInput().getInputValue();
-                }
-                neuron.outputValue += synapse.weight * inputValue;
-            }
-            if (!mlpLayer.isOutputLayer) {
-                neuron.outputValue = sigmoid(neuron.outputValue);
-            }
-        }
     }
 
     static float sigmoidDerivative(final float x) {

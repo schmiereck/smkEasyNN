@@ -5,6 +5,7 @@ public class MlpNet {
     final MlpInputInterface biasInput;
     final MlpInputInterface clockInput;
     private MlpValueInput[] valueInputArr;
+    private MlpInternalValueInput[] internalValueInputArr;
     private float[] layerOutputArr;
     private final MlpConfiguration config;
 
@@ -23,12 +24,28 @@ public class MlpNet {
         return this.valueInputArr;
     }
 
-    public void setValueInputArr(MlpValueInput[] valueInputArr) {
+    public void setValueInputArr(final MlpValueInput[] valueInputArr) {
         this.valueInputArr = valueInputArr;
     }
 
     public MlpValueInput getInputValue(final int inputPos) {
         return this.valueInputArr[inputPos];
+    }
+
+    public void setInternalInputValue(final int inputPos, final float inputValue) {
+        this.internalValueInputArr[inputPos].setValue(inputValue);
+    }
+
+    public MlpInternalValueInput[] getInternalValueInputArr() {
+        return this.internalValueInputArr;
+    }
+
+    public void setInternalValueInputArr(final MlpInternalValueInput[] internalValueInputArr) {
+        this.internalValueInputArr = internalValueInputArr;
+    }
+
+    public MlpInternalValueInput getInternalInputValue(final int inputPos) {
+        return this.internalValueInputArr[inputPos];
     }
 
     public MlpLayer[] getLayerArr() {

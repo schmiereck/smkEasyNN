@@ -3,6 +3,7 @@ package de.schmiereck.smkEasyNN.mlp;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight3;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.FIRST_LAYER_NR;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -107,14 +108,6 @@ public final class MlpLayerService {
                 addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
             }
         }
-        for (int neuronPos = arraySize; neuronPos < layerSize; neuronPos++) {
-            final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
-
-            for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
-                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr, useError, useLastInput, useLastInput, config.getInitialWeightValue());
-            }
-            addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
-        }
 
         //mlpLayer.initWeights2(config.initialWeightValue, rnd);
         mlpLayer.setIsOutputLayer(isOutputLayer);
@@ -127,7 +120,7 @@ public final class MlpLayerService {
                                         final boolean useError, final boolean useLastInput, final boolean useTrainLastInput, final float initialWeightValue) {
         final MlpInputInterface input;
         final MlpInputErrorInterface inputError;
-        if (layerPos == 0) {
+        if (layerPos == FIRST_LAYER_NR) {
             input = valueInputArr[inputLayerNeuronPos];
             inputError = null;
         } else {
@@ -270,7 +263,8 @@ public final class MlpLayerService {
         return createSynapse(initWeight, useLastError, useLastInput, useTrainLastInput, input, inputError);
     }
 
-    private static MlpSynapse createSynapse(final float initWeight, final boolean useLastError, final boolean useLastInput, final boolean useTrainLastInput,
+    public static MlpSynapse createSynapse(final float initWeight, final boolean useLastError, final boolean useLastInput,
+                                           final boolean useTrainLastInput,
                                             final MlpInputInterface input, final MlpInputErrorInterface inputError) {
         final MlpSynapse synapse = new MlpSynapse(input, inputError, useLastError, useLastInput, useTrainLastInput);
         synapse.weight = initWeight;

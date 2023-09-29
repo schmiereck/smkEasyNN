@@ -107,6 +107,8 @@ public class GridworldMain {
             //addForwwardInputs(net, 5, 4, false, false, true, rnd);
             //addForwwardInputs(net, 6, 5, false, false, true, rnd);
 
+            //MlpNetService.makeInternalInput(net, 4, inputLayerNr, 4);
+
             netArr.put(gameStatistic, net);
         }
         int newNetPos = netCount;

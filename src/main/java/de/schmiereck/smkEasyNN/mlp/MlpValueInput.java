@@ -3,9 +3,6 @@ package de.schmiereck.smkEasyNN.mlp;
 public class MlpValueInput implements MlpInputInterface {
     final int layerNr;
     final int neuronNr;
-    public boolean internalInput;
-    public int inputLayerNr;
-    public int inputNeuronNr;
     private float value;
 
     public MlpValueInput(final int layerNr, final int neuronNr, final float value) {

@@ -1,9 +1,13 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createLayers;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createSynapse;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.FIRST_LAYER_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INPUT_LAYER_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_BIAS_INPUT_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_CLOCK_INPUT_NR;
+import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_INPUT_LAYER_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_LAYER_NR;
 
 import java.util.List;
@@ -54,6 +58,7 @@ public final class MlpNetService {
         final MlpNet newNet = new MlpNet(net.getConfig());
 
         newNet.setValueInputArr(duplicateValueInputArr(net.getValueInputArr()));
+        newNet.setInternalValueInputArr(duplicateInternalValueInputArr(net.getInternalValueInputArr()));
         newNet.setLayerArr(duplicateNeuronLayers(newNet, net.getLayerArr()));
         duplicateSynapses(newNet, net.getLayerArr());
 
@@ -68,6 +73,15 @@ public final class MlpNetService {
         for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
             final MlpValueInput valueInput = valueInputArr[neuronPos];
             newValueInputArr[neuronPos] = new MlpValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
+        }
+        return newValueInputArr;
+    }
+
+    private static MlpInternalValueInput[] duplicateInternalValueInputArr(MlpInternalValueInput[] valueInputArr) {
+        final MlpInternalValueInput[] newValueInputArr = new MlpInternalValueInput[valueInputArr.length];
+        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
+            final MlpInternalValueInput valueInput = valueInputArr[neuronPos];
+            newValueInputArr[neuronPos] = new MlpInternalValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
 
             newValueInputArr[neuronPos].internalInput = valueInput.internalInput;
             newValueInputArr[neuronPos].inputLayerNr = valueInput.inputLayerNr;
@@ -190,13 +204,39 @@ public final class MlpNetService {
         net.getClockInput().setValue(MlpService.CLOCK_VALUE);
     }
 
-    public static void makeInternalInput(final MlpNet net, int inputPos, int inputLayerNr, int inputNeuronNr) {
-        final MlpValueInput[] valueInputArr = net.getValueInputArr();
+    public static void createInternalInputs(final MlpNet net, final int inputLayerNr, final int firstNeuronPos, final int lastNeuronPos, final Random rnd) {
+        final int inputSize = (lastNeuronPos - firstNeuronPos) + 1;
+        final MlpInternalValueInput[] internalValueInputArr = new MlpInternalValueInput[inputSize];
 
-        valueInputArr[inputPos].internalInput = true;
-        valueInputArr[inputPos].inputLayerNr = inputLayerNr;
-        valueInputArr[inputPos].inputNeuronNr = inputNeuronNr;
+        for (int neuronPos = 0; neuronPos < inputSize; neuronPos++) {
+            final MlpInternalValueInput valueInput = new MlpInternalValueInput(INTERNAL_INPUT_LAYER_NR, neuronPos, 0.0F);
 
-        //net.getLayerArr()[inputLayerNr].neuronArr[inputNeuronNr].isOutputNeuron = true;
+            valueInput.inputLayerNr = inputLayerNr;
+            valueInput.inputNeuronNr = firstNeuronPos + neuronPos;
+
+            internalValueInputArr[neuronPos] = valueInput;
+        }
+        net.setInternalValueInputArr(internalValueInputArr);
+
+        final MlpLayer layer = net.getLayer(FIRST_LAYER_NR);
+
+        for (int neuronPos = 0; neuronPos < layer.neuronArr.length; neuronPos++) {
+            final MlpNeuron neuron = layer.neuronArr[neuronPos];
+
+            for (int inputPos = 0; inputPos < internalValueInputArr.length; inputPos++) {
+                final MlpInternalValueInput valueInput = internalValueInputArr[inputPos];
+
+                //final MlpLayer inputLayer = net.getLayer(valueInput.inputLayerNr);
+                //final MlpNeuron inputNeuron = inputLayer.neuronArr[valueInput.inputNeuronNr];
+
+                final boolean useLastError = false;
+                final boolean useLastInput = false;
+                final boolean useTrainLastInput = false;
+
+                final MlpSynapse synapse = MlpLayerService.createSynapse(calcInitWeight2(net.getInitialWeightValue(), rnd),
+                        useLastError, useLastInput, useTrainLastInput, valueInput, null);
+                neuron.synapseList.add(synapse);
+            }
+        }
     }
 }

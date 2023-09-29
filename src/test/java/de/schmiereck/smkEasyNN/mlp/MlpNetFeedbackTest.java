@@ -18,8 +18,8 @@ public class MlpNetFeedbackTest {
     @Test
     void GIVEN_digital_numbers_in_sequenz_THEN_add_them_to_output() {
         // Arrange
-        //final int maxMemCount = 1; // 0, 1
-        final int maxMemCount = 2; // 0, 1, 2
+        final int maxMemCount = 1; // 0, 1
+        //final int maxMemCount = 2; // 0, 1, 2
         //final int maxMemCount = 3; // 0, 1, 2, 3
 
         final Random rnd = new Random(123456);
@@ -36,12 +36,12 @@ public class MlpNetFeedbackTest {
                 mlpConfiguration = new MlpConfiguration(true, false,
                         0.5F, 0.0F);
                 layerConfigArr = new MlpLayerConfig[5];
-                layerConfigArr[0] = new MlpLayerConfig(8);
+                layerConfigArr[0] = new MlpLayerConfig(4);
                 layerConfigArr[1] = new MlpLayerConfig(8 * 3);
                 layerConfigArr[2] = new MlpLayerConfig(8 * 2);
                 layerConfigArr[3] = new MlpLayerConfig(8);
                 layerConfigArr[4] = new MlpLayerConfig(4);
-                epochMax = 3_500_000;
+                epochMax = 6_500_000;
                 learningRate = 0.1F;
                 momentum = 1.1F;
                 inputLayerNr = 3;
@@ -50,7 +50,7 @@ public class MlpNetFeedbackTest {
                 mlpConfiguration = new MlpConfiguration(true, false,
                         0.5F, 0.0F);
                 layerConfigArr = new MlpLayerConfig[6];
-                layerConfigArr[0] = new MlpLayerConfig(8);
+                layerConfigArr[0] = new MlpLayerConfig(4);
                 layerConfigArr[1] = new MlpLayerConfig(8 * 3);
                 layerConfigArr[2] = new MlpLayerConfig(8 * 3);
                 layerConfigArr[3] = new MlpLayerConfig(8 * 2);
@@ -62,26 +62,12 @@ public class MlpNetFeedbackTest {
                 inputLayerNr = 4;
             }
             default -> {
-                mlpConfiguration = new MlpConfiguration(true, false,
-                        0.5F, 0.0F);
-                layerConfigArr = new MlpLayerConfig[5];
-                layerConfigArr[0] = new MlpLayerConfig(8);
-                layerConfigArr[1] = new MlpLayerConfig(8 * 3);
-                layerConfigArr[2] = new MlpLayerConfig(8 * 2);
-                layerConfigArr[3] = new MlpLayerConfig(8);
-                layerConfigArr[4] = new MlpLayerConfig(4);
-                epochMax = 3_500_000;
-                learningRate = 0.1F;
-                momentum = 1.1F;
-                inputLayerNr = 3;
+                throw new RuntimeException("Not supportet.");
             }
         }
         final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
 
-        MlpNetService.makeInternalInput(net, 4, inputLayerNr, 4);
-        MlpNetService.makeInternalInput(net, 5, inputLayerNr, 5);
-        MlpNetService.makeInternalInput(net, 6, inputLayerNr, 6);
-        MlpNetService.makeInternalInput(net, 7, inputLayerNr, 7);
+        MlpNetService.createInternalInputs(net, inputLayerNr, 4, 7, rnd);
 
         //runTraining(rnd, 1, net, learningRate, momentum, epochMax);
         //runTraining(rnd, 2, net, learningRate, momentum, 6_500_000);
@@ -92,8 +78,8 @@ public class MlpNetFeedbackTest {
 
         System.out.println();
         System.out.println("Assert:");
+        final float[] trainInputArr = new float[4];
         final float[] assertExpectedOutputArr = new float[4];
-        final float[] trainInputArr = new float[8];
 
         for (int assertPos = 0; assertPos < 1000; assertPos++) {
             System.out.printf("assertPos: %d\n", assertPos);
@@ -120,7 +106,7 @@ public class MlpNetFeedbackTest {
     private int runTraining(Random rnd, int maxMemCount, final MlpNet net, float learningRate, float momentum, int epochMax) {
         final float[][] trainInputArrArr = new float[8][maxMemCount];
         final float[][] expectedOutputArrArr = new float[4][maxMemCount];
-        final float[] trainInputArr = new float[8];
+        final float[] trainInputArr = new float[4];
         final float[] expectedOutputArr = new float[4];
 
         int epochPos = 0;
