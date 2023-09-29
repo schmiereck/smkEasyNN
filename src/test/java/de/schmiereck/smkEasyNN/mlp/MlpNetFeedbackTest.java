@@ -16,36 +16,113 @@ import org.junit.jupiter.api.Test;
 public class MlpNetFeedbackTest {
 
     @Test
-    void GIVEN_xxx_THEN_yyy() {
+    void GIVEN_digital_numbers_in_sequenz_THEN_add_them_to_output() {
         // Arrange
-        //final int maxMemCount = 1;
-        final int maxMemCount = 2;
+        //final int maxMemCount = 1; // 0, 1
+        final int maxMemCount = 2; // 0, 1, 2
+        //final int maxMemCount = 3; // 0, 1, 2, 3
 
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration;
+        final MlpLayerConfig[] layerConfigArr;
+        final int epochMax;
+        final float learningRate;
+        final float momentum;
+        final int inputLayerNr;
+        switch (maxMemCount) {
+            case 1, 2 -> {
+                mlpConfiguration = new MlpConfiguration(true, false,
+                        0.5F, 0.0F);
+                layerConfigArr = new MlpLayerConfig[5];
+                layerConfigArr[0] = new MlpLayerConfig(8);
+                layerConfigArr[1] = new MlpLayerConfig(8 * 3);
+                layerConfigArr[2] = new MlpLayerConfig(8 * 2);
+                layerConfigArr[3] = new MlpLayerConfig(8);
+                layerConfigArr[4] = new MlpLayerConfig(4);
+                epochMax = 3_500_000;
+                learningRate = 0.1F;
+                momentum = 1.1F;
+                inputLayerNr = 3;
+            }
+            case 3 -> {
+                mlpConfiguration = new MlpConfiguration(true, false,
+                        0.5F, 0.0F);
+                layerConfigArr = new MlpLayerConfig[6];
+                layerConfigArr[0] = new MlpLayerConfig(8);
+                layerConfigArr[1] = new MlpLayerConfig(8 * 3);
+                layerConfigArr[2] = new MlpLayerConfig(8 * 3);
+                layerConfigArr[3] = new MlpLayerConfig(8 * 2);
+                layerConfigArr[4] = new MlpLayerConfig(8);
+                layerConfigArr[5] = new MlpLayerConfig(4);
+                epochMax = 6_500_000;
+                learningRate = 0.1F;
+                momentum = 1.1F;
+                inputLayerNr = 4;
+            }
+            default -> {
+                mlpConfiguration = new MlpConfiguration(true, false,
+                        0.5F, 0.0F);
+                layerConfigArr = new MlpLayerConfig[5];
+                layerConfigArr[0] = new MlpLayerConfig(8);
+                layerConfigArr[1] = new MlpLayerConfig(8 * 3);
+                layerConfigArr[2] = new MlpLayerConfig(8 * 2);
+                layerConfigArr[3] = new MlpLayerConfig(8);
+                layerConfigArr[4] = new MlpLayerConfig(4);
+                epochMax = 3_500_000;
+                learningRate = 0.1F;
+                momentum = 1.1F;
+                inputLayerNr = 3;
+            }
+        }
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        MlpNetService.makeInternalInput(net, 4, inputLayerNr, 4);
+        MlpNetService.makeInternalInput(net, 5, inputLayerNr, 5);
+        MlpNetService.makeInternalInput(net, 6, inputLayerNr, 6);
+        MlpNetService.makeInternalInput(net, 7, inputLayerNr, 7);
+
+        //runTraining(rnd, 1, net, learningRate, momentum, epochMax);
+        //runTraining(rnd, 2, net, learningRate, momentum, 6_500_000);
+        final int epochPos = runTraining(rnd, maxMemCount, net, learningRate, momentum, epochMax);
+
+        // Act & Assert
+        Assertions.assertTrue(epochPos < epochMax);
+
+        System.out.println();
+        System.out.println("Assert:");
+        final float[] assertExpectedOutputArr = new float[4];
+        final float[] trainInputArr = new float[8];
+
+        for (int assertPos = 0; assertPos < 1000; assertPos++) {
+            System.out.printf("assertPos: %d\n", assertPos);
+            int sumInputNr = 0;
+            resetNetOutputs(net);
+            float[] lastCalcOutputArr = null;
+            for (int pos = 0; pos <= maxMemCount; pos++) {
+                final int inputNr = rnd.nextInt(maxMemCount + 1);
+                sumInputNr += inputNr;
+
+                calcBinaryInput(trainInputArr, inputNr, 4);
+                calcBinaryInput(assertExpectedOutputArr, sumInputNr, 4);
+
+                lastCalcOutputArr = run(net, trainInputArr);
+
+                MlpNetPrintUtils.printResultLine(trainInputArr, lastCalcOutputArr, assertExpectedOutputArr);
+                System.out.println();
+            }
+
+            assertExpectedOutput("assertPos: %d ".formatted(assertPos), 0.15F, trainInputArr, assertExpectedOutputArr, lastCalcOutputArr);
+        }
+    }
+
+    private int runTraining(Random rnd, int maxMemCount, final MlpNet net, float learningRate, float momentum, int epochMax) {
         final float[][] trainInputArrArr = new float[8][maxMemCount];
         final float[][] expectedOutputArrArr = new float[4][maxMemCount];
         final float[] trainInputArr = new float[8];
         final float[] expectedOutputArr = new float[4];
 
-        final Random rnd = new Random(123456);
-        //final Random rnd = new Random();
-
-        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false,
-                0.5F, 0.0F);
-        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[5];
-        layerConfigArr[0] = new MlpLayerConfig(8);
-        layerConfigArr[1] = new MlpLayerConfig(8 * 3);
-        layerConfigArr[2] = new MlpLayerConfig(8 * 2);
-        layerConfigArr[3] = new MlpLayerConfig(8);
-        layerConfigArr[4] = new MlpLayerConfig(4);
-
-        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
-
-        MlpNetService.makeInternalInput(net, 4, 3, 4);
-        MlpNetService.makeInternalInput(net, 5, 3, 5);
-        MlpNetService.makeInternalInput(net, 6, 3, 6);//6, 2
-        MlpNetService.makeInternalInput(net, 7, 3, 7);//7, 3
-
-        final int epochMax = 3_500_000;
         int epochPos = 0;
         {
             int mseSucessCounter = 0;
@@ -69,7 +146,7 @@ public class MlpNetFeedbackTest {
                     //calcBinaryInput(expectedOutputArr, expectedInputNr, 4);
                     calcBinaryInput(expectedOutputArr, sumInputNr, 4);
 
-                    final float mainOutputMseErrorValue = trainWithOutput(net, expectedOutputArr, calcOutputArr, 0.1F, 1.1F);
+                    final float mainOutputMseErrorValue = trainWithOutput(net, expectedOutputArr, calcOutputArr, learningRate, momentum);
 
                     if ((epochPos + 1) % 100 == 0) {
                         MlpNetPrintUtils.printFullResultForEpoch(net, trainInputArr, calcOutputArr, expectedOutputArr, epochPos, mainOutputMseErrorValue);
@@ -95,33 +172,7 @@ public class MlpNetFeedbackTest {
                 }
             }
         }
-        // Act & Assert
-        Assertions.assertTrue(epochPos < epochMax);
-
-        System.out.println();
-        System.out.println("Assert:");
-        final float[] assertExpectedOutputArr = new float[4];
-
-        for (int assertPos = 0; assertPos < 1000; assertPos++) {
-            System.out.printf("assertPos: %d\n", assertPos);
-            int sumInputNr = 0;
-            resetNetOutputs(net);
-            float[] lastCalcOutputArr = null;
-            for (int pos = 0; pos <= maxMemCount; pos++) {
-                final int inputNr = rnd.nextInt(maxMemCount + 1);
-                sumInputNr += inputNr;
-
-                calcBinaryInput(trainInputArr, inputNr, 4);
-                calcBinaryInput(assertExpectedOutputArr, sumInputNr, 4);
-
-                lastCalcOutputArr = run(net, trainInputArr);
-
-                MlpNetPrintUtils.printResultLine(trainInputArr, lastCalcOutputArr, assertExpectedOutputArr);
-                System.out.println();
-            }
-
-            assertExpectedOutput("assertPos: %d ".formatted(assertPos), 0.15F, trainInputArr, assertExpectedOutputArr, lastCalcOutputArr);
-        }
+        return epochPos;
     }
 
     private void calcBinaryInput(final float[] trainInputArr, final int inputNr, final int size) {

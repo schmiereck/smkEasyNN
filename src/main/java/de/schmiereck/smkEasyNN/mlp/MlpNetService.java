@@ -196,5 +196,7 @@ public final class MlpNetService {
         valueInputArr[inputPos].internalInput = true;
         valueInputArr[inputPos].inputLayerNr = inputLayerNr;
         valueInputArr[inputPos].inputNeuronNr = inputNeuronNr;
+
+        //net.getLayerArr()[inputLayerNr].neuronArr[inputNeuronNr].isOutputNeuron = true;
     }
 }
