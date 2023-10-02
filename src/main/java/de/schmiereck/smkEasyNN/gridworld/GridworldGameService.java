@@ -80,8 +80,8 @@ public class GridworldGameService {
                     //randomizeExpectedOutput(expectedOutputArr, rnd);
                     //normalizeExpectedOutput(expectedOutputArr, 0.5F);
                     expectedOutputArr[action] = calcExpectedOutput(outputArr[action], 1.00F); // Good.
-                    runTrain = true;
-                    //runTrain = false;
+                    //runTrain = true;
+                    runTrain = false;
                 }
                 case HitWall -> {
                     System.arraycopy(outputArr, 0, expectedOutputArr, 0, 4); // All other actions are also OK.

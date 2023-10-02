@@ -62,7 +62,9 @@ public class GridworldMain {
         for (int netPos = 0; netPos < netCount; netPos++) {
             final MlpConfiguration config;
             final MlpLayerConfig[] layerConfigArr;
-            switch (netPos % 2) {
+            final int netType = netPos % 3;
+            final MlpNet net;
+            switch (netType) {
                 case 0 -> {
                     config = new MlpConfiguration(true, false, 0.2F, 0.0F);
                     layerConfigArr = new MlpLayerConfig[6];
@@ -74,31 +76,50 @@ public class GridworldMain {
                     layerConfigArr[4] = new MlpLayerConfig(32);
 
                     layerConfigArr[5] = new MlpLayerConfig(4);
+
+                    net = MlpNetService.createNet(config, layerConfigArr, rnd);
+
+                    MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
+                }
+                case 1 -> {
+                    config = new MlpConfiguration(true, false, 0.2F, 0.0F);
+                    layerConfigArr = new MlpLayerConfig[6];
+                    layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+                    layerConfigArr[1] = new MlpLayerConfig(164 + 1);
+                    layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+
+                    layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+                    layerConfigArr[4] = new MlpLayerConfig(32);
+
+                    layerConfigArr[5] = new MlpLayerConfig(4);
+
+                    net = MlpNetService.createNet(config, layerConfigArr, rnd);
+
+                    //MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
                 }
                 default -> {
-                    config = new MlpConfiguration(true, rnd.nextBoolean(), rnd.nextFloat(0.05F) + 0.1F, 0.0F);
-                    layerConfigArr = new MlpLayerConfig[8];
+                    config = new MlpConfiguration(true, rnd.nextBoolean(), rnd.nextFloat(0.05F) + 0.175F, 0.0F);
+                    layerConfigArr = new MlpLayerConfig[6];
                     layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+                    layerConfigArr[1] = new MlpLayerConfig(164 + 1);
+                    layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
 
-                    layerConfigArr[1] = new MlpLayerConfig(64 + 1);
-                    layerConfigArr[2] = new MlpLayerConfig(64 + rnd.nextInt(32));
+                    layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+                    layerConfigArr[4] = new MlpLayerConfig(32);
 
-                    layerConfigArr[3] = new MlpLayerConfig(32 + rnd.nextInt(32));
-                    layerConfigArr[4] = new MlpLayerConfig(32 + rnd.nextInt(32));
+                    layerConfigArr[5] = new MlpLayerConfig(4);
 
-                    layerConfigArr[5] = new MlpLayerConfig(32);
-                    layerConfigArr[6] = new MlpLayerConfig(16);
+                    net = MlpNetService.createNet(config, layerConfigArr, rnd);
 
-                    layerConfigArr[7] = new MlpLayerConfig(4);
+                    MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
                 }
             }
 
             //layerConfigArr[0].setIsArray(true,4, 4, 16, 4, 1);
             //layerConfigArr[1].setIsArray(true,4, 4, 16, 4, 1);
 
-            final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
             //gameStatisticArr[netPos] = new GameStatistic(netPos);
-            final GameStatistic gameStatistic = new GameStatistic(netPos);
+            final GameStatistic gameStatistic = new GameStatistic(netType, netPos);
 
             gameStatistic.learningRate = rnd.nextFloat( 0.6F) + 0.05F;
             gameStatistic.momentum = rnd.nextFloat( 0.9F) + 0.05F;
@@ -137,11 +158,11 @@ public class GridworldMain {
                     initBoard(board, gameStatistic.level, rnd);
 
                     //printBoard(board);
-                    final boolean newLevel = (oldLevel != gameStatistic.level);
+                    final boolean newLevel = (oldLevel != gameStatistic.level) || (gameStatistic.moveCounter > 30_000);
 
                     if ((gameStatistic.epoche % 100 == 0) || newLevel) {
-                        System.out.printf("%2d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f",
-                                gameStatistic.netPos, gameStatistic.epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter, gameStatistic.mse);
+                        System.out.printf("%3d:%1d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f",
+                                gameStatistic.netPos, gameStatistic.netType, gameStatistic.epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter, gameStatistic.mse);
                         if (!newLevel) {
                             System.out.print('\r');
                         }
@@ -200,7 +221,7 @@ public class GridworldMain {
     }
 
     private static GameStatistic copyGameStatistic(final int newNetPos, final GameStatistic gameStatistic) {
-        final GameStatistic newGameStatistic = new GameStatistic(newNetPos);
+        final GameStatistic newGameStatistic = new GameStatistic(gameStatistic.netType, newNetPos);
 
         newGameStatistic.moveCounter = gameStatistic.moveCounter;
         newGameStatistic.hitGoalCounter = gameStatistic.hitGoalCounter;

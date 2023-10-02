@@ -69,23 +69,33 @@ public final class MlpNetService {
     }
 
     private static MlpValueInput[] duplicateValueInputArr(MlpValueInput[] valueInputArr) {
-        final MlpValueInput[] newValueInputArr = new MlpValueInput[valueInputArr.length];
-        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
-            final MlpValueInput valueInput = valueInputArr[neuronPos];
-            newValueInputArr[neuronPos] = new MlpValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
+        final MlpValueInput[] newValueInputArr;
+        if (Objects.nonNull(valueInputArr)) {
+            newValueInputArr = new MlpValueInput[valueInputArr.length];
+            for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
+                final MlpValueInput valueInput = valueInputArr[neuronPos];
+                newValueInputArr[neuronPos] = new MlpValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
+            }
+        } else {
+            newValueInputArr = null;
         }
         return newValueInputArr;
     }
 
     private static MlpInternalValueInput[] duplicateInternalValueInputArr(MlpInternalValueInput[] valueInputArr) {
-        final MlpInternalValueInput[] newValueInputArr = new MlpInternalValueInput[valueInputArr.length];
-        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
-            final MlpInternalValueInput valueInput = valueInputArr[neuronPos];
-            newValueInputArr[neuronPos] = new MlpInternalValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
+        final MlpInternalValueInput[] newValueInputArr;
+        if (Objects.nonNull(valueInputArr)) {
+            newValueInputArr = new MlpInternalValueInput[valueInputArr.length];
+            for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
+                final MlpInternalValueInput valueInput = valueInputArr[neuronPos];
+                newValueInputArr[neuronPos] = new MlpInternalValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
 
-            newValueInputArr[neuronPos].internalInput = valueInput.internalInput;
-            newValueInputArr[neuronPos].inputLayerNr = valueInput.inputLayerNr;
-            newValueInputArr[neuronPos].inputNeuronNr = valueInput.inputNeuronNr;
+                newValueInputArr[neuronPos].internalInput = valueInput.internalInput;
+                newValueInputArr[neuronPos].inputLayerNr = valueInput.inputLayerNr;
+                newValueInputArr[neuronPos].inputNeuronNr = valueInput.inputNeuronNr;
+            }
+        } else {
+            newValueInputArr = null;
         }
         return newValueInputArr;
     }
@@ -151,8 +161,12 @@ public final class MlpNetService {
             if (layerNr == INPUT_LAYER_NR) {
                 input = newNet.getValueInputArr()[neuronNr];
             } else {
-                final MlpLayer newInputLayer = newNet.getLayerArr()[layerNr];
-                input = newInputLayer.neuronArr[neuronNr];
+                if (layerNr == INTERNAL_INPUT_LAYER_NR) {
+                    input = newNet.getInternalValueInputArr()[neuronNr];
+                } else {
+                    final MlpLayer newInputLayer = newNet.getLayerArr()[layerNr];
+                    input = newInputLayer.neuronArr[neuronNr];
+                }
             }
         }
         return input;
