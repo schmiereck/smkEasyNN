@@ -47,7 +47,7 @@ public class GridworldMain {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final int netCount = 10;
+        final int netCount = 12;
         final int killSize = 4;
         // final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F); -> Infinite Error/Weight Sum.
 
@@ -66,7 +66,7 @@ public class GridworldMain {
             final MlpNet net;
             switch (netType) {
                 case 0 -> {
-                    config = new MlpConfiguration(true, false, 0.2F, 0.0F);
+                    config = new MlpConfiguration(true, true, 0.2F, 0.0F);
                     layerConfigArr = new MlpLayerConfig[6];
                     layerConfigArr[0] = new MlpLayerConfig(64 + 1);
                     layerConfigArr[1] = new MlpLayerConfig(164 + 1);
@@ -82,7 +82,7 @@ public class GridworldMain {
                     MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
                 }
                 case 1 -> {
-                    config = new MlpConfiguration(true, false, 0.2F, 0.0F);
+                    config = new MlpConfiguration(true, true, 0.2F, 0.0F);
                     layerConfigArr = new MlpLayerConfig[6];
                     layerConfigArr[0] = new MlpLayerConfig(64 + 1);
                     layerConfigArr[1] = new MlpLayerConfig(164 + 1);
@@ -95,7 +95,7 @@ public class GridworldMain {
 
                     net = MlpNetService.createNet(config, layerConfigArr, rnd);
 
-                    //MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
+                    MlpNetService.createInternalInputs(net, 4, 16, 31, rnd);
                 }
                 default -> {
                     config = new MlpConfiguration(true, rnd.nextBoolean(), rnd.nextFloat(0.05F) + 0.175F, 0.0F);
@@ -158,7 +158,14 @@ public class GridworldMain {
                     initBoard(board, gameStatistic.level, rnd);
 
                     //printBoard(board);
-                    final boolean newLevel = (oldLevel != gameStatistic.level) || (gameStatistic.moveCounter > 30_000);
+                    final boolean moveBreak;
+                    if (gameStatistic.moveCounter > 30_000) {
+                        moveBreak = true;
+                    } else {
+                        moveBreak = false;
+                    }
+                    final boolean newLevel = (oldLevel != gameStatistic.level);
+                    final boolean breakTraining = newLevel || moveBreak;
 
                     if ((gameStatistic.epoche % 100 == 0) || newLevel) {
                         System.out.printf("%3d:%1d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f",
@@ -168,7 +175,10 @@ public class GridworldMain {
                         }
                     }
 
-                    if (newLevel) {
+                    if (breakTraining) {
+                        if (moveBreak && !newLevel) {
+                            gameStatistic.level++;
+                        }
                         break;
                     }
 
