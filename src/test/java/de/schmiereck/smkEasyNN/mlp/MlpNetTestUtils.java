@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class MlpNetTestUtils {
 
-    public static void runTrainWithGrowingTrainSize(final MlpNet mlpNet,
+    public static void runTrainWithGrowingTrainSize(final MlpNet net,
                                                     final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
                                                     final int epochMax, final int successfulCounterMax, final boolean printFullResult,
                                                     final float learningRate, final float momentum,
@@ -21,12 +21,12 @@ public class MlpNetTestUtils {
         int expectedOutputTrainSize = 1;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
+            final float mainOutputMseErrorValue = runTrainRandomOrder(net, expectedOutputArrArrArr, trainInputArrArrArr,
                     expectedOutputTrainSize, learningRate, momentum, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
                 if (printFullResult) {
-                    printFullResultForEpochWithTrainSize(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
+                    printFullResultForEpochWithTrainSize(net, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
                 } else {
                     printResultForEpochWithTrainSize(epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
                 }
@@ -37,7 +37,7 @@ public class MlpNetTestUtils {
                     if (expectedOutputTrainSize < 3) {
                         expectedOutputTrainSize++;
                     } else {
-                        printFullResultForEpochWithTrainSize(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
+                        printFullResultForEpochWithTrainSize(net, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue, expectedOutputTrainSize);
                         break;
                     }
                     successfulCounter = 0;

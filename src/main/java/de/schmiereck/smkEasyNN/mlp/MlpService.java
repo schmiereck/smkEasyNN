@@ -97,13 +97,18 @@ public final class MlpService {
         return mainOutputMseErrorValue / mainOutputCount;
     }
 
-    public static float runTrainRandom(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+    public static float runTrainRandom(final MlpNet net, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+        return runTrainRandom(net, expectedOutputArrArr, trainInputArrArr, 0.3F, 0.6F, rnd);
+    }
+
+    public static float runTrainRandom(final MlpNet net, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                                       final float learningRate, final float momentum, final Random rnd) {
         float mainOutputMseErrorValue = 0.0F;
         int mainOutputCount = 0;
         for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
             int idx = rnd.nextInt(expectedOutputArrArr.length);
             //int idx = expectedResultPos;
-            mainOutputMseErrorValue += train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+            mainOutputMseErrorValue += train(net, trainInputArrArr[idx], expectedOutputArrArr[idx], learningRate, momentum);
             mainOutputCount++;
         }
         return mainOutputMseErrorValue / mainOutputCount;

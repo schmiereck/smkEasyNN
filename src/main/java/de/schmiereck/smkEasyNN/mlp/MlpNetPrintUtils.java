@@ -21,6 +21,14 @@ public class MlpNetPrintUtils {
         }
     }
 
+    public static void printFullResultForEpochWithTrainSize(final MlpNet mlpNet,
+                                                            final float[][] trainInputArrArr, final float[][] expectedOutputArrArr,
+                                                            final int epochPos, final float mainOutputMseErrorValue) {
+        System.out.println();
+        printEpoch(epochPos, mainOutputMseErrorValue);
+        printResult(mlpNet, trainInputArrArr, expectedOutputArrArr);
+    }
+
     public static void printFullResultForEpoch(final MlpNet mlpNet,
                                                final float[][][] trainInputArrArrArr, final float[][][] expectedOutputArrArrArr,
                                                final int epochPos, final float mainOutputMseErrorValue) {
