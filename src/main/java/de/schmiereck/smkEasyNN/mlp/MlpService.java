@@ -31,7 +31,8 @@ public final class MlpService {
     private MlpService() {}
 
     public static float[] run(final MlpNet net, final float[] inputArr) {
-        for (int inputPos = 0; inputPos < inputArr.length; inputPos++) {
+        //for (int inputPos = 0; inputPos < inputArr.length; inputPos++) {
+        for (int inputPos = 0; inputPos < net.getValueInputArr().length; inputPos++) {
             net.setInputValue(inputPos, inputArr[inputPos]);
         }
 

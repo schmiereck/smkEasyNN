@@ -51,6 +51,11 @@ public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     }
 
     @Override
+    public float getErrorValue() {
+        return this.errorValue;
+    }
+
+    @Override
     public void addLastErrorValue(final float errorValue) {
         this.lastErrorValue += errorValue;
     }
