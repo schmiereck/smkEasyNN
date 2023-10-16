@@ -335,7 +335,7 @@ public class MlpArrayLayerTest {
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet,
                     expectedOutputArrArrArr, trainInputArrArrArr, 0.1F, 0.9F, rnd);
 
-            if ((epochPos + 1) % 100 == 0) {
+            if ((epochPos + 1) % 600 == 0) {
                 MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }

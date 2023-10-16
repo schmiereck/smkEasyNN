@@ -108,6 +108,15 @@ public final class MlpLayerService {
                 addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
             }
         }
+        // add extraArraySize:
+        for (int neuronPos = arraySize; neuronPos < layerSize; neuronPos++) {
+            final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
+
+            for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
+                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr, useError, useLastInput, useLastInput, config.getInitialWeightValue());
+            }
+            addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
+        }
 
         //mlpLayer.initWeights2(config.initialWeightValue, rnd);
         mlpLayer.setIsOutputLayer(isOutputLayer);
