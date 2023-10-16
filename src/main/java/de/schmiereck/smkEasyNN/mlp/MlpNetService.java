@@ -248,7 +248,8 @@ public final class MlpNetService {
                 final boolean useLastInput = false;
                 final boolean useTrainLastInput = false;
 
-                final MlpSynapse synapse = MlpLayerService.createSynapse(calcInitWeight2(net.getInitialWeightValue(), rnd),
+                final float weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                final MlpSynapse synapse = MlpLayerService.createSynapse(weight,
                         useLastError, useLastInput, useTrainLastInput, valueInput, null);
                 neuron.synapseList.add(synapse);
             }
@@ -296,7 +297,7 @@ public final class MlpNetService {
                 final boolean useLastInput = false;
                 final boolean useTrainLastInput = false;
 
-                final float weight = calcInitWeight2(net.getInitialWeightValue(), rnd);
+                final float weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
                 //final float weight = net.getConfig().getCalcInitialWeightValueInterface().calcInitialWeightValue(neuron.synapseList.size() + 1, 0, rnd);
                 final MlpSynapse synapse = MlpLayerService.createSynapse(weight,
                         useLastError, useLastInput, useTrainLastInput, valueInput, null);

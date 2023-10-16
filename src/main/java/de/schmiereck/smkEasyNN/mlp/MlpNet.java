@@ -88,10 +88,6 @@ public class MlpNet {
         return this.config.useAdditionalClockInput;
     }
 
-    public float getInitialWeightValue() {
-        return this.config.initialWeightValue;
-    }
-
     public MlpConfiguration getConfig() {
         return this.config;
     }
