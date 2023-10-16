@@ -155,13 +155,14 @@ public final class MlpLayerService {
             //synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
             //synapse.weight = calcInitWeight(config.getInitialBiasWeightValue(), rnd);
             // synapse.weight = calcInitWeight2(config.getInitialWeightValue(), rnd);
-            //synapse.weight = config.getInitialBiasWeightValue(); // TODO XXX
-            synapse.weight = config.getCalcInitialBiasWeightValueInterface().calcInitialWeightValue(neuron.synapseList.size() + 1, 0, rnd); // TODO XXX
+            //synapse.weight = config.getInitialBiasWeightValue();
+            synapse.weight = config.getCalcInitialBiasWeightValueInterface().calcInitialWeightValue(neuron.synapseList.size() + 1, 0, rnd);
             neuron.synapseList.add(synapse);
         }
         if (config.useAdditionalClockInput) {
             final MlpSynapse synapse = new MlpSynapse(clockInput, null, false, false, false);
-            synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
+            //synapse.weight = calcInitWeight3(config.getInitialWeightValue(), rnd);
+            synapse.weight =  config.getCalcInitialBiasWeightValueInterface().calcInitialWeightValue(neuron.synapseList.size() + 1, 0, rnd);
             neuron.synapseList.add(synapse);
         }
     }

@@ -164,7 +164,7 @@ public class MlpNetTimeTest {
                 };
         final int[] layerSizeArr = new int[]{ 1, 16, 32, 32, 16, 1 };
 
-        final Random rnd = new Random(123456);
+        final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
         final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, true, rnd);
@@ -180,7 +180,7 @@ public class MlpNetTimeTest {
         //addAdditionalBiasInputToLayer(mlpNet, 3, true, rnd);
         //addShortTermMemoryInputs(mlpNet, 2, 2, 3, false, true, true, rnd);
 
-        final int epochMax = 54_000;
+        final int epochMax = 9_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, rnd);
