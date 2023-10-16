@@ -66,7 +66,7 @@ public class GridworldMain {
             final MlpNet net;
             switch (netType) {
                 case 0 -> {
-                    config = new MlpConfiguration(true, true, 0.2F, 0.0F);
+                    config = new MlpConfiguration(true, true);
                     layerConfigArr = new MlpLayerConfig[6];
                     layerConfigArr[0] = new MlpLayerConfig(64 + 1);
                     layerConfigArr[1] = new MlpLayerConfig(164 + 1);
@@ -82,7 +82,7 @@ public class GridworldMain {
                     MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
                 }
                 case 1 -> {
-                    config = new MlpConfiguration(true, true, 0.2F, 0.0F);
+                    config = new MlpConfiguration(true, true);
                     layerConfigArr = new MlpLayerConfig[6];
                     layerConfigArr[0] = new MlpLayerConfig(64 + 1);
                     layerConfigArr[1] = new MlpLayerConfig(164 + 1);
@@ -98,7 +98,7 @@ public class GridworldMain {
                     MlpNetService.createInternalInputs(net, 4, 16, 31, rnd);
                 }
                 default -> {
-                    config = new MlpConfiguration(true, rnd.nextBoolean(), rnd.nextFloat(0.05F) + 0.175F, 0.0F);
+                    config = new MlpConfiguration(true, rnd.nextBoolean());
                     layerConfigArr = new MlpLayerConfig[6];
                     layerConfigArr[0] = new MlpLayerConfig(64 + 1);
                     layerConfigArr[1] = new MlpLayerConfig(164 + 1);

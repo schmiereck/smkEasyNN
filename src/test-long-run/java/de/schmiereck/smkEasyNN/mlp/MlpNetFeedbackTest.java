@@ -33,8 +33,8 @@ public class MlpNetFeedbackTest {
         final int inputLayerNr;
         switch (maxMemCount) {
             case 1, 2 -> {
-                mlpConfiguration = new MlpConfiguration(true, false,
-                        0.5F, 0.0F);
+                mlpConfiguration = new MlpConfiguration(true, false
+                );
                 layerConfigArr = new MlpLayerConfig[5];
                 layerConfigArr[0] = new MlpLayerConfig(4);
                 layerConfigArr[1] = new MlpLayerConfig(8 * 3);
@@ -47,8 +47,8 @@ public class MlpNetFeedbackTest {
                 inputLayerNr = 3;
             }
             case 3 -> {
-                mlpConfiguration = new MlpConfiguration(true, false,
-                        0.5F, 0.0F);
+                mlpConfiguration = new MlpConfiguration(true, false
+                );
                 layerConfigArr = new MlpLayerConfig[6];
                 layerConfigArr[0] = new MlpLayerConfig(4);
                 layerConfigArr[1] = new MlpLayerConfig(8 * 3);

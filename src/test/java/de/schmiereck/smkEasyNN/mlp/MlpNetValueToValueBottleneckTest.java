@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpoch;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printSamplesOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
@@ -43,7 +44,13 @@ public class MlpNetValueToValueBottleneckTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, false,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(4.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet mlpNet = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         final int bottleneckLayerPos = 3;
         mlpNet.getLayer(bottleneckLayerPos).setIsOutputLayer(true);

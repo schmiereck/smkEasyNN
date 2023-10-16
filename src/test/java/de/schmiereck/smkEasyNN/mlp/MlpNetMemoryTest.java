@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addAdditionalBiasInputToLayer;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addShortTermMemoryInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
@@ -210,33 +211,39 @@ public class MlpNetMemoryTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, false,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(4.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         // 0
         // 1 to   <---,
         // 2 from ----'
-        //addForwwardInputs(mlpNet, 2, 1, rnd);
-        //addForwwardInputs(mlpNet, 2, 1, true, false, true, rnd);
-        //addForwwardInputs2(mlpNet, 2, 1, true, false, true, false, true, rnd);
-        addForwwardInputs(mlpNet, 2, 1, true, false, true, false, true, rnd);
-        addAdditionalBiasInputToLayer(mlpNet, 1, true, rnd);
-        //addShortTermMemoryInputs(mlpNet, 2, 2, 3, false, true, true, rnd);
-        //addForwwardInputs(mlpNet, 1, 1, true, false, true, rnd);
-        //addForwwardInputs(mlpNet, 2, 2, true, false, true, rnd);
+        //addForwwardInputs(net, 2, 1, rnd);
+        //addForwwardInputs(net, 2, 1, true, false, true, rnd);
+        //addForwwardInputs2(net, 2, 1, true, false, true, false, true, rnd);
+        addForwwardInputs(net, 2, 1, true, false, true, false, true, rnd);
+        addAdditionalBiasInputToLayer(net, 1, true, rnd);
+        //addShortTermMemoryInputs(net, 2, 2, 3, false, true, true, rnd);
+        //addForwwardInputs(net, 1, 1, true, false, true, rnd);
+        //addForwwardInputs(net, 2, 2, true, false, true, rnd);
 
         final int epochMax = 85_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(net, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                //MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue);
+                //MlpNetPrintUtils.printFullResultForEpoch(net, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(net, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue);
             }
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), 0.05F);
+        actAssertExpectedOutput(net, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), 0.05F);
     }
 
     @Test
@@ -254,7 +261,12 @@ public class MlpNetMemoryTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpConfiguration config = new MlpConfiguration(true, false, 0.1F, 0.01F);
+        final MlpConfiguration config = new MlpConfiguration(true, false,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(0.1F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.01F);
         final MlpNet mlpNet = MlpNetService.createNet(config, layerConfigArr, rnd);
 
         //addShortTermMemoryInputs(mlpNet, 1, 3, 5, false, false, rnd);
@@ -284,29 +296,35 @@ public class MlpNetMemoryTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, false,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(4.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         // 0
         // 1 to   <---,
         // 2 from ----'
-        //addForwwardInputs2(mlpNet, 2, 1, true, false, true, false, true, rnd);
-        //addForwwardInputs(mlpNet, 2, 1, true, false, true, true, true, rnd);
-        //addAdditionalBiasInputToLayer(mlpNet, 1, true, rnd);
-        addShortTermMemoryInputs(mlpNet, 2, 4, 7, false, true, true, rnd);
+        //addForwwardInputs2(net, 2, 1, true, false, true, false, true, rnd);
+        //addForwwardInputs(net, 2, 1, true, false, true, true, true, rnd);
+        //addAdditionalBiasInputToLayer(net, 1, true, rnd);
+        addShortTermMemoryInputs(net, 2, 4, 7, false, true, true, rnd);
 
         final int epochMax = 22_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.01F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(net, result.expectedOutputArrArrArr(), result.trainInputArrArrArr(), 0.01F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                //MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue);
+                //MlpNetPrintUtils.printFullResultForEpoch(net, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue, 1);
+                MlpNetPrintUtils.printFullResultForEpoch(net, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), epochPos, mainOutputMseErrorValue);
             }
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), 0.05F);
+        actAssertExpectedOutput(net, result.trainInputArrArrArr(), result.expectedOutputArrArrArr(), 0.05F);
     }
 
     @Test

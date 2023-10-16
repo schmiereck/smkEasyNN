@@ -51,16 +51,52 @@ public class MlpLayer {
     /**
      * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
      */
-    public static float calcInitWeightXavier(final float initialWeightValue, final Random rnd) {
+    public static float calcInitWeightXavier_hack(final float initialWeightValue, final Random rnd) {
         // number of nodes in the previous layer
         final int inputSize = (int)(initialWeightValue * 10);
         return calcInitWeightXavier(inputSize, rnd);
     }
 
     /**
-     * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
+     * https://machinehack.com/story/addressing-unstable-training-of-gan-with-xavier-glorot-initialization
      */
     public static float calcInitWeightXavier(final int inputSize, final Random rnd) {
+        // Xavier Glorot weight:
+
+        // inputSize: number of nodes in the previous layer
+        final int outputSize = 0;
+        final float variance = 6.0F / (inputSize + outputSize);
+
+        // calculate the range for the weights
+        final float bound = (float)Math.sqrt(variance);
+        // generate random number and
+        // scale to the desired range
+        final float scaled = (rnd.nextFloat(-bound, bound));
+        return scaled;
+    }
+
+    /**
+     * https://machinehack.com/story/addressing-unstable-training-of-gan-with-xavier-glorot-initialization
+     */
+    public static float calcInitWeightXavierWithFactor(final int inputSize, final float weightFactor, final Random rnd) {
+        // Xavier Glorot weight:
+
+        // inputSize: number of nodes in the previous layer
+        final int outputSize = 0;
+        final float variance = (2.0F * weightFactor) / (inputSize + outputSize);
+
+        // calculate the range for the weights
+        final float bound = (float)Math.sqrt(variance);
+        // generate random number and
+        // scale to the desired range
+        final float scaled = (rnd.nextFloat(-bound, bound));
+        return scaled;
+    }
+
+    /**
+     * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
+     */
+    public static float calcInitWeightXavier2(final int inputSize, final Random rnd) {
         // number of nodes in the previous layer
         // calculate the range for the weights
         final float lower = -(1.0F / (float)Math.sqrt(inputSize));
@@ -74,10 +110,10 @@ public class MlpLayer {
     /**
      * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
      */
-    public static float calcInitWeightNormalizedXavier(final float initialWeightValue, final Random rnd) {
+    public static float calcInitWeightNormalizedXavier(final int inputSize, final int outputSize, final Random rnd) {
         // number of nodes in the previous layer
-        final int inputSize = (int)(initialWeightValue * 10);
-        final int outputSize = (int)(initialWeightValue * 10);
+        //final int inputSize = (int)(initialWeightValue * 10);
+        //final int outputSize = (int)(initialWeightValue * 10);
         // calculate the range for the weights
         final float lower = -((float)Math.sqrt(6.0F) / (float)Math.sqrt(inputSize + outputSize));
         final float upper = ((float)Math.sqrt(6.0F) / (float)Math.sqrt(inputSize + outputSize));

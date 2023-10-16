@@ -33,10 +33,10 @@ public class MlpNetXorTest {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F, 0.0F);
+        final MlpConfiguration config = new MlpConfiguration(true, false);
         final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
-        final int epochMax = 500;
+        final int epochMax = 1500;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = runTrainRandom(net, expectedOutputArrArr, trainInputArrArr, rnd);
@@ -45,7 +45,7 @@ public class MlpNetXorTest {
                 printFullResultForEpoch(net, trainInputArrArr, expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
-        final MlpNet mlpNet2 = MlpNetService.duplicateNet(net);
+        final MlpNet net2 = MlpNetService.duplicateNet(net);
 
         // Act & Assert
         System.out.println("Act & Assert 1");
@@ -53,8 +53,8 @@ public class MlpNetXorTest {
         actAssertExpectedOutput(net, trainInputArrArr, expectedOutputArrArr, 0.05F);
 
         System.out.println("Act & Assert 2");
-        printFullResultForEpoch(mlpNet2, trainInputArrArr, expectedOutputArrArr, 2, 2);
-        actAssertExpectedOutput(mlpNet2, trainInputArrArr, expectedOutputArrArr, 0.05F);
+        printFullResultForEpoch(net2, trainInputArrArr, expectedOutputArrArr, 2, 2);
+        actAssertExpectedOutput(net2, trainInputArrArr, expectedOutputArrArr, 0.05F);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MlpNetXorTest {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        final MlpConfiguration config = new MlpConfiguration(true, false, 4.0F, 0.0F);
+        final MlpConfiguration config = new MlpConfiguration(true, false);
         final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         {

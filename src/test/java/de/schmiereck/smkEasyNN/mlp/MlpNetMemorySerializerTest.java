@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addShortTermMemoryInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
@@ -91,24 +92,30 @@ public class MlpNetMemorySerializerTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, true, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, true,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(4.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
-        addForwwardInputs(mlpNet, 4, 2, true, false, true, false, true, rnd);
-        //addAdditionalBiasInputToLayer(mlpNet, 2, true, rnd);
-        addShortTermMemoryInputs(mlpNet, 2, 5, 9, false, true, true, rnd);
+        addForwwardInputs(net, 4, 2, true, false, true, false, true, rnd);
+        //addAdditionalBiasInputToLayer(net, 2, true, rnd);
+        addShortTermMemoryInputs(net, 2, 5, 9, false, true, true, rnd);
 
         final int epochMax = 25_000;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
-            final float mainOutputMseErrorValue = runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
+            final float mainOutputMseErrorValue = runTrainRandomOrder(net, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
 
             if ((epochPos + 1) % 100 == 0) {
-                MlpNetPrintUtils.printFullResultForEpoch(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
+                MlpNetPrintUtils.printFullResultForEpoch(net, trainInputArrArrArr, expectedOutputArrArrArr, epochPos, mainOutputMseErrorValue);
             }
         }
 
         // Act & Assert
-        actAssertExpectedOutput(mlpNet, trainInputArrArrArr, expectedOutputArrArrArr, 0.05F);
+        actAssertExpectedOutput(net, trainInputArrArrArr, expectedOutputArrArrArr, 0.05F);
     }
 
     @Test
@@ -205,8 +212,13 @@ public class MlpNetMemorySerializerTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpConfiguration configuration = new MlpConfiguration(true, false, 3.0F);
-        final MlpNet mlpNet = MlpNetService.createNet(configuration, layerSizeArr, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, false,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(3.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet mlpNet = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         //addForwwardInputs(mlpNet, 3, 3, rnd);
         //addForwwardInputs(mlpNet, 4, 4, rnd);
@@ -353,7 +365,7 @@ public class MlpNetMemorySerializerTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpConfiguration configuration = new MlpConfiguration(true, false, 3.0F);
+        final MlpConfiguration configuration = new MlpConfiguration(true, false);
         final MlpNet mlpNet = MlpNetService.createNet(configuration, layerSizeArr, rnd);
 
         //addForwwardInputs(mlpNet, 13, 1, false, false, true, rnd);

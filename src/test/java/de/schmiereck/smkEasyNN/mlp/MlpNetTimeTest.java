@@ -1,5 +1,8 @@
 package de.schmiereck.smkEasyNN.mlp;
 
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeightXavier;
+import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeightXavierWithFactor;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addAdditionalBiasInputToLayer;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.addForwwardInputs;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandomOrder;
@@ -46,7 +49,13 @@ public class MlpNetTimeTest {
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, false, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, false,
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavierWithFactor(inputSize, 2.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd2),
+                (inputSize, outputSize, rnd2) -> calcInitWeight(4.0F, rnd2),
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet mlpNet = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         // 0
         // 1 to   <---,
@@ -167,7 +176,13 @@ public class MlpNetTimeTest {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        final MlpNet mlpNet = MlpNetService.createNet(layerSizeArr, true, true, rnd);
+        final MlpConfiguration config = new MlpConfiguration(true, true,
+                (inputSize, outputSize, rnd2) -> calcInitWeight(4.0F, rnd),
+                //(inputSize, outputSize, rnd2) -> calcInitWeightXavier(inputSize, rnd2),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
+                (inputSize, outputSize, rnd2) -> 0.0F);
+        final MlpNet mlpNet = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         // 0
         // 1 to   <---,

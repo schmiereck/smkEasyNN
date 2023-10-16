@@ -27,7 +27,7 @@ public class TicTacToeMain {
 
         final MlpNet[] netArr = new MlpNet[2];
         for (int pos = 0; pos < netArr.length; pos++) {
-            final MlpConfiguration config = new MlpConfiguration(true, true, 3.0F);
+            final MlpConfiguration config = new MlpConfiguration(true, true);
             netArr[pos] = MlpNetService.createNet(config, layerSizeArr, rnd);
 
             addForwwardInputs(netArr[pos], 2, 1, true, false, true, false, rnd);

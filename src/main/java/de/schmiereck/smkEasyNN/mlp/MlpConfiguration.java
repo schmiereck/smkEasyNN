@@ -1,6 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeightXavier;
 
 import java.util.Random;
@@ -21,19 +20,12 @@ public class MlpConfiguration {
     }
 
     public MlpConfiguration(final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput) {
-        this(useAdditionalBiasInput, useAdditionalClockInput, 4.0F);
-    }
-
-    public MlpConfiguration(final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput, final float initialWeightValue) {
-        this(useAdditionalBiasInput, useAdditionalClockInput, initialWeightValue, 0.0F);
-    }
-
-    public MlpConfiguration(final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput, final float initialWeightValue, final float initialBiasWeightValue) {
         this(useAdditionalBiasInput, useAdditionalClockInput,
-                (inputSize, outputSize, rnd) -> calcInitWeight(initialWeightValue, rnd),
-                //(inputSize, outputSize, rnd) -> calcInitWeightXavier(inputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeight(initialWeightValue, rnd),
+                (inputSize, outputSize, rnd) -> calcInitWeightXavier(inputSize, rnd),
+                //(inputSize, outputSize, rnd) -> calcInitWeightNormalizedXavier(inputSize, outputSize, rnd),
                 //(inputSize, outputSize, rnd) -> calcInitWeight3(initialBiasWeightValue, rnd));
-                (inputSize, outputSize, rnd) -> initialBiasWeightValue);
+                (inputSize, outputSize, rnd) -> 0.0F);
     }
 
     public MlpConfiguration(final boolean useAdditionalBiasInput, final boolean useAdditionalClockInput,
