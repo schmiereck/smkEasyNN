@@ -100,7 +100,7 @@ public final class MlpLayerService {
                 for (int yPos = yMinPos; yPos <= yMaxPos; yPos++) {
                     for (int xPos = xMinPos; xPos <= xMaxPos; xPos++) {
                         final int inputLayerNeuronPos = ((yPos) * xArraySize) + (xPos);
-                        final float weight = config.getCalcInitialWeightValueInterface().calcInitialWeightValue(inputLayerSize, 0, rnd);
+                        final float weight = config.getCalcInitialWeightValueInterface().calcInitialWeightValue(arraySize, 0, rnd);
                         addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr,
                                 useError, useLastInput, useLastInput,
                                 //calcInitWeight(config.getInitialWeightValue(), rnd));
@@ -115,7 +115,8 @@ public final class MlpLayerService {
             final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
 
             for (int inputLayerNeuronPos = 0; inputLayerNeuronPos < inputLayerSize; inputLayerNeuronPos++) {
-                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr, useError, useLastInput, useLastInput, config.getInitialWeightValue());
+                final float weight = config.getCalcInitialWeightValueInterface().calcInitialWeightValue(inputLayerSize, 0, rnd);
+                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr, useError, useLastInput, useLastInput, weight);
             }
             addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
         }
