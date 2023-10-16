@@ -189,7 +189,7 @@ public class MlpSaveService {
 
                 neuron.outputValue += synapse.weight * inputValue;
                 if (Float.isNaN(neuron.outputValue)) {
-                    throw new RuntimeException("runLayer neuron.output NaN:" + synapse.weight + ", " + inputValue);
+                    throw new RuntimeException("runLayer neuron.output NaN: " + synapse.weight + ", " + inputValue);
                 }
             }
             if (!mlpLayer.isOutputLayer) {

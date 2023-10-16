@@ -48,6 +48,45 @@ public class MlpLayer {
         return 0.025F;
     }
 
+    /**
+     * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
+     */
+    public static float calcInitWeightXavier(final float initialWeightValue, final Random rnd) {
+        // number of nodes in the previous layer
+        final int inputSize = (int)(initialWeightValue * 10);
+        return calcInitWeightXavier(inputSize, rnd);
+    }
+
+    /**
+     * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
+     */
+    public static float calcInitWeightXavier(final int inputSize, final Random rnd) {
+        // number of nodes in the previous layer
+        // calculate the range for the weights
+        final float lower = -(1.0F / (float)Math.sqrt(inputSize));
+        final float upper = (1.0F / (float)Math.sqrt(inputSize));
+        // generate random number and
+        // scale to the desired range
+        final float scaled = lower + rnd.nextFloat() * (upper - lower);
+        return scaled;
+    }
+
+    /**
+     * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
+     */
+    public static float calcInitWeightNormalizedXavier(final float initialWeightValue, final Random rnd) {
+        // number of nodes in the previous layer
+        final int inputSize = (int)(initialWeightValue * 10);
+        final int outputSize = (int)(initialWeightValue * 10);
+        // calculate the range for the weights
+        final float lower = -((float)Math.sqrt(6.0F) / (float)Math.sqrt(inputSize + outputSize));
+        final float upper = ((float)Math.sqrt(6.0F) / (float)Math.sqrt(inputSize + outputSize));
+        // generate random number and
+        // scale to the desired range
+        final float scaled = lower + rnd.nextFloat() * (upper - lower);
+        return scaled;
+    }
+
     //public void initWeights(final Random rnd) {
     //    for (int neuronPos = 0; neuronPos < this.neuronArr.length; neuronPos++) {
     //        final MlpNeuron mlpNeuron = this.neuronArr[neuronPos];

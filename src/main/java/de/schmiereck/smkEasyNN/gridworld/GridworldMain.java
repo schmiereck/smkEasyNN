@@ -167,10 +167,10 @@ public class GridworldMain {
                     final boolean newLevel = (oldLevel != gameStatistic.level);
                     final boolean breakTraining = newLevel || moveBreak;
 
-                    if ((gameStatistic.epoche % 100 == 0) || newLevel) {
+                    if ((gameStatistic.epoche % 100 == 0) || breakTraining) {
                         System.out.printf("%3d:%1d - %9d: level:%3d  moves:%9d [goal:%6d, pit:%6d, wall:%6d, max-move:%6d] mse:%.6f",
                                 gameStatistic.netPos, gameStatistic.netType, gameStatistic.epoche, oldLevel, gameStatistic.moveCounter, gameStatistic.hitGoalCounter, gameStatistic.hitPitCounter, gameStatistic.hitWallCounter, gameStatistic.maxMoveCounter, gameStatistic.mse);
-                        if (!newLevel) {
+                        if (!breakTraining) {
                             System.out.print('\r');
                         }
                     }
@@ -193,7 +193,7 @@ public class GridworldMain {
                         gameStatistic.hitPitCounter +
                         gameStatistic.maxMoveCounter +
                         gameStatistic.hitWallCounter);
-                final float m = ((float)ma) / gameStatistic.moveCounter;
+                final float m = (((float)ma) / gameStatistic.moveCounter) * 4.0F;
                 // 1: more of these results, 0: no results
                 // moves / goal
                 final float mg = (calcFit(gameStatistic.hitGoalCounter, ma) * 10.0F);

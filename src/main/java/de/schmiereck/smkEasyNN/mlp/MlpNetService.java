@@ -10,6 +10,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_CLOCK_INPUT_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_INPUT_LAYER_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_LAYER_NR;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -218,7 +219,7 @@ public final class MlpNetService {
         net.getClockInput().setValue(MlpService.CLOCK_VALUE);
     }
 
-    public static void createInternalInputs(final MlpNet net, final int inputLayerNr, final int firstNeuronPos, final int lastNeuronPos, final Random rnd) {
+    public static void createInternalInputs_xxx(final MlpNet net, final int inputLayerNr, final int firstNeuronPos, final int lastNeuronPos, final Random rnd) {
         final int inputSize = (lastNeuronPos - firstNeuronPos) + 1;
         final MlpInternalValueInput[] internalValueInputArr = new MlpInternalValueInput[inputSize];
 
@@ -248,6 +249,56 @@ public final class MlpNetService {
                 final boolean useTrainLastInput = false;
 
                 final MlpSynapse synapse = MlpLayerService.createSynapse(calcInitWeight2(net.getInitialWeightValue(), rnd),
+                        useLastError, useLastInput, useTrainLastInput, valueInput, null);
+                neuron.synapseList.add(synapse);
+            }
+        }
+    }
+
+    public static void createInternalInputs(final MlpNet net, final int inputLayerNr, final int firstNeuronPos, final int lastNeuronPos, final Random rnd) {
+        final int inputSize = (lastNeuronPos - firstNeuronPos) + 1;
+        final MlpInternalValueInput[] newInternalValueInputArr = new MlpInternalValueInput[inputSize];
+        final MlpInternalValueInput[] internalValueInputArr;
+        if (Objects.nonNull(net.getInternalValueInputArr())) {
+            internalValueInputArr = net.getInternalValueInputArr();
+        } else {
+            internalValueInputArr = new MlpInternalValueInput[0];
+        }
+        final int nextPosInternalValueInput = internalValueInputArr.length;
+
+        for (int neuronPos = 0; neuronPos < inputSize; neuronPos++) {
+            final MlpInternalValueInput valueInput = new MlpInternalValueInput(INTERNAL_INPUT_LAYER_NR,
+                    nextPosInternalValueInput + neuronPos, 0.0F);
+
+            valueInput.inputLayerNr = inputLayerNr;
+            valueInput.inputNeuronNr = firstNeuronPos + neuronPos;
+
+            newInternalValueInputArr[neuronPos] = valueInput;
+        }
+        final MlpInternalValueInput[] resultInternalValueInputArr =
+                Arrays.copyOf(internalValueInputArr, internalValueInputArr.length + newInternalValueInputArr.length);
+        System.arraycopy(newInternalValueInputArr, 0, resultInternalValueInputArr, internalValueInputArr.length, newInternalValueInputArr.length);
+
+        net.setInternalValueInputArr(resultInternalValueInputArr);
+
+        final MlpLayer layer = net.getLayer(FIRST_LAYER_NR);
+
+        for (int neuronPos = 0; neuronPos < layer.neuronArr.length; neuronPos++) {
+            final MlpNeuron neuron = layer.neuronArr[neuronPos];
+
+            for (int inputPos = 0; inputPos < newInternalValueInputArr.length; inputPos++) {
+                final MlpInternalValueInput valueInput = newInternalValueInputArr[inputPos];
+
+                //final MlpLayer inputLayer = net.getLayer(valueInput.inputLayerNr);
+                //final MlpNeuron inputNeuron = inputLayer.neuronArr[valueInput.inputNeuronNr];
+
+                final boolean useLastError = false;
+                final boolean useLastInput = false;
+                final boolean useTrainLastInput = false;
+
+                final float weight = calcInitWeight2(net.getInitialWeightValue(), rnd);
+                //final float weight = net.getConfig().getCalcInitialWeightValueInterface().calcInitialWeightValue(neuron.synapseList.size() + 1, 0, rnd);
+                final MlpSynapse synapse = MlpLayerService.createSynapse(weight,
                         useLastError, useLastInput, useTrainLastInput, valueInput, null);
                 neuron.synapseList.add(synapse);
             }
