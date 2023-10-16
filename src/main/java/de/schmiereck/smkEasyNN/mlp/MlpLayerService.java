@@ -208,10 +208,13 @@ public final class MlpLayerService {
         final MlpLayer inputLayer = net.getLayer(inputLayerPos);
         final MlpLayer toLayer = net.getLayer(toLayerPos);
 
+        final int inputSize = inputLayer.neuronArr.length;
+
         if (createManyToMany) {
             Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
                 Arrays.stream(inputLayer.neuronArr).forEach(inputNeuron -> {
-                    final float weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                    //final float weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                    final float weight = net.getConfig().getCalcInitialWeightValueInterface().calcInitialWeightValue(inputSize, 0, rnd);
                     final MlpSynapse synapse = createSynapse(weight, useError, useLastError, useLastInput, useTrainLastInput, inputNeuron, rnd);
                     toNeuron.synapseList.add(synapse);
                 });
@@ -230,7 +233,8 @@ public final class MlpLayerService {
                 final int inputNeuronPos = (toNeuronPos * inputLayer.neuronArr.length) / toLayer.neuronArr.length;
                 final MlpNeuron inputNeuron = inputLayer.neuronArr[inputNeuronPos];
 
-                final float weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                //final float weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                final float weight = net.getConfig().getCalcInitialWeightValueInterface().calcInitialWeightValue(inputSize, 0, rnd);
                 final MlpSynapse synapse = createSynapse(weight, useError, useLastError, useLastInput, useTrainLastInput, inputNeuron, rnd);
                 toNeuron.synapseList.add(synapse);
             }
@@ -241,9 +245,11 @@ public final class MlpLayerService {
         final MlpLayer toLayer = net.getLayer(toLayerPos);
 
         Arrays.stream(toLayer.neuronArr).forEach(toNeuron -> {
-            if (net.getUseAdditionalBiasInput()) {  // TODO XXX
+            if (net.getUseAdditionalBiasInput()) {
                 final MlpSynapse synapse = new MlpSynapse(net.biasInput, null, useLastError, false, false);
-                synapse.weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                //synapse.weight = calcInitWeight2(net.getConfig().getInitialWeightValue(), rnd);
+                //synapse.weight = net.getConfig().getCalcInitialWeightValueInterface().calcInitialWeightValue(toNeuron.synapseList.size() + 1, 0, rnd);
+                synapse.weight = net.getConfig().getCalcInitialBiasWeightValueInterface().calcInitialWeightValue(toNeuron.synapseList.size() + 1, 0, rnd);
                 toNeuron.synapseList.add(synapse);
             }
         });
