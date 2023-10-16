@@ -37,24 +37,9 @@ public class MlpLayer {
         return (rnd.nextFloat() - 0.5F) * initialWeightValue;
     }
 
-    public static float calcInitWeight2(final float initialWeightValue, final Random rnd) {
-        //return (rnd.nextFloat() - 0.5F) * 1.0F;
-        //return (rnd.nextFloat() - 0.5F) * 0.1F;
-        return calcInitWeight(initialWeightValue, rnd);
-    }
-
     public static float calcInitWeight3(final float initialWeightValue, final Random rnd) {
         //return calcInitWeight(initialWeightValue, rnd) * 0.01F;
         return 0.025F;
-    }
-
-    /**
-     * https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
-     */
-    public static float calcInitWeightXavier_hack(final float initialWeightValue, final Random rnd) {
-        // number of nodes in the previous layer
-        final int inputSize = (int)(initialWeightValue * 10);
-        return calcInitWeightXavier(inputSize, rnd);
     }
 
     /**

@@ -1,8 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createLayers;
-import static de.schmiereck.smkEasyNN.mlp.MlpLayerService.createSynapse;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.FIRST_LAYER_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INPUT_LAYER_NR;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.INTERNAL_BIAS_INPUT_NR;

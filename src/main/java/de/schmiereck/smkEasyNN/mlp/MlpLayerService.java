@@ -1,7 +1,6 @@
 package de.schmiereck.smkEasyNN.mlp;
 
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
-import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight2;
 import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight3;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.FIRST_LAYER_NR;
 
