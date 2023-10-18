@@ -1,7 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpNetService.resetNetOutputs;
-
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -52,8 +50,8 @@ public final class MlpService {
             }
         }
         for (int layerPos = 0; layerPos < net.layerArr.length; layerPos++) {
-            final MlpLayer mlpLayer = net.layerArr[layerPos];
-            runLayer(mlpLayer);
+            final MlpLayer layer = net.layerArr[layerPos];
+            runLayer(layer);
         }
 
         final MlpLayer outputLayer = net.getOutputLayer();
@@ -64,9 +62,9 @@ public final class MlpService {
         return layerOutputArr;
     }
 
-    public static void runLayer(final MlpLayer mlpLayer) {
-        for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
-            final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
+    public static void runLayer(final MlpLayer layer) {
+        for (int outputPos = 0; outputPos < layer.neuronArr.length; outputPos++) {
+            final MlpNeuron neuron = layer.neuronArr[outputPos];
             neuron.lastOutputValue = neuron.outputValue;
             neuron.outputValue = 0.0F;
 
@@ -81,18 +79,18 @@ public final class MlpService {
                 }
                 neuron.outputValue += synapse.weight * inputValue;
             }
-            if (!mlpLayer.isOutputLayer) {
+            if (!layer.isOutputLayer) {
                 neuron.outputValue = sigmoid(neuron.outputValue);
             }
         }
     }
 
-    public static float runTrainOrder(final MlpNet mlpNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+    public static float runTrainOrder(final MlpNet net, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
         float mainOutputMseErrorValue = 0.0F;
         int mainOutputCount = 0;
         for (int expectedResultPos = 0; expectedResultPos < expectedOutputArrArr.length; expectedResultPos++) {
             int idx = expectedResultPos;
-            mainOutputMseErrorValue += train(mlpNet, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
+            mainOutputMseErrorValue += train(net, trainInputArrArr[idx], expectedOutputArrArr[idx], 0.3F, 0.6F);
             mainOutputCount++;
         }
         return mainOutputMseErrorValue / mainOutputCount;
@@ -115,21 +113,21 @@ public final class MlpService {
         return mainOutputMseErrorValue / mainOutputCount;
     }
 
-    public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr, final Random rnd) {
-        return runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
+    public static float runTrainRandomOrder(final MlpNet net, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr, final Random rnd) {
+        return runTrainRandomOrder(net, expectedOutputArrArrArr, trainInputArrArrArr, 0.3F, 0.6F, rnd);
     }
 
-    public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+    public static float runTrainRandomOrder(final MlpNet net, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
                                            final float learningRate, final float momentum, final Random rnd) {
         //final float[][] expectedOutputArrArr = expectedOutputArrArrArr[0];
         //final int expectedOutputTrainSize = expectedOutputArrArr.length;
 
-        return runTrainRandomOrder(mlpNet, expectedOutputArrArrArr, trainInputArrArrArr,
+        return runTrainRandomOrder(net, expectedOutputArrArrArr, trainInputArrArrArr,
                                     Integer.MAX_VALUE,
                                     learningRate, momentum, rnd);
     }
 
-    public static float runTrainRandomOrder(final MlpNet mlpNet, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
+    public static float runTrainRandomOrder(final MlpNet net, final float[][][] expectedOutputArrArrArr, final float[][][] trainInputArrArrArr,
                                            final int expectedOutputTrainSize,
                                            final float learningRate, final float momentum, final Random rnd) {
         float mainOutputMseErrorValue = 0.0F;
@@ -144,31 +142,29 @@ public final class MlpService {
             } else {
                 trainSize = expectedOutputTrainSize;
             }
-            //resetNetOutputs(mlpNet);
+            //resetNetOutputs(net);
             //for (int pos = 0; pos < expectedOutputArrArr.length; pos++) {
             //for (int pos = 0; pos < expectedOutputTrainSize; pos++) {
             for (int pos = 0; pos < trainSize; pos++) {
-                mainOutputMseErrorValue += train(mlpNet, trainInputArrArr[pos], expectedOutputArrArr[pos], learningRate, momentum);
+                mainOutputMseErrorValue += train(net, trainInputArrArr[pos], expectedOutputArrArr[pos], learningRate, momentum);
                 mainOutputCount++;
             }
         }
         return mainOutputMseErrorValue / mainOutputCount;
     }
 
-    public static float train(final MlpNet mlpNet, final float[] trainInputArr, final float[] expectedOutputArr, final float learningRate, final float momentum) {
-        float[] calcOutputArr = run(mlpNet, trainInputArr);
+    public static float train(final MlpNet net, final float[] trainInputArr, final float[] expectedOutputArr, final float learningRate, final float momentum) {
+        float[] calcOutputArr = run(net, trainInputArr);
 
-        return trainWithOutput(mlpNet, expectedOutputArr, calcOutputArr, learningRate, momentum);
+        return trainWithOutput(net, expectedOutputArr, calcOutputArr, learningRate, momentum);
     }
 
     /**
      * @return mittlerer quadratischen Fehler (MSE).
      */
-    public static float trainWithOutput(final MlpNet mlpNet, final float[] expectedOutputArr, final float[] calcOutputArr,
+    public static float trainWithOutput(final MlpNet net, final float[] expectedOutputArr, final float[] calcOutputArr,
                                         final float learningRate, final float momentum) {
-        float mainOutputMseErrorValue = 0.0F;
-
-        Arrays.stream(mlpNet.layerArr).forEach(layer -> {
+        Arrays.stream(net.layerArr).forEach(layer -> {
             Arrays.stream(layer.neuronArr).forEach(neuron -> {
                 neuron.lastErrorValue = 0.0F;
                 //neuron.lastError = neuron.error;
@@ -176,7 +172,30 @@ public final class MlpService {
             });
         });
 
-        final MlpLayer outputLayer = mlpNet.getOutputLayer();
+        return trainWithError(net, learningRate, momentum, expectedOutputArr);
+    }
+
+    public static float trainWithError(final MlpNet net, final float learningRate, final float momentum,
+            final float[] expectedOutputArr) {
+        final float mse = trainNetErrorValues(net, learningRate, momentum, expectedOutputArr);
+
+        trainNetWeights(net, learningRate, momentum);
+
+        return mse;
+    }
+
+    private static void trainNetWeights(final MlpNet net, final float learningRate, final float momentum) {
+        for (int layerPos = net.layerArr.length - 1; layerPos >= 0; layerPos--) {
+            final MlpLayer layer = net.layerArr[layerPos];
+            trainLayerWeights(layer, learningRate, momentum);
+        }
+    }
+
+    private static float trainNetErrorValues(final MlpNet net, final float learningRate, final float momentum,
+                                             final float[] expectedOutputArr) {
+        float mainOutputMseErrorValue = 0.0F;
+
+        final MlpLayer outputLayer = net.getOutputLayer();
 
         for (int outputNeuronPos = 0; outputNeuronPos < outputLayer.neuronArr.length; outputNeuronPos++) {
             final MlpNeuron outputNeuron = outputLayer.neuronArr[outputNeuronPos];
@@ -184,30 +203,20 @@ public final class MlpService {
             mainOutputMseErrorValue += (outputNeuron.errorValue * outputNeuron.errorValue);
         }
 
-        trainWithError(mlpNet, learningRate, momentum);
+        for (int layerPos = net.layerArr.length - 1; layerPos >= 0; layerPos--) {
+            final MlpLayer layer = net.layerArr[layerPos];
+            MlpService.trainLayerErrorValues(layer, learningRate, momentum);
+        }
 
         return mainOutputMseErrorValue / outputLayer.neuronArr.length;
     }
 
-    public static void trainWithError(final MlpNet mlpNet, final float learningRate, final float momentum) {
-        for (int layerPos = mlpNet.layerArr.length - 1; layerPos >= 0; layerPos--) {
-            final MlpLayer mlpLayer = mlpNet.layerArr[layerPos];
-            MlpService.trainNetErrorValues(mlpLayer, learningRate, momentum);
-            //MlpService.train2(mlpLayer, learningRate, momentum);
-        }
-        for (int layerPos = mlpNet.layerArr.length - 1; layerPos >= 0; layerPos--) {
-            final MlpLayer mlpLayer = mlpNet.layerArr[layerPos];
-            //MlpService.train(mlpLayer, learningRate, momentum);
-            MlpService.trainNetWeights(mlpLayer, learningRate, momentum);
-        }
-    }
+    public static void trainLayerErrorValues(final MlpLayer layer, final float learningRate, final float momentum) {
+        for (int outputPos = 0; outputPos < layer.neuronArr.length; outputPos++) {
+            final MlpNeuron neuron = layer.neuronArr[outputPos];
 
-    public static void trainNetErrorValues(final MlpLayer mlpLayer, final float learningRate, final float momentum) {
-        for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
-            final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
-
-            if (!mlpLayer.isOutputLayer) {
-                neuron.errorValue *= sigmoidDerivative(mlpLayer.neuronArr[outputPos].outputValue);
+            if (!layer.isOutputLayer) {
+                neuron.errorValue *= sigmoidDerivative(layer.neuronArr[outputPos].outputValue);
             }
 
             for (int inputPos = 0; inputPos < neuron.synapseList.size(); inputPos++) {
@@ -228,9 +237,9 @@ public final class MlpService {
         }
     }
 
-    public static void trainNetWeights(final MlpLayer mlpLayer, final float learningRate, final float momentum) {
-        for (int outputPos = 0; outputPos < mlpLayer.neuronArr.length; outputPos++) {
-            final MlpNeuron neuron = mlpLayer.neuronArr[outputPos];
+    public static void trainLayerWeights(final MlpLayer layer, final float learningRate, final float momentum) {
+        for (int outputPos = 0; outputPos < layer.neuronArr.length; outputPos++) {
+            final MlpNeuron neuron = layer.neuronArr[outputPos];
 
             for (int inputPos = 0; inputPos < neuron.synapseList.size(); inputPos++) {
                 final MlpSynapse synapse = neuron.synapseList.get(inputPos);
@@ -258,8 +267,8 @@ public final class MlpService {
         }
     }
 
-    private static MlpNeuron getNeuron(final MlpNet mlpNet, final int inputLayerNr, final int inputNeuronNr) {
-        return mlpNet.getLayerArr()[inputLayerNr].neuronArr[inputNeuronNr];
+    private static MlpNeuron getNeuron(final MlpNet net, final int inputLayerNr, final int inputNeuronNr) {
+        return net.getLayerArr()[inputLayerNr].neuronArr[inputNeuronNr];
     }
 
     static float sigmoidDerivative(final float x) {
