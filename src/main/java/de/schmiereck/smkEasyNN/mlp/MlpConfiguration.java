@@ -5,6 +5,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeightXavier;
 import java.util.Random;
 
 public class MlpConfiguration {
+
     @FunctionalInterface
     public interface CalcInitialWeightValueInterface {
         float calcInitialWeightValue(final int inputSize, final int outputSize, final Random rnd);
@@ -43,5 +44,9 @@ public class MlpConfiguration {
 
     public CalcInitialWeightValueInterface getCalcInitialBiasWeightValueInterface() {
         return this.calcInitialBiasWeightValueInterface;
+    }
+
+    public boolean getUseAdditionalBiasInput() {
+        return this.useAdditionalBiasInput;
     }
 }
