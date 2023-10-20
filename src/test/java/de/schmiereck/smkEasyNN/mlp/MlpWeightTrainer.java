@@ -17,12 +17,16 @@ public class MlpWeightTrainer {
         final int[] trainLayerSizeArr = new int[]
                 {
                         InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
-                        8 * trainSize,
-                        12 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
+                        //18 * trainSize,
+                        //32 * trainSize,
+                        //18 * trainSize,
+                        //18 * trainSize,
+                        18 * trainSize,
+                        18 * trainSize,
+                        18 * trainSize,
+                        18 * trainSize,
+                        18 * trainSize,
+                        18 * trainSize,
                         OutArrSynapseSize * (trainSize + additionalNeuronSize)
                 };
         final MlpConfiguration trainConfig = new MlpConfiguration(true, false);

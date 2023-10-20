@@ -194,7 +194,7 @@ public abstract class MlpWeightTrainerService {
                     expectedOutArr[pos] = 0.0F;
                 }
 
-                weightTrainer.trainerMse += MlpService.trainWithOutput(weightTrainer.trainNet, expectedOutArr, calcOutputArr, learningRate, momentum);
+                weightTrainer.trainerMse += MlpService.trainWithOutput(weightTrainer.trainNet, expectedOutArr, calcOutputArr, 0.01F, 0.6F);//1learningRate, momentum);
                 trainingCnt++;
             }
         }

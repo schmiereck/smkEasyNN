@@ -33,8 +33,9 @@ public class MlpNetMathTest {
 
         // Train the Trainer and Net:
         {
-            for (int trainPos = 0; trainPos < 1000; trainPos++) {
+            for (int trainPos = 0; trainPos < 1200; trainPos++) {
                 trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer);
+                System.out.printf("trainPos: %d\n", trainPos);
             }
         }
 
