@@ -6,7 +6,9 @@ import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutpu
 import static de.schmiereck.smkEasyNN.mlp.MlpService.runTrainRandom;
 import static de.schmiereck.smkEasyNN.mlp.MlpWeightTrainerService.calcAdditionalNeuronSize;
 
+import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,104 @@ public class MlpNetMathTest {
     private record Result(float[][] trainInputArrArr, float[][] expectedOutputArrArr) {
     }
 
+    /**
+     * Train one Trainer-Net with all Neurons in the output Layers.
+     */
+    @Test
+    @Disabled
+    void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output() {
+        // Arrange
+        final Result result = arrangeAddResult();
+        //final Result result = arrangeMultResult();
+
+        final Random rnd = new Random(12345);
+        //final Random rnd = new Random();
+
+        final int[] layerSizeArr = new int[]{ 2, 6, 4, 1 };
+        final MlpConfiguration config = new MlpConfiguration(true, false);
+
+        final int additionalNeuronSize = calcAdditionalNeuronSize(config);
+        final MlpWeightTrainer[] weightTrainerArr = new MlpWeightTrainer[layerSizeArr.length];
+        for (int trainerPos = 0; trainerPos < layerSizeArr.length; trainerPos++) {
+            weightTrainerArr[trainerPos] = new MlpWeightTrainer(6, additionalNeuronSize, rnd);
+        }
+
+        //weightTrainer.useWeightDiff = true;
+
+        // Train the Trainer and Net:
+        {
+            for (int trainPos = 0; trainPos < 1200; trainPos++) {
+            //for (int trainPos = 0; trainPos < 120; trainPos++) {
+            //for (int trainPos = 0; trainPos < 20; trainPos++) {
+                System.out.printf("trainPos: %d\n", trainPos);
+                trainTheTrainerArr(config, layerSizeArr, rnd, result, weightTrainerArr);
+            }
+        }
+
+        // Train the Net with Trainer:
+        System.out.println("---- Train the Net with Trainer: --------------------------------------------------------");
+        {
+            final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
+
+            final int successfulCounterMax = 60;
+            final int epochMax = 27_000;
+            //final int epochMax = 1_000;
+            trainTheNetWithTrainerArr(net, config, layerSizeArr, rnd, epochMax, result, weightTrainerArr, successfulCounterMax);
+
+            // Act & Assert
+            System.out.println("Act & Assert");
+            actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
+        }
+    }
+
+    /**
+     * Train one Trainer-Net with all Neurons in the output Layers.
+     */
+    @Test
+    @Disabled
+    void GIVEN_2_value_inputs_with_trainer_for_output_layer_THEN_add_output() {
+        // Arrange
+        final Result result = arrangeAddResult();
+        //final Result result = arrangeMultResult();
+
+        final Random rnd = new Random(12345);
+        //final Random rnd = new Random();
+
+        final int[] layerSizeArr = new int[]{ 2, 6, 4, 1 };
+        final MlpConfiguration config = new MlpConfiguration(true, false);
+
+        final int additionalNeuronSize = calcAdditionalNeuronSize(config);
+        final MlpWeightTrainer weightTrainer = new MlpWeightTrainer(6, additionalNeuronSize, rnd);
+        final int trainLayerPos = layerSizeArr.length - 1;
+
+        //weightTrainer.useWeightDiff = true;
+
+        // Train the Trainer and Net:
+        {
+            //for (int trainPos = 0; trainPos < 1200; trainPos++) {
+            for (int trainPos = 0; trainPos < 120; trainPos++) {
+                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos);
+                System.out.printf("trainPos: %d\n", trainPos);
+            }
+        }
+
+        // Train the Net with Trainer:
+        {
+            final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
+
+            final int successfulCounterMax = 60;
+            final int epochMax = 27_000;
+            trainTheNetWithTrainer(net, config, layerSizeArr, rnd, epochMax, result, weightTrainer, trainLayerPos, successfulCounterMax);
+
+            // Act & Assert
+            System.out.println("Act & Assert");
+            actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
+        }
+    }
+
+    /**
+     * Train one Trainer-Net with all Neurons in all Layers.
+     */
     @Test
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_THEN_add_output() {
@@ -30,11 +130,15 @@ public class MlpNetMathTest {
 
         final int additionalNeuronSize = calcAdditionalNeuronSize(config);
         final MlpWeightTrainer weightTrainer = new MlpWeightTrainer(6, additionalNeuronSize, rnd);
+        final int trainLayerPos = -1;
+
+        //weightTrainer.useWeightDiff = true;
 
         // Train the Trainer and Net:
         {
             for (int trainPos = 0; trainPos < 1200; trainPos++) {
-                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer);
+            //for (int trainPos = 0; trainPos < 20; trainPos++) {
+                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos);
                 System.out.printf("trainPos: %d\n", trainPos);
             }
         }
@@ -44,68 +148,13 @@ public class MlpNetMathTest {
             final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
             final int successfulCounterMax = 60;
-            int successfulCounter = 0;
             final int epochMax = 27_000;
-            for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
-
-                final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomWithTrainer(net,
-                        result.expectedOutputArrArr, result.trainInputArrArr,
-                        0.1F, 0.6F, rnd,
-                        weightTrainer);
-
-                if ((epochPos + 1) % 100 == 0) {
-                    printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
-                }
-                if (mainOutputMseErrorValue < 0.0001F) {
-                    successfulCounter++;
-                    if (successfulCounter > successfulCounterMax) {
-                        printFullResultForEpochWithTrainSize(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
-                        break;
-                    }
-                } else {
-                    successfulCounter = 0;
-                }
-            }
+            trainTheNetWithTrainer(net, config, layerSizeArr, rnd, epochMax, result, weightTrainer, trainLayerPos, successfulCounterMax);
 
             // Act & Assert
             System.out.println("Act & Assert");
             actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
         }
-    }
-
-    private void trainTheTrainer(MlpConfiguration config, int[] layerSizeArr, Random rnd, Result result, MlpWeightTrainer weightTrainer) {
-        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
-
-        final int successfulCounterMax = 10;
-        int successfulCounter = 0;
-        //final int epochMax = 27_000;
-        final int epochMax = 200;
-        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
-
-            final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomNetAndTrainer(net,
-                    result.expectedOutputArrArr, result.trainInputArrArr,
-                    0.1F, 0.6F, rnd,
-                    weightTrainer);
-
-            if ((epochPos + 1) % 100 == 0) {
-                printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
-                System.out.printf("trainerMse: %.8f\n", weightTrainer.trainerMse);
-            }
-            if (mainOutputMseErrorValue < 0.0001F) {
-                successfulCounter++;
-                if (successfulCounter > successfulCounterMax) {
-                    printFullResultForEpochWithTrainSize(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
-                    System.out.printf("trainerMse: %.8f\n", weightTrainer.trainerMse);
-                    break;
-                }
-            } else {
-                successfulCounter = 0;
-            }
-        }
-
-        // Act & Assert
-        System.out.println("Act & Assert");
-        //actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
     }
 
     @Test
@@ -224,6 +273,136 @@ public class MlpNetMathTest {
         // Act & Assert
         System.out.println("Act & Assert");
         actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.02F);
+    }
+
+    private void trainTheTrainerArr(final MlpConfiguration config, final int[] layerSizeArr, final Random rnd, final Result result,
+                                 final MlpWeightTrainer[] weightTrainerArr) {
+        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
+
+        final int successfulCounterMax = 10;
+        int successfulCounter = 0;
+        //final int epochMax = 27_000;
+        final int epochMax = 200;
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
+            //for (int trainerPos = 0; trainerPos < layerSizeArr.length; trainerPos++) {
+            //    final int trainLayerPos = trainerPos;
+
+            final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomNetAndTrainerArr(net,
+                    result.expectedOutputArrArr, result.trainInputArrArr,
+                    0.1F, 0.6F, rnd,
+                    weightTrainerArr);
+
+            if ((epochPos + 1) % 100 == 0) {
+                printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+                printTrainerMse(weightTrainerArr);
+            }
+            if (mainOutputMseErrorValue < 0.0001F) {
+                successfulCounter++;
+                if (successfulCounter > successfulCounterMax) {
+                    printFullResultForEpochWithTrainSize(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+                    printTrainerMse(weightTrainerArr);
+                    break;
+                }
+            } else {
+                successfulCounter = 0;
+            }
+        }
+
+        // Act & Assert
+        System.out.println("Act & Assert");
+        //actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
+    }
+
+    private void printTrainerMse(MlpWeightTrainer[] weightTrainerArr) {
+        final String trainerMseStr = Arrays.stream(weightTrainerArr).
+                map(weightTrainer -> String.format("%.8f", weightTrainer.trainerMse)).
+                collect(Collectors.joining(", ", "[", "]"));
+        System.out.printf("trainerMse: %s\n", trainerMseStr);
+    }
+
+    private void trainTheTrainer(final MlpConfiguration config, final int[] layerSizeArr, final Random rnd, final Result result,
+                                 final MlpWeightTrainer weightTrainer, final int trainLayerPos) {
+        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
+
+        final int successfulCounterMax = 10;
+        int successfulCounter = 0;
+        //final int epochMax = 27_000;
+        final int epochMax = 200;
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
+
+            final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomNetAndTrainer(net,
+                    result.expectedOutputArrArr, result.trainInputArrArr,
+                    0.1F, 0.6F, rnd,
+                    weightTrainer, trainLayerPos);
+
+            if ((epochPos + 1) % 100 == 0) {
+                printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+                System.out.printf("trainerMse: %.8f\n", weightTrainer.trainerMse);
+            }
+            if (mainOutputMseErrorValue < 0.0001F) {
+                successfulCounter++;
+                if (successfulCounter > successfulCounterMax) {
+                    printFullResultForEpochWithTrainSize(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+                    System.out.printf("trainerMse: %.8f\n", weightTrainer.trainerMse);
+                    break;
+                }
+            } else {
+                successfulCounter = 0;
+            }
+        }
+
+        // Act & Assert
+        System.out.println("Act & Assert");
+        //actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
+    }
+
+    private void trainTheNetWithTrainerArr(final MlpNet net, MlpConfiguration config, int[] layerSizeArr,
+                                           Random rnd, int epochMax, Result result, MlpWeightTrainer[] weightTrainerArr, int successfulCounterMax) {
+        int successfulCounter = 0;
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
+
+            final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomWithTrainerArr(net,
+                    result.expectedOutputArrArr, result.trainInputArrArr,
+                    0.1F, 0.6F, rnd,
+                    weightTrainerArr);
+
+            if ((epochPos) % 100 == 0) {
+                printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+            }
+            if (mainOutputMseErrorValue < 0.0001F) {
+                successfulCounter++;
+                if (successfulCounter > successfulCounterMax) {
+                    printFullResultForEpochWithTrainSize(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+                    break;
+                }
+            } else {
+                successfulCounter = 0;
+            }
+        }
+    }
+
+    private void trainTheNetWithTrainer(final MlpNet net, MlpConfiguration config, int[] layerSizeArr, Random rnd, int epochMax, Result result, MlpWeightTrainer weightTrainer, int trainLayerPos, int successfulCounterMax) {
+        int successfulCounter = 0;
+        for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
+
+            final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomWithTrainer(net,
+                    result.expectedOutputArrArr, result.trainInputArrArr,
+                    0.1F, 0.6F, rnd,
+                    weightTrainer, trainLayerPos);
+
+            if ((epochPos + 1) % 100 == 0) {
+                printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+            }
+            if (mainOutputMseErrorValue < 0.0001F) {
+                successfulCounter++;
+                if (successfulCounter > successfulCounterMax) {
+                    printFullResultForEpochWithTrainSize(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);
+                    break;
+                }
+            } else {
+                successfulCounter = 0;
+            }
+        }
     }
 
     private static Result arrangeAddResult() {
