@@ -17,12 +17,46 @@ public class MlpNetMathTest {
     private record Result(float[][] trainInputArrArr, float[][] expectedOutputArrArr) {
     }
 
+    @Test
+    @Disabled
+    void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_1() {
+        final int trainTheTrainerEpochMax = 200;
+        final boolean useWeightDiff = false;
+        //final int trainTheTrainerMaxTrainPos = 1200;
+        //final int trainTheTrainerMaxTrainPos = 120;
+        final int trainTheTrainerMaxTrainPos = 20;
+        //final int trainTheNetEpochMax = 27_000;
+        final int trainTheNetEpochMax = 1_000;
+        //final int trainTheNetEpochMax = 100;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
+
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax);
+    }
+
+    @Test
+    @Disabled
+    void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_2() {
+        final int trainTheTrainerEpochMax = 200;
+        //final int trainTheTrainerEpochMax = 2000;
+        final boolean useWeightDiff = false;
+        //final int trainTheTrainerMaxTrainPos = 1200;
+        //final int trainTheTrainerMaxTrainPos = 120;
+        //final int trainTheTrainerMaxTrainPos = 20;
+        final int trainTheTrainerMaxTrainPos = 20;
+        //final int trainTheNetEpochMax = 27_000;
+        //final int trainTheNetEpochMax = 5_000;
+        final int trainTheNetEpochMax = 1_000;
+        //final int trainTheNetEpochMax = 100;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
+
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax);
+    }
+
     /**
      * Train one Trainer-Net with all Neurons in the output Layers.
      */
-    @Test
-    @Disabled
-    void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output() {
+    private void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum, boolean useWeightDiff, int trainTheTrainerMaxTrainPos, int trainTheTrainerEpochMax, int trainTheNetEpochMax) {
         // Arrange
         final Result result = arrangeAddResult();
         //final Result result = arrangeMultResult();
@@ -30,24 +64,22 @@ public class MlpNetMathTest {
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
+        // TODO Use Netzwork-Layouts with a fixed Input-Synapse size (only connect to the nearest input neurons). Like Array-Layers.
         final int[] layerSizeArr = new int[]{ 2, 6, 4, 1 };
         final MlpConfiguration config = new MlpConfiguration(true, false);
 
         final int additionalNeuronSize = calcAdditionalNeuronSize(config);
         final MlpWeightTrainer[] weightTrainerArr = new MlpWeightTrainer[layerSizeArr.length];
         for (int trainerPos = 0; trainerPos < layerSizeArr.length; trainerPos++) {
-            weightTrainerArr[trainerPos] = new MlpWeightTrainer(6, additionalNeuronSize, rnd);
+            weightTrainerArr[trainerPos] = new MlpWeightTrainer(6, additionalNeuronSize, rnd, trainLayerSizeEnum);
+            weightTrainerArr[trainerPos].useWeightDiff = useWeightDiff;
         }
-
-        //weightTrainer.useWeightDiff = true;
 
         // Train the Trainer and Net:
         {
-            for (int trainPos = 0; trainPos < 1200; trainPos++) {
-            //for (int trainPos = 0; trainPos < 120; trainPos++) {
-            //for (int trainPos = 0; trainPos < 20; trainPos++) {
+            for (int trainPos = 0; trainPos < trainTheTrainerMaxTrainPos; trainPos++) {
                 System.out.printf("trainPos: %d\n", trainPos);
-                trainTheTrainerArr(config, layerSizeArr, rnd, result, weightTrainerArr);
+                trainTheTrainerArr(config, layerSizeArr, rnd, result, weightTrainerArr, trainTheTrainerEpochMax);
             }
         }
 
@@ -57,9 +89,7 @@ public class MlpNetMathTest {
             final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
             final int successfulCounterMax = 60;
-            final int epochMax = 27_000;
-            //final int epochMax = 1_000;
-            trainTheNetWithTrainerArr(net, config, layerSizeArr, rnd, epochMax, result, weightTrainerArr, successfulCounterMax);
+            trainTheNetWithTrainerArr(net, config, layerSizeArr, rnd, trainTheNetEpochMax, result, weightTrainerArr, successfulCounterMax);
 
             // Act & Assert
             System.out.println("Act & Assert");
@@ -84,16 +114,17 @@ public class MlpNetMathTest {
         final MlpConfiguration config = new MlpConfiguration(true, false);
 
         final int additionalNeuronSize = calcAdditionalNeuronSize(config);
-        final MlpWeightTrainer weightTrainer = new MlpWeightTrainer(6, additionalNeuronSize, rnd);
+        final MlpWeightTrainer weightTrainer = new MlpWeightTrainer(6, additionalNeuronSize, rnd, MlpWeightTrainer.TrainLayerSizeEnum.Small);
         final int trainLayerPos = layerSizeArr.length - 1;
 
         //weightTrainer.useWeightDiff = true;
 
         // Train the Trainer and Net:
         {
+            final int epochMax = 200;
             //for (int trainPos = 0; trainPos < 1200; trainPos++) {
             for (int trainPos = 0; trainPos < 120; trainPos++) {
-                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos);
+                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos, epochMax);
                 System.out.printf("trainPos: %d\n", trainPos);
             }
         }
@@ -129,16 +160,17 @@ public class MlpNetMathTest {
         final MlpConfiguration config = new MlpConfiguration(true, false);
 
         final int additionalNeuronSize = calcAdditionalNeuronSize(config);
-        final MlpWeightTrainer weightTrainer = new MlpWeightTrainer(6, additionalNeuronSize, rnd);
+        final MlpWeightTrainer weightTrainer = new MlpWeightTrainer(6, additionalNeuronSize, rnd, MlpWeightTrainer.TrainLayerSizeEnum.Small);
         final int trainLayerPos = -1;
 
         //weightTrainer.useWeightDiff = true;
 
         // Train the Trainer and Net:
         {
+            final int epochMax = 200;
             for (int trainPos = 0; trainPos < 1200; trainPos++) {
             //for (int trainPos = 0; trainPos < 20; trainPos++) {
-                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos);
+                trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos, epochMax);
                 System.out.printf("trainPos: %d\n", trainPos);
             }
         }
@@ -276,13 +308,12 @@ public class MlpNetMathTest {
     }
 
     private void trainTheTrainerArr(final MlpConfiguration config, final int[] layerSizeArr, final Random rnd, final Result result,
-                                 final MlpWeightTrainer[] weightTrainerArr) {
+                                 final MlpWeightTrainer[] weightTrainerArr, final int epochMax) {
         final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         final int successfulCounterMax = 10;
         int successfulCounter = 0;
         //final int epochMax = 27_000;
-        final int epochMax = 200;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
             //for (int trainerPos = 0; trainerPos < layerSizeArr.length; trainerPos++) {
             //    final int trainLayerPos = trainerPos;
@@ -321,13 +352,12 @@ public class MlpNetMathTest {
     }
 
     private void trainTheTrainer(final MlpConfiguration config, final int[] layerSizeArr, final Random rnd, final Result result,
-                                 final MlpWeightTrainer weightTrainer, final int trainLayerPos) {
+                                 final MlpWeightTrainer weightTrainer, final int trainLayerPos, final int epochMax) {
         final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
 
         final int successfulCounterMax = 10;
         int successfulCounter = 0;
         //final int epochMax = 27_000;
-        final int epochMax = 200;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
 
             final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomNetAndTrainer(net,

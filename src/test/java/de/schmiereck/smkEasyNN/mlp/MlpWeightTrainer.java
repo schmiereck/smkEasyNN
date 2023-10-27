@@ -14,52 +14,82 @@ public class MlpWeightTrainer {
 
     public boolean useWeightDiff = false;
 
-    public MlpWeightTrainer(final int trainSize, final int additionalNeuronSize, final Random rnd) {
+    public enum TrainLayerSizeEnum {
+        Small,
+        Deeper0Small,
+        Deeper1Small,
+        Normal,
+        Big,
+        Bigger,
+    }
+
+    public MlpWeightTrainer(final int trainSize, final int additionalNeuronSize, final Random rnd,
+                            final TrainLayerSizeEnum trainLayerSizeEnum) {
         this.trainSize = trainSize;
-        final int[] trainLayerSizeArr = new int[]
-                {
-                        InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
-
-                        // Small
-                        /*
-                        */
-                        8 * trainSize,
-                        6 * trainSize,
-                        4 * trainSize,
-
-                        // normal
-                        /*
-                        18 * trainSize,
-                        32 * trainSize,
-                        18 * trainSize,
-                        18 * trainSize,
-                        */
-
-                        // Big
-                        /*
-                        18 * trainSize,
-                        18 * trainSize,
-                        18 * trainSize,
-                        18 * trainSize,
-                        18 * trainSize,
-                        18 * trainSize,
-                        */
-
-                        // Bigger
-                        /*
-                        28 * trainSize,
-                        28 * trainSize,
-                        14 * trainSize,
-                        14 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        8 * trainSize,
-                        */
-
-                        OutArrSynapseSize * (trainSize + additionalNeuronSize)
+        final int[] trainLayerSizeArr =
+                switch (trainLayerSizeEnum) {
+                    case Small -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    8 * trainSize,
+                                    6 * trainSize,
+                                    4 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Deeper0Small -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    8 * trainSize,
+                                    6 * trainSize,
+                                    4 * trainSize,
+                                    4 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Deeper1Small -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    8 * trainSize,
+                                    6 * trainSize,
+                                    6 * trainSize,
+                                    4 * trainSize,
+                                    4 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Normal -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    18 * trainSize,
+                                    32 * trainSize,
+                                    18 * trainSize,
+                                    18 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Big -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    18 * trainSize,
+                                    18 * trainSize,
+                                    18 * trainSize,
+                                    18 * trainSize,
+                                    18 * trainSize,
+                                    18 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Bigger ->new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    28 * trainSize,
+                                    28 * trainSize,
+                                    14 * trainSize,
+                                    14 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
                 };
         final MlpConfiguration trainConfig = new MlpConfiguration(true, false);
         this.trainNet = MlpNetService.createNet(trainConfig, trainLayerSizeArr, rnd);
