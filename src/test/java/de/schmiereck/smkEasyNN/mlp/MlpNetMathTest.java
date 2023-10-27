@@ -99,6 +99,10 @@ public class MlpNetMathTest {
         {
             for (int trainPos = 0; trainPos < trainTheTrainerMaxTrainPos; trainPos++) {
                 System.out.printf("trainPos: %d\n", trainPos);
+
+                // TODO Train with all "net" in random Order
+                // TOTO Array with net and succ.Counter. etc.
+
                 trainTheTrainerArr(config, layerConfigArr, rnd, result, weightTrainerArr, trainTheTrainerEpochMax);
             }
         }
