@@ -1,7 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight;
-import static de.schmiereck.smkEasyNN.mlp.MlpLayer.calcInitWeight3;
 import static de.schmiereck.smkEasyNN.mlp.MlpService.FIRST_LAYER_NR;
 
 import java.util.Arrays;
@@ -35,9 +33,18 @@ public final class MlpLayerService {
                         layerArr, valueInputArr, biasInput, clockInput,
                         config, useError, useLastInput, rnd);
             } else {
-                layerArr[layerPos] = createFlatLayer(layerPos, isOutputLayer, allInputLayerSize, layerSize, layerPos, inputLayerPos, inputLayerSize,
-                        layerArr, valueInputArr, biasInput, clockInput,
-                        config, useError, useLastInput, rnd);
+                if (layerConfig.getIsLimited()) {
+                    layerArr[layerPos] = createLimitedLayer(layerPos, isOutputLayer, allInputLayerSize,
+                            layerSize,
+                            layerConfig.getLimitedInputSize(), layerConfig.getUseBoundings(),
+                            layerPos, inputLayerPos, inputLayerSize,
+                            layerArr, valueInputArr, biasInput, clockInput,
+                            config, useError, useLastInput, rnd);
+                } else {
+                    layerArr[layerPos] = createFlatLayer(layerPos, isOutputLayer, allInputLayerSize, layerSize, layerPos, inputLayerPos, inputLayerSize,
+                            layerArr, valueInputArr, biasInput, clockInput,
+                            config, useError, useLastInput, rnd);
+                }
             }
         }
         return layerArr;
@@ -124,6 +131,78 @@ public final class MlpLayerService {
         mlpLayer.setIsOutputLayer(isOutputLayer);
 
         return mlpLayer;
+    }
+
+    static MlpLayer createLimitedLayer(final int layerNr, final boolean isOutputLayer, final int allInputLayerSize,
+                                     final int layerSize,
+                                     final int limitedInputSize, final boolean useBoundings,
+                                     final int layerPos, final int inputLayerPos, final int inputLayerSize,
+                                     final MlpLayer[] layers, final MlpValueInput[] valueInputArr, final MlpInputInterface biasInput, final MlpInputInterface clockInput,
+                                     final MlpConfiguration config, final boolean useError, final boolean useLastInput, final Random rnd) {
+        final MlpLayer mlpLayer = new MlpLayer(layerNr, allInputLayerSize, layerSize);
+
+        if (limitedInputSize > inputLayerSize) {
+            throw new RuntimeException("limitedInputSize > layerSize");
+        }
+
+        final int half1LimitedSize = limitedInputSize / 2;
+        final int half2LimitedSize = limitedInputSize - half1LimitedSize;
+
+        final MlpLayer inputLayer = layers[inputLayerPos];
+
+        for (int neuronPos = 0; neuronPos < layerSize; neuronPos++) {
+            final MlpNeuron neuron = mlpLayer.neuronArr[neuronPos];
+
+            final int inputPosOffset;
+            if (useBoundings) {
+                inputPosOffset = calcBoundingsPosOffset(neuronPos, inputLayerSize, half1LimitedSize, half2LimitedSize);
+            } else {
+                inputPosOffset = 0;
+            }
+
+            for (int xPos = neuronPos - half1LimitedSize; xPos < neuronPos + half2LimitedSize; xPos++) {
+                final int inputLayerNeuronPos = calcBoundingsWrap(xPos + inputPosOffset, inputLayerSize);
+                final float weight = config.getCalcInitialWeightValueInterface().calcInitialWeightValue(layerSize, 0, rnd);
+                addInputSynapse(layerPos, neuron, inputLayer, inputLayerNeuronPos, valueInputArr,
+                        useError, useLastInput, useLastInput,
+                        //calcInitWeight(config.getInitialWeightValue(), rnd));
+                        weight);
+            }
+            addAdditionalSynapse(neuron, biasInput, clockInput, config, rnd);
+        }
+
+        //mlpLayer.initWeights2(config.initialWeightValue, rnd);
+        mlpLayer.setIsOutputLayer(isOutputLayer);
+
+        return mlpLayer;
+    }
+
+    static int calcBoundingsWrap(final int pos, final int layerSize) {
+        final int retPos;
+        if (pos >= layerSize) {
+            retPos = pos % layerSize;
+        } else {
+            if (pos < 0) {
+                retPos = layerSize + pos;
+            } else {
+                retPos = pos;
+            }
+        }
+        return retPos;
+    }
+
+    static int calcBoundingsPosOffset(final int neuronPos, final int layerSize, final int half1LimitedSize, final int half2LimitedSize) {
+        final int posOffset;
+        if ((neuronPos - half1LimitedSize) < 0) {
+            posOffset = -(neuronPos - half1LimitedSize);
+        } else {
+            if ((neuronPos + half2LimitedSize) >= layerSize) {
+                posOffset = layerSize - (neuronPos + half2LimitedSize);
+            } else {
+                posOffset = 0;
+            }
+        }
+        return posOffset;
     }
 
     private static void addInputSynapse(final int layerPos, final MlpNeuron neuron,

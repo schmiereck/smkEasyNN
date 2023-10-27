@@ -3,6 +3,9 @@ package de.schmiereck.smkEasyNN.mlp;
 public class MlpLayerConfig {
     private final int size;
     private boolean isArray = false;
+    private boolean isLimited = false;
+    private boolean useBoundings = false;
+    private int limitedInputSize;
 
     private int xArrayCellSize;// = 1;
     private int yArrayCellSize;// = 1;
@@ -22,6 +25,10 @@ public class MlpLayerConfig {
         return this.isArray;
     }
 
+   public boolean getIsLimited() {
+        return this.isLimited;
+    }
+
     public void setIsArray(final boolean isArray) {
         this.isArray = isArray;
     }
@@ -36,6 +43,12 @@ public class MlpLayerConfig {
         this.xArraySize = xArraySize;
         this.yArraySize = yArraySize;
         this.extraArraySize = extraArraySize;
+    }
+
+    public void setIsLimited(final int limitedInputSize, final boolean useBoundings) {
+        this.isLimited = true;
+        this.useBoundings = useBoundings;
+        this.limitedInputSize = limitedInputSize;
     }
 
     public int getXArrayCellSize() {
@@ -56,5 +69,13 @@ public class MlpLayerConfig {
 
     public int getExtraArraySize() {
         return this.extraArraySize;
+    }
+
+    public int getLimitedInputSize() {
+        return this.limitedInputSize;
+    }
+
+    public boolean getUseBoundings() {
+        return this.useBoundings;
     }
 }
