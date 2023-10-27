@@ -225,8 +225,11 @@ public abstract class MlpWeightTrainerService {
     }
 
     private static float[][][] initWeightTrainerInput(final int trainerTrainSize, final MlpNet net) {
+        final int maxNeuronSize = calcMaxNeuronSize(net);
         final int additionalNeuronSize = calcAdditionalNeuronSize(net.getConfig());
-        final float[][][] inArrArrArr = new float[net.getLayerArr().length][trainerTrainSize][InArrNeuronSize + (trainerTrainSize + additionalNeuronSize) * InArrSynapseSize];
+        final float[][][] inArrArrArr = new float[net.getLayerArr().length]
+                [maxNeuronSize]
+                [InArrNeuronSize + (trainerTrainSize + additionalNeuronSize) * InArrSynapseSize];
 
         for (int layerPos = 0; layerPos < net.getLayerArr().length; layerPos++) {
             final MlpLayer layer = net.getLayer(layerPos);
@@ -241,6 +244,20 @@ public abstract class MlpWeightTrainerService {
             }
         }
         return inArrArrArr;
+    }
+
+    private static int calcMaxNeuronSize(final MlpNet net) {
+        int maxNeuronSize = 0;
+
+        for (int layerPos = 0; layerPos < net.getLayerArr().length; layerPos++) {
+            final MlpLayer layer = net.getLayer(layerPos);
+
+            if (layer.neuronArr.length > maxNeuronSize) {
+                maxNeuronSize = layer.neuronArr.length;
+            }
+        }
+
+        return maxNeuronSize;
     }
 
     private static void initWeightTrainerInputForNeuron(final MlpNet net, final int layerPos, final MlpNeuron neuron, final float[] inArr) {

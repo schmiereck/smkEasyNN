@@ -30,48 +30,68 @@ public class MlpNetMathTest {
         //final int trainTheNetEpochMax = 100;
         final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
 
-        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax);
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
+                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax, 4);
     }
 
     @Test
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_2() {
-        final int trainTheTrainerEpochMax = 200;
-        //final int trainTheTrainerEpochMax = 2000;
+        //final int trainTheTrainerEpochMax = 200;
+        final int trainTheTrainerEpochMax = 2000;
         final boolean useWeightDiff = false;
-        //final int trainTheTrainerMaxTrainPos = 1200;
+        final int trainTheTrainerMaxTrainPos = 1200;
         //final int trainTheTrainerMaxTrainPos = 120;
         //final int trainTheTrainerMaxTrainPos = 20;
-        final int trainTheTrainerMaxTrainPos = 20;
+        //final int trainTheTrainerMaxTrainPos = 20;
         //final int trainTheNetEpochMax = 27_000;
-        //final int trainTheNetEpochMax = 5_000;
-        final int trainTheNetEpochMax = 1_000;
+        final int trainTheNetEpochMax = 5_000;
+        //final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
-        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
 
-        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax);
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
+                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax, 4);
     }
 
     /**
      * Train one Trainer-Net with all Neurons in the output Layers.
      */
-    private void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum, boolean useWeightDiff, int trainTheTrainerMaxTrainPos, int trainTheTrainerEpochMax, int trainTheNetEpochMax) {
+    private void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum,
+                                                                                   boolean useWeightDiff,
+                                                                                   int trainTheTrainerMaxTrainPos,
+                                                                                   int trainTheTrainerEpochMax,
+                                                                                   int trainTheNetEpochMax,
+                                                                                   final int trainerTrainSize) {
         // Arrange
-        final Result result = arrangeAddResult();
+        final Result result = arrangeAddResult4();
+        //final Result result = arrangeAddResult();
         //final Result result = arrangeMultResult();
 
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
 
-        // TODO Use Netzwork-Layouts with a fixed Input-Synapse size (only connect to the nearest input neurons). Like Array-Layers.
-        final int[] layerSizeArr = new int[]{ 2, 6, 4, 1 };
+        // Use Netzwork-Layouts with a fixed Input-Synapse size (only connect to the nearest input neurons). Like Array-Layers.
+        //final int[] layerSizeArr = new int[]{ 2, 6, 4, 1 };
         final MlpConfiguration config = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[4];
+        layerConfigArr[0] = new MlpLayerConfig(4);
+        layerConfigArr[1] = new MlpLayerConfig(6);
+        layerConfigArr[2] = new MlpLayerConfig(4);
+        layerConfigArr[3] = new MlpLayerConfig(1);
+
+        layerConfigArr[0].setIsLimited(4, true);
+        layerConfigArr[1].setIsLimited(4, true);
+        layerConfigArr[2].setIsLimited(4, true);
+        layerConfigArr[3].setIsLimited(4, true);
 
         final int additionalNeuronSize = calcAdditionalNeuronSize(config);
-        final MlpWeightTrainer[] weightTrainerArr = new MlpWeightTrainer[layerSizeArr.length];
-        for (int trainerPos = 0; trainerPos < layerSizeArr.length; trainerPos++) {
-            weightTrainerArr[trainerPos] = new MlpWeightTrainer(6, additionalNeuronSize, rnd, trainLayerSizeEnum);
+        final MlpWeightTrainer[] weightTrainerArr = new MlpWeightTrainer[layerConfigArr.length];
+        for (int trainerPos = 0; trainerPos < layerConfigArr.length; trainerPos++) {
+            weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainerTrainSize, additionalNeuronSize, rnd, trainLayerSizeEnum);
             weightTrainerArr[trainerPos].useWeightDiff = useWeightDiff;
         }
 
@@ -79,17 +99,17 @@ public class MlpNetMathTest {
         {
             for (int trainPos = 0; trainPos < trainTheTrainerMaxTrainPos; trainPos++) {
                 System.out.printf("trainPos: %d\n", trainPos);
-                trainTheTrainerArr(config, layerSizeArr, rnd, result, weightTrainerArr, trainTheTrainerEpochMax);
+                trainTheTrainerArr(config, layerConfigArr, rnd, result, weightTrainerArr, trainTheTrainerEpochMax);
             }
         }
 
         // Train the Net with Trainer:
         System.out.println("---- Train the Net with Trainer: --------------------------------------------------------");
         {
-            final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
+            final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
 
             final int successfulCounterMax = 60;
-            trainTheNetWithTrainerArr(net, config, layerSizeArr, rnd, trainTheNetEpochMax, result, weightTrainerArr, successfulCounterMax);
+            trainTheNetWithTrainerArr(net, rnd, trainTheNetEpochMax, result, weightTrainerArr, successfulCounterMax);
 
             // Act & Assert
             System.out.println("Act & Assert");
@@ -307,9 +327,9 @@ public class MlpNetMathTest {
         actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.02F);
     }
 
-    private void trainTheTrainerArr(final MlpConfiguration config, final int[] layerSizeArr, final Random rnd, final Result result,
+    private void trainTheTrainerArr(final MlpConfiguration config, final MlpLayerConfig[] layerConfigArr, final Random rnd, final Result result,
                                  final MlpWeightTrainer[] weightTrainerArr, final int epochMax) {
-        final MlpNet net = MlpNetService.createNet(config, layerSizeArr, rnd);
+        final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
 
         final int successfulCounterMax = 10;
         int successfulCounter = 0;
@@ -386,7 +406,7 @@ public class MlpNetMathTest {
         //actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
     }
 
-    private void trainTheNetWithTrainerArr(final MlpNet net, MlpConfiguration config, int[] layerSizeArr,
+    private void trainTheNetWithTrainerArr(final MlpNet net,
                                            Random rnd, int epochMax, Result result, MlpWeightTrainer[] weightTrainerArr, int successfulCounterMax) {
         int successfulCounter = 0;
         for (int epochPos = 0; epochPos <= epochMax; epochPos++) {
@@ -459,6 +479,58 @@ public class MlpNetMathTest {
                         new float[]{3, 1},
                         new float[]{3, 2},
                         new float[]{3, 3},
+                };
+        final float[][] expectedOutputArrArr = new float[][]
+                {
+                        new float[]{0},
+
+                        new float[]{0},
+                        new float[]{1},
+                        new float[]{2},
+                        new float[]{3},
+
+                        new float[]{1},
+                        new float[]{2},
+                        new float[]{3},
+                        new float[]{4},
+
+                        new float[]{2},
+                        new float[]{3},
+                        new float[]{4},
+                        new float[]{5},
+
+                        new float[]{3},
+                        new float[]{4},
+                        new float[]{5},
+                        new float[]{6},
+                };
+        return new Result(trainInputArrArr, expectedOutputArrArr);
+    }
+
+    private static Result arrangeAddResult4() {
+        final float[][] trainInputArrArr = new float[][]
+                {
+                        new float[]{ 0, 0, 0, 0},
+
+                        new float[]{ 0, 0, 0, 0},
+                        new float[]{ 0, 0, 0, 1},
+                        new float[]{ 0, 0, 0, 2},
+                        new float[]{ 0, 0, 0, 3},
+
+                        new float[]{ 0, 0, 1, 0},
+                        new float[]{ 0, 0, 1, 1},
+                        new float[]{ 0, 0, 1, 2},
+                        new float[]{ 0, 0, 1, 3},
+
+                        new float[]{ 0, 0, 2, 0},
+                        new float[]{ 0, 0, 2, 1},
+                        new float[]{ 0, 0, 2, 2},
+                        new float[]{ 0, 0, 2, 3},
+
+                        new float[]{ 0, 0, 3, 0},
+                        new float[]{ 0, 0, 3, 1},
+                        new float[]{ 0, 0, 3, 2},
+                        new float[]{ 0, 0, 3, 3},
                 };
         final float[][] expectedOutputArrArr = new float[][]
                 {
