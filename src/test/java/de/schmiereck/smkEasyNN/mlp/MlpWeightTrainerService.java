@@ -1,7 +1,5 @@
 package de.schmiereck.smkEasyNN.mlp;
 
-import static de.schmiereck.smkEasyNN.mlp.MlpService.train;
-
 import java.util.Objects;
 import java.util.Random;
 
@@ -41,7 +39,7 @@ public abstract class MlpWeightTrainerService {
             //----------------------------------------------------------------------------------------------------------
             final float[] calcOutputArr = MlpService.run(net, trainInputArr);
 
-            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, learningRate, momentum, expectedOutputArr);
+            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, expectedOutputArr);
 
             //----------------------------------------------------------------------------------------------------------
             //final float[][][] inArrArrArr = initWeightTrainerInput(weightTrainer, net);
@@ -70,7 +68,7 @@ public abstract class MlpWeightTrainerService {
                 useTrainerNet = false;
             }
             if (useTrainerNet) {
-                trainLayerWeightsWithTrainer(net, layerPos, layer, learningRate, momentum, weightTrainer);
+                trainLayerWeightsWithTrainer(net, layerPos, layer, weightTrainer);
             } else {
                 MlpService.trainLayerWeights(layer, learningRate, momentum);
             }
@@ -90,7 +88,7 @@ public abstract class MlpWeightTrainerService {
             //----------------------------------------------------------------------------------------------------------
             final float[] calcOutputArr = MlpService.run(net, trainInputArr);
 
-            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, learningRate, momentum, expectedOutputArr);
+            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, expectedOutputArr);
 
             //----------------------------------------------------------------------------------------------------------
             //final float[][][] inArrArrArr = initWeightTrainerInput(weightTrainer, net);
@@ -122,7 +120,7 @@ public abstract class MlpWeightTrainerService {
                 useTrainerNet = true;
             }
             if (useTrainerNet) {
-                trainLayerWeightsWithTrainer(net, layerPos, layer, learningRate, momentum, weightTrainer);
+                trainLayerWeightsWithTrainer(net, layerPos, layer, weightTrainer);
             } else {
                 MlpService.trainLayerWeights(layer, learningRate, momentum);
             }
@@ -131,7 +129,6 @@ public abstract class MlpWeightTrainerService {
 
     public static void trainLayerWeightsWithTrainer(final MlpNet net,
                                                     final int layerPos, final MlpLayer layer,
-                                                    final float learningRate, final float momentum,
                                                     final MlpWeightTrainer weightTrainer) {
         final int additionalNeuronSize = calcAdditionalNeuronSize(net.getConfig());
 
@@ -157,8 +154,9 @@ public abstract class MlpWeightTrainerService {
     }
 
     public static float runTrainRandomNetAndTrainerArr(final MlpNet net, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
-                                                    final float learningRate, final float momentum, final Random rnd,
-                                                    final MlpWeightTrainer[] weightTrainerArr) {
+                                                       final float learningRate, final float momentum, final Random rnd,
+                                                       final MlpWeightTrainer[] weightTrainerArr,
+                                                       final float trainerLearningRate, final float trainerMomentum) {
         for (int trainerPos = 0; trainerPos < weightTrainerArr.length; trainerPos++) {
             weightTrainerArr[trainerPos].trainerMse = 0.0F;
         }
@@ -173,7 +171,7 @@ public abstract class MlpWeightTrainerService {
             //----------------------------------------------------------------------------------------------------------
             final float[] calcOutputArr = MlpService.run(net, trainInputArr);
 
-            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, learningRate, momentum, expectedOutputArr);
+            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, expectedOutputArr);
 
             //----------------------------------------------------------------------------------------------------------
             final float[][][] inArrArrArr = initWeightTrainerInput(trainerTrainSize, net);
@@ -186,7 +184,7 @@ public abstract class MlpWeightTrainerService {
             //----------------------------------------------------------------------------------------------------------
             mainOutputCount++;
 
-            trainWeightTrainerArr(weightTrainerArr, net, inArrArrArr);
+            trainWeightTrainerArr(weightTrainerArr, net, inArrArrArr, trainerLearningRate, trainerMomentum);
         }
         return mainOutputMseErrorValue / mainOutputCount;
     }
@@ -206,7 +204,7 @@ public abstract class MlpWeightTrainerService {
             //----------------------------------------------------------------------------------------------------------
             final float[] calcOutputArr = MlpService.run(net, trainInputArr);
 
-            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, learningRate, momentum, expectedOutputArr);
+            mainOutputMseErrorValue += MlpService.trainNetErrorValues(net, expectedOutputArr);
 
             //----------------------------------------------------------------------------------------------------------
             final float[][][] inArrArrArr = initWeightTrainerInput(trainerTrainSize, net);
@@ -276,7 +274,7 @@ public abstract class MlpWeightTrainerService {
     }
 
     private static void trainWeightTrainerArr(final MlpWeightTrainer[] weightTrainerArr, final MlpNet net,
-                                           final float[][][] inArrArrArr) {
+                                           final float[][][] inArrArrArr, final float trainerLearningRate, final float trainerMomentum) {
         for (int layerPos = 0; layerPos < net.getLayerArr().length; layerPos++) {
             final MlpLayer layer = net.getLayer(layerPos);
             final MlpWeightTrainer weightTrainer = weightTrainerArr[layerPos];
@@ -316,11 +314,13 @@ public abstract class MlpWeightTrainerService {
 
                 // Accept the unknown output as expected and do not train it:
                 for (int pos = (neuron.synapseList.size() * OutArrSynapseSize); pos < expectedOutArr.length; pos++) {
-                    //expectedOutArr[pos] = calcOutputArr[pos];
-                    expectedOutArr[pos] = 0.0F;
+                    expectedOutArr[pos] = calcOutputArr[pos];
+                    //expectedOutArr[pos] = 0.0F;
                 }
 
-                weightTrainer.trainerMse += MlpService.trainWithOutput(weightTrainer.trainNet, expectedOutArr, calcOutputArr, 0.01F, 0.6F);//1learningRate, momentum);
+                weightTrainer.trainerMse += MlpService.trainWithOutput(weightTrainer.trainNet,
+                        expectedOutArr, calcOutputArr,
+                        trainerLearningRate, trainerMomentum);//1learningRate, momentum);
                 trainingCnt++;
             }
             weightTrainer.trainerMse /= trainingCnt;

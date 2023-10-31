@@ -15,9 +15,11 @@ public class MlpWeightTrainer {
     public boolean useWeightDiff = false;
 
     public enum TrainLayerSizeEnum {
+        Mini,
         Small,
         Deeper0Small,
         Deeper1Small,
+        Deeper2,
         Normal,
         Big,
         Bigger,
@@ -28,6 +30,17 @@ public class MlpWeightTrainer {
         this.trainSize = trainSize;
         final int[] trainLayerSizeArr =
                 switch (trainLayerSizeEnum) {
+                    case Mini -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    6 * trainSize,
+                                    5 * trainSize,
+                                    5 * trainSize,
+                                    5 * trainSize,
+                                    3 * trainSize,
+                                    3 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
                     case Small -> new int[]
                             {
                                     InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
@@ -53,6 +66,16 @@ public class MlpWeightTrainer {
                                     6 * trainSize,
                                     4 * trainSize,
                                     4 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Deeper2 -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    16 * trainSize,
+                                    12 * trainSize,
+                                    12 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
                                     OutArrSynapseSize * (trainSize + additionalNeuronSize)
                             };
                     case Normal -> new int[]

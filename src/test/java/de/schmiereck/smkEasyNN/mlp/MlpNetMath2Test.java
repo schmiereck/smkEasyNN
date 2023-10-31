@@ -19,46 +19,113 @@ public class MlpNetMath2Test {
     @Test
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_1() {
-        final int trainTheTrainerEpochMax = 200;
         final boolean useWeightDiff = false;
+
+        final int trainTheTrainerEpochMax = 200;
         //final int trainTheTrainerMaxTrainPos = 1200;
+
         final int trainTheTrainerMaxTrainPos = 120;
         //final int trainTheTrainerMaxTrainPos = 20;
+
+        final int trainTheTrainerDataSize = 100;
+
         //final int trainTheNetEpochMax = 27_000;
         final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
+
         final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
-        final int trainTheTraineDataSize = 100;
 
         GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
-                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax, 4,
-                trainTheTraineDataSize);
+                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
+                trainTheNetEpochMax, 4,
+                0.01F, 0.6F);
     }
 
     @Test
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_2() {
+        final boolean useWeightDiff = false;
+
         final int trainTheTrainerEpochMax = 200;
         //final int trainTheTrainerEpochMax = 2000;
-        final boolean useWeightDiff = false;
-        final int trainTheTrainerMaxTrainPos = 1200;
+
+        // How many Epoches used for every Net-Slots to train.
+        //final int trainTheTrainerMaxTrainPos = 2200;
+        final int trainTheTrainerMaxTrainPos = 800;
+        //final int trainTheTrainerMaxTrainPos = 200;
         //final int trainTheTrainerMaxTrainPos = 120;
         //final int trainTheTrainerMaxTrainPos = 20;
         //final int trainTheTrainerMaxTrainPos = 20;
+
+        // How many Net-Slots trained in parallel.
+        //final int trainTheTrainerDataSize = 2000;
+        final int trainTheTrainerDataSize = 600;
+        //final int trainTheTrainerDataSize = 200;
+        //final int trainTheTrainerDataSize = 100;
+        //final int trainTheTrainerDataSize = 40;
+        //final int trainTheTrainerDataSize = 20;
+
         //final int trainTheNetEpochMax = 27_000;
-        //final int trainTheNetEpochMax = 5_000;
-        final int trainTheNetEpochMax = 1_000;
+        final int trainTheNetEpochMax = 5_000;
+        //final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
+
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
-        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
-        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
-        final int trainTheTraineDataSize = 100;
 
         GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
-                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheNetEpochMax, 4,
-                trainTheTraineDataSize);
+                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
+                trainTheNetEpochMax, 4,
+                0.01F, 0.6F);
+    }
+
+    @Test
+    @Disabled
+    void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_3() {
+        final boolean useWeightDiff = false;
+
+        final int trainTheTrainerEpochMax = 200;
+        //final int trainTheTrainerEpochMax = 2000;
+
+        // How many Epoches used for every Net-Slots to train.
+        //final int trainTheTrainerMaxTrainPos = 2200;
+        //final int trainTheTrainerMaxTrainPos = 800;
+        final int trainTheTrainerMaxTrainPos = 200;
+        //final int trainTheTrainerMaxTrainPos = 120;
+        //final int trainTheTrainerMaxTrainPos = 20;
+        //final int trainTheTrainerMaxTrainPos = 20;
+
+        // How many Net-Slots trained in parallel.
+        //final int trainTheTrainerDataSize = 2000;
+        //final int trainTheTrainerDataSize = 600;
+        //final int trainTheTrainerDataSize = 400;
+        final int trainTheTrainerDataSize = 200;
+        //final int trainTheTrainerDataSize = 100;
+        //final int trainTheTrainerDataSize = 40;
+        //final int trainTheTrainerDataSize = 20;
+
+        //final int trainTheNetEpochMax = 27_000;
+        final int trainTheNetEpochMax = 5_000;
+        //final int trainTheNetEpochMax = 1_000;
+        //final int trainTheNetEpochMax = 100;
+
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Mini;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
+
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
+                trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
+                trainTheNetEpochMax, 4,
+                //0.01F, 0.6F);
+                0.05F, 0.6F);
     }
 
     /**
@@ -68,9 +135,10 @@ public class MlpNetMath2Test {
                                                                                    boolean useWeightDiff,
                                                                                    int trainTheTrainerMaxTrainPos,
                                                                                    int trainTheTrainerEpochMax,
+                                                                                   final int trainTheTrainerDataSize,
                                                                                    int trainTheNetEpochMax,
                                                                                    final int trainerTrainSize,
-                                                                                   final int trainTheTraineDataSize) {
+                                                                                   final float trainerLearningRate, final float trainerMomentum) {
         // Arrange
         final MlpNetMath2Test.Result result = arrangeAddResult4();
         //final Result result = arrangeAddResult();
@@ -102,9 +170,9 @@ public class MlpNetMath2Test {
 
         // Train the Trainer and Net:
         {
-            // Train with all "net" in random Order:
+            // Train all "Net"-Slots in random Order:
 
-            final TrainData[] trainDataArr = new TrainData[trainTheTraineDataSize];
+            final TrainData[] trainDataArr = new TrainData[trainTheTrainerDataSize];
             for (int trainDataPos = 0; trainDataPos < trainDataArr.length; trainDataPos++) {
                 final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
                 trainDataArr[trainDataPos] = new TrainData(net);
@@ -112,11 +180,13 @@ public class MlpNetMath2Test {
 
             final int successfulCounterMax = 10;
 
-            for (int trainPos = 0; trainPos < (trainTheTrainerMaxTrainPos * trainTheTraineDataSize); trainPos++) {
-                final int trainDataPos = rnd.nextInt(trainDataArr.length);
+            for (int trainPos = 0; trainPos < (trainTheTrainerMaxTrainPos * trainTheTrainerDataSize); trainPos++) {
+                final int trainDataPos = rnd.nextInt((trainPos % (trainDataArr.length)) + 1);
                 final TrainData trainData = trainDataArr[trainDataPos];
 
-                trainTheTrainerArr(trainData, rnd, result, weightTrainerArr);
+                trainTheTrainerArr(trainData, rnd, result, weightTrainerArr,
+                        0.1F, 0.6F,
+                trainerLearningRate, trainerMomentum);
 
                 if ((trainPos) % 100 == 0) {
                     printTrainerMse(trainPos, weightTrainerArr);
@@ -381,13 +451,18 @@ public class MlpNetMath2Test {
     }
 
     private void trainTheTrainerArr(final TrainData trainData, final Random rnd, final MlpNetMath2Test.Result result,
-                                    final MlpWeightTrainer[] weightTrainerArr) {
-        trainData.mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomNetAndTrainerArr(trainData.net,
-                    result.expectedOutputArrArr, result.trainInputArrArr,
-                    0.1F, 0.6F, rnd,
-                    weightTrainerArr);
+                                    final MlpWeightTrainer[] weightTrainerArr,
+                                    final float learningRate, final float momentum,
+                                    final float trainerLearningRate, final float trainerMomentum) {
+        trainData.mainOutputMseErrorValue =
+                MlpWeightTrainerService.runTrainRandomNetAndTrainerArr(trainData.net,
+                                                                       result.expectedOutputArrArr, result.trainInputArrArr,
+                                                                       learningRate, momentum, rnd,
+                                                                       weightTrainerArr,
+                        trainerLearningRate, trainerMomentum);
 
-        if (trainData.mainOutputMseErrorValue < 0.0001F) {
+        //if (trainData.mainOutputMseErrorValue < 0.0001F) {
+        if (trainData.mainOutputMseErrorValue < 0.05F) {
             trainData.successfulCounter++;
         } else {
             trainData.successfulCounter = 0;

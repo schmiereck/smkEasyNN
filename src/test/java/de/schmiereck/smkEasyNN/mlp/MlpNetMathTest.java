@@ -345,7 +345,8 @@ public class MlpNetMathTest {
             final float mainOutputMseErrorValue = MlpWeightTrainerService.runTrainRandomNetAndTrainerArr(net,
                     result.expectedOutputArrArr, result.trainInputArrArr,
                     0.1F, 0.6F, rnd,
-                    weightTrainerArr);
+                    weightTrainerArr,
+                    0.01F, 0.6F);
 
             if ((epochPos + 1) % 100 == 0) {
                 printFullResultForEpoch(net, result.trainInputArrArr, result.expectedOutputArrArr, epochPos, mainOutputMseErrorValue);

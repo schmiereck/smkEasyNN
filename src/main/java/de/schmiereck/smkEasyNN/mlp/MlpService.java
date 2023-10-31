@@ -162,7 +162,7 @@ public final class MlpService {
     public static float trainWithOutput(final MlpNet net, final float[] expectedOutputArr, final float[] calcOutputArr,
                                         final float learningRate, final float momentum) {
 
-        final float mse = trainNetErrorValues(net, learningRate, momentum, expectedOutputArr);
+        final float mse = trainNetErrorValues(net, expectedOutputArr);
 
         trainNetWeights(net, learningRate, momentum);
 
@@ -172,7 +172,7 @@ public final class MlpService {
     /**
      * @return mittlerer quadratischen Fehler (MSE).
      */
-    static float trainNetErrorValues(final MlpNet net, final float learningRate, final float momentum,
+    static float trainNetErrorValues(final MlpNet net,
                                      final float[] expectedOutputArr) {
         float mainOutputMseErrorValue = 0.0F;
 
@@ -194,13 +194,13 @@ public final class MlpService {
 
         for (int layerPos = net.layerArr.length - 1; layerPos >= 0; layerPos--) {
             final MlpLayer layer = net.layerArr[layerPos];
-            MlpService.trainLayerErrorValues(layer, learningRate, momentum);
+            MlpService.trainLayerErrorValues(layer);
         }
 
         return mainOutputMseErrorValue / outputLayer.neuronArr.length;
     }
 
-    public static void trainLayerErrorValues(final MlpLayer layer, final float learningRate, final float momentum) {
+    public static void trainLayerErrorValues(final MlpLayer layer) {
         for (int outputPos = 0; outputPos < layer.neuronArr.length; outputPos++) {
             final MlpNeuron neuron = layer.neuronArr[outputPos];
 
