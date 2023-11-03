@@ -114,7 +114,14 @@ public class MlpWeightTrainer {
                                     OutArrSynapseSize * (trainSize + additionalNeuronSize)
                             };
                 };
+
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[trainLayerSizeArr.length];
+        for (int layerPos = 0; layerPos < trainLayerSizeArr.length; layerPos++) {
+            layerConfigArr[layerPos] = new MlpLayerConfig(trainLayerSizeArr[layerPos]);
+            layerConfigArr[layerPos].setIsLimited(2 * trainSize, true);
+        }
         final MlpConfiguration trainConfig = new MlpConfiguration(true, false);
-        this.trainNet = MlpNetService.createNet(trainConfig, trainLayerSizeArr, rnd);
+        //this.trainNet = MlpNetService.createNet(trainConfig, trainLayerSizeArr, rnd);
+        this.trainNet = MlpNetService.createNet(trainConfig, layerConfigArr, rnd);
     }
 }

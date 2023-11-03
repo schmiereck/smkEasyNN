@@ -116,4 +116,9 @@ public class MlpLayer {
     //        }
     //    }
     //}
+
+
+    public MlpNeuron[] getNeuronArr() {
+        return this.neuronArr;
+    }
 }

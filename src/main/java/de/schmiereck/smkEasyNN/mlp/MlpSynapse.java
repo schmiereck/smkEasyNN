@@ -30,4 +30,11 @@ public class MlpSynapse {
         return this.inputError;
     }
 
+    public float getWeight() {
+        return this.weight;
+    }
+
+    public float getDweight() {
+        return this.dweight;
+    }
 }

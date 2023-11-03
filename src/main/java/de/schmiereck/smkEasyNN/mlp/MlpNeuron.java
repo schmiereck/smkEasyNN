@@ -75,4 +75,8 @@ public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     public void setLastErrorValue(final float lastErrorValue) {
         this.lastErrorValue = lastErrorValue;
     }
+
+    public List<MlpSynapse> getSynapseList() {
+        return this.synapseList;
+    }
 }

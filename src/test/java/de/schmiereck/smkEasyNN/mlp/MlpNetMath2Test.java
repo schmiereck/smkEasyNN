@@ -92,34 +92,37 @@ public class MlpNetMath2Test {
         //final int trainTheTrainerEpochMax = 2000;
 
         // How many Epoches used for every Net-Slots to train.
-        //final int trainTheTrainerMaxTrainPos = 2200;
-        //final int trainTheTrainerMaxTrainPos = 800;
-        final int trainTheTrainerMaxTrainPos = 200;
-        //final int trainTheTrainerMaxTrainPos = 120;
-        //final int trainTheTrainerMaxTrainPos = 20;
+        //final int trainTheTrainerMaxTrainPos = 2000;
+        //final int trainTheTrainerMaxTrainPos = 1000;
+        final int trainTheTrainerMaxTrainPos = 800;
+        //final int trainTheTrainerMaxTrainPos = 500;
+        //final int trainTheTrainerMaxTrainPos = 200;
+        //final int trainTheTrainerMaxTrainPos = 100;
         //final int trainTheTrainerMaxTrainPos = 20;
 
         // How many Net-Slots trained in parallel.
         //final int trainTheTrainerDataSize = 2000;
-        //final int trainTheTrainerDataSize = 600;
+        final int trainTheTrainerDataSize = 600;
         //final int trainTheTrainerDataSize = 400;
-        final int trainTheTrainerDataSize = 200;
+        //final int trainTheTrainerDataSize = 200;
         //final int trainTheTrainerDataSize = 100;
         //final int trainTheTrainerDataSize = 40;
         //final int trainTheTrainerDataSize = 20;
 
         //final int trainTheNetEpochMax = 27_000;
-        final int trainTheNetEpochMax = 5_000;
+        final int trainTheNetEpochMax = 15_000;
+        //final int trainTheNetEpochMax = 5_000;
         //final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
 
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Mini;
-        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
-        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Bigger;
 
         GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
