@@ -37,10 +37,8 @@ public final class MlpNetService {
     public static MlpNet createNet(final MlpConfiguration config, final MlpLayerConfig[] layerConfigArr, final Random rnd) {
         final MlpNet net = new MlpNet(config);
 
-        final MlpValueInput[] valueInputArr = new MlpValueInput[layerConfigArr[0].getSize()];
-        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
-            valueInputArr[neuronPos] = new MlpValueInput(INPUT_LAYER_NR, neuronPos, 0.0F);
-        }
+        final int size = layerConfigArr[0].getSize();
+        final MlpValueInput[] valueInputArr = createValueInputArr(size);
         net.setValueInputArr(valueInputArr);
 
         net.setLayerArr(createLayers(layerConfigArr,
@@ -51,6 +49,14 @@ public final class MlpNetService {
         net.setLayerOutputArr(new float[outputLayer.neuronArr.length]);
 
         return net;
+    }
+
+    public static MlpValueInput[] createValueInputArr(int size) {
+        final MlpValueInput[] valueInputArr = new MlpValueInput[size];
+        for (int neuronPos = 0; neuronPos < valueInputArr.length; neuronPos++) {
+            valueInputArr[neuronPos] = new MlpValueInput(INPUT_LAYER_NR, neuronPos, 0.0F);
+        }
+        return valueInputArr;
     }
 
     public static MlpNet duplicateNet(final MlpNet net) {
@@ -147,7 +153,7 @@ public final class MlpNetService {
         return newSynapse;
     }
 
-    private static MlpInputInterface searchInputNeuron(final MlpNet newNet, final int layerNr, final int neuronNr) {
+    public static MlpInputInterface searchInputNeuron(final MlpNet newNet, final int layerNr, final int neuronNr) {
         final MlpInputInterface input;
         if (layerNr == INTERNAL_LAYER_NR) {
             input =
@@ -171,8 +177,14 @@ public final class MlpNetService {
         return input;
     }
 
-    private static MlpInputErrorInterface searchErrorNeuron(final MlpNet newNet, final int layerNr, final int neuronNr) {
-        return newNet.getLayerArr()[layerNr].neuronArr[neuronNr];
+    public static MlpInputErrorInterface searchErrorNeuron(final MlpNet newNet, final int layerNr, final int neuronNr) {
+        final MlpInputErrorInterface inputErrorInterface;
+        if (layerNr >= 0) {
+            inputErrorInterface = newNet.getLayerArr()[layerNr].neuronArr[neuronNr];
+        } else {
+            inputErrorInterface = null;
+        }
+        return inputErrorInterface;
     }
 
     private static MlpLayer duplicateLayer(final MlpLayer layer) {

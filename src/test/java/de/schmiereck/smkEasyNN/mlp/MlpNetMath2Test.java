@@ -5,6 +5,9 @@ import static de.schmiereck.smkEasyNN.mlp.MlpNetPrintUtils.printFullResultForEpo
 import static de.schmiereck.smkEasyNN.mlp.MlpNetTestUtils.actAssertExpectedOutput;
 import static de.schmiereck.smkEasyNN.mlp.MlpWeightTrainerService.calcAdditionalNeuronSize;
 
+import de.schmiereck.smkEasyNN.mlp.persistent.MlpPersistentService;
+
+import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -20,6 +23,7 @@ public class MlpNetMath2Test {
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_1() {
         final boolean useWeightDiff = false;
+        final boolean useNetPool = true;
 
         final int trainTheTrainerEpochMax = 200;
         //final int trainTheTrainerMaxTrainPos = 1200;
@@ -35,7 +39,7 @@ public class MlpNetMath2Test {
 
         final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
 
-        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, useNetPool,
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
                 trainTheNetEpochMax, 4,
                 0.01F, 0.6F);
@@ -45,6 +49,7 @@ public class MlpNetMath2Test {
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_2() {
         final boolean useWeightDiff = false;
+        final boolean useNetPool = true;
 
         final int trainTheTrainerEpochMax = 200;
         //final int trainTheTrainerEpochMax = 2000;
@@ -77,7 +82,7 @@ public class MlpNetMath2Test {
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
 
-        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, useNetPool,
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
                 trainTheNetEpochMax, 4,
                 0.01F, 0.6F);
@@ -87,14 +92,17 @@ public class MlpNetMath2Test {
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_3() {
         final boolean useWeightDiff = false;
+        final boolean useNetPool = true;
 
-        final int trainTheTrainerEpochMax = 200;
         //final int trainTheTrainerEpochMax = 2000;
+        final int trainTheTrainerEpochMax = 400;
+        //final int trainTheTrainerEpochMax = 200;
 
         // How many Epoches used for every Net-Slots to train.
+        final int trainTheTrainerMaxTrainPos = 8000;
         //final int trainTheTrainerMaxTrainPos = 2000;
         //final int trainTheTrainerMaxTrainPos = 1000;
-        final int trainTheTrainerMaxTrainPos = 800;
+        //final int trainTheTrainerMaxTrainPos = 800;
         //final int trainTheTrainerMaxTrainPos = 500;
         //final int trainTheTrainerMaxTrainPos = 200;
         //final int trainTheTrainerMaxTrainPos = 100;
@@ -102,9 +110,9 @@ public class MlpNetMath2Test {
 
         // How many Net-Slots trained in parallel.
         //final int trainTheTrainerDataSize = 2000;
-        final int trainTheTrainerDataSize = 600;
+        //final int trainTheTrainerDataSize = 600;
         //final int trainTheTrainerDataSize = 400;
-        //final int trainTheTrainerDataSize = 200;
+        final int trainTheTrainerDataSize = 200;
         //final int trainTheTrainerDataSize = 100;
         //final int trainTheTrainerDataSize = 40;
         //final int trainTheTrainerDataSize = 20;
@@ -118,13 +126,13 @@ public class MlpNetMath2Test {
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Mini;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
-        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
-        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Bigger;
 
-        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff,
+        GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, useNetPool,
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
                 trainTheNetEpochMax, 4,
                 //0.01F, 0.6F);
@@ -136,6 +144,7 @@ public class MlpNetMath2Test {
      */
     private void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum,
                                                                                    boolean useWeightDiff,
+                                                                                   final boolean useNetPool,
                                                                                    int trainTheTrainerMaxTrainPos,
                                                                                    int trainTheTrainerEpochMax,
                                                                                    final int trainTheTrainerDataSize,
@@ -177,8 +186,7 @@ public class MlpNetMath2Test {
 
             final TrainData[] trainDataArr = new TrainData[trainTheTrainerDataSize];
             for (int trainDataPos = 0; trainDataPos < trainDataArr.length; trainDataPos++) {
-                final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
-                trainDataArr[trainDataPos] = new TrainData(net);
+                trainDataArr[trainDataPos] = createNewTrainData(trainDataPos, config, layerConfigArr, useNetPool, rnd);
             }
 
             final int successfulCounterMax = 10;
@@ -197,15 +205,13 @@ public class MlpNetMath2Test {
 
                 if (trainData.epochPos > trainTheTrainerEpochMax) {
                     // Not Successfully trained: Remove net.
-                    final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
-                    trainDataArr[trainDataPos] = new TrainData(net);
+                    trainDataArr[trainDataPos] = createNewTrainData(trainDataPos, config, layerConfigArr, useNetPool, rnd);
                     System.out.printf("trainPos: %d, trainDataPos: %d - Not Successfully trained\n", trainPos, trainDataPos);
                 } else {
                     if (trainData.successfulCounter > successfulCounterMax) {
                         //printFullResultForEpochWithTrainSize(trainData.net, result.trainInputArrArr, result.expectedOutputArrArr, trainData.epochPos, trainData.mainOutputMseErrorValue);
                         // Successfully trained: Remove net.
-                        final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
-                        trainDataArr[trainDataPos] = new TrainData(net);
+                        trainDataArr[trainDataPos] = createNewTrainData(trainDataPos, config, layerConfigArr, useNetPool, rnd);
                         System.out.printf("trainPos: %d, trainDataPos: %d - Successfully trained\n", trainPos, trainDataPos);
                     } else {
                         if ((trainData.epochPos + 1) % 100 == 0) {
@@ -216,10 +222,23 @@ public class MlpNetMath2Test {
             }
         }
 
+        for (int trainerPos = 0; trainerPos < weightTrainerArr.length; trainerPos++) {
+            final MlpWeightTrainer weightTrainer = weightTrainerArr[trainerPos];
+
+            final File file = new File("C:\\Temp\\weightTrainer%d.mlp".formatted(trainerPos));
+            MlpPersistentService.saveNet(file, weightTrainer.trainNet);
+        }
+
         // Train the Net with Trainer:
         System.out.println("---- Train the Net with Trainer: --------------------------------------------------------");
         {
-            final MlpNet net = MlpNetService.createNet(config, layerConfigArr, rnd);
+            final Random usedRnd;
+            if (useNetPool) {
+                usedRnd = new Random(trainTheTrainerDataSize / 2);
+            } else {
+                usedRnd = rnd;
+            }
+            final MlpNet net = MlpNetService.createNet(config, layerConfigArr, usedRnd);
 
             final int successfulCounterMax = 60;
             trainTheNetWithTrainerArr(net, rnd, trainTheNetEpochMax, result, weightTrainerArr, successfulCounterMax);
@@ -228,6 +247,17 @@ public class MlpNetMath2Test {
             System.out.println("Act & Assert");
             actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
         }
+    }
+
+    private TrainData createNewTrainData(int trainDataPos, MlpConfiguration config, MlpLayerConfig[] layerConfigArr, final boolean useNetPool, final Random rnd) {
+        final Random fixedRnd;
+        if (useNetPool) {
+            fixedRnd = new Random(trainDataPos);
+        } else {
+            fixedRnd = rnd;
+        }
+        final MlpNet net = MlpNetService.createNet(config, layerConfigArr, fixedRnd);
+        return new TrainData(net);
     }
 
     /**

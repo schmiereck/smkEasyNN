@@ -15,4 +15,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NetDocument {
     public List<LayerData> layerDataList;
+    public boolean useAdditionalBiasInput;
+    public boolean useAdditionalClockInput;
 }

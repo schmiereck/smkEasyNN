@@ -52,7 +52,7 @@ public class MlpNet {
         return this.layerArr;
     }
 
-    public void setLayerArr(MlpLayer[] layerArr) {
+    public void setLayerArr(final MlpLayer[] layerArr) {
         this.layerArr = layerArr;
     }
 

@@ -19,8 +19,8 @@ public final class MlpService {
     public static final float BIAS_VALUE = 1.0F;
     public static final float CLOCK_VALUE = 1.0F;
     public static final float NORM_VALUE = 1.0F;
-    public static final int INPUT_LAYER_NR = -1;
     public static final int FIRST_LAYER_NR = 0;
+    public static final int INPUT_LAYER_NR = -1;
     public static final int INTERNAL_LAYER_NR = -2;
     public static final int INTERNAL_INPUT_LAYER_NR = -3;
     public static final int INTERNAL_BIAS_INPUT_NR = 0;

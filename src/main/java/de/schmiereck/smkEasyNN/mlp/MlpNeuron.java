@@ -79,4 +79,8 @@ public class MlpNeuron implements MlpInputInterface, MlpInputErrorInterface {
     public List<MlpSynapse> getSynapseList() {
         return this.synapseList;
     }
+
+    public void addSynapse(final MlpSynapse synapse) {
+        this.synapseList.add(synapse);
+    }
 }

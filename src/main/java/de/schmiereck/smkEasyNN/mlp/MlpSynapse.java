@@ -14,7 +14,8 @@ public class MlpSynapse {
      */
     float dweight;
 
-    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError, final boolean useLastError, final boolean useLastInput, final boolean useTrainLastInput) {
+    public MlpSynapse(final MlpInputInterface input, final MlpInputErrorInterface inputError,
+                      final boolean useLastError, final boolean useLastInput, final boolean useTrainLastInput) {
         this.input = input;
         this.inputError = inputError;
         this.useLastError = useLastError;
@@ -34,7 +35,23 @@ public class MlpSynapse {
         return this.weight;
     }
 
+    public void setWeight(final float weight) {
+        this.weight = weight;
+    }
+
     public float getDweight() {
         return this.dweight;
+    }
+
+    public boolean isUseLastError() {
+        return this.useLastError;
+    }
+
+    public boolean isUseLastInput() {
+        return this.useLastInput;
+    }
+
+    public boolean isUseTrainLastInput() {
+        return this.useTrainLastInput;
     }
 }
