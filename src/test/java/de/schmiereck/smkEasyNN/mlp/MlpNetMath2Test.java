@@ -99,9 +99,9 @@ public class MlpNetMath2Test {
         //final int trainTheTrainerEpochMax = 200;
 
         // How many Epoches used for every Net-Slots to train.
-        final int trainTheTrainerMaxTrainPos = 8000;
+        //final int trainTheTrainerMaxTrainPos = 8000;
         //final int trainTheTrainerMaxTrainPos = 2000;
-        //final int trainTheTrainerMaxTrainPos = 1000;
+        final int trainTheTrainerMaxTrainPos = 1000;
         //final int trainTheTrainerMaxTrainPos = 800;
         //final int trainTheTrainerMaxTrainPos = 500;
         //final int trainTheTrainerMaxTrainPos = 200;
@@ -110,15 +110,15 @@ public class MlpNetMath2Test {
 
         // How many Net-Slots trained in parallel.
         //final int trainTheTrainerDataSize = 2000;
-        //final int trainTheTrainerDataSize = 600;
+        final int trainTheTrainerDataSize = 600;
         //final int trainTheTrainerDataSize = 400;
-        final int trainTheTrainerDataSize = 200;
+        //final int trainTheTrainerDataSize = 200;
         //final int trainTheTrainerDataSize = 100;
         //final int trainTheTrainerDataSize = 40;
         //final int trainTheTrainerDataSize = 20;
 
-        //final int trainTheNetEpochMax = 27_000;
-        final int trainTheNetEpochMax = 15_000;
+        final int trainTheNetEpochMax = 27_000;
+        //final int trainTheNetEpochMax = 15_000;
         //final int trainTheNetEpochMax = 5_000;
         //final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
@@ -176,7 +176,11 @@ public class MlpNetMath2Test {
         final int additionalNeuronSize = calcAdditionalNeuronSize(config);
         final MlpWeightTrainer[] weightTrainerArr = new MlpWeightTrainer[layerConfigArr.length];
         for (int trainerPos = 0; trainerPos < layerConfigArr.length; trainerPos++) {
-            weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainerTrainSize, additionalNeuronSize, rnd, trainLayerSizeEnum);
+            final File file = createFileName(trainLayerSizeEnum, trainerTrainSize, trainerPos, additionalNeuronSize);
+            final MlpNet trainNet = MlpPersistentService.loadNet(file);
+
+            //weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainerTrainSize, additionalNeuronSize, rnd, trainLayerSizeEnum);
+            weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainNet, trainerTrainSize);
             weightTrainerArr[trainerPos].useWeightDiff = useWeightDiff;
         }
 
@@ -224,8 +228,7 @@ public class MlpNetMath2Test {
 
         for (int trainerPos = 0; trainerPos < weightTrainerArr.length; trainerPos++) {
             final MlpWeightTrainer weightTrainer = weightTrainerArr[trainerPos];
-
-            final File file = new File("C:\\Temp\\weightTrainer%d.mlp".formatted(trainerPos));
+            final File file = createFileName(trainLayerSizeEnum, trainerTrainSize, trainerPos, additionalNeuronSize);
             MlpPersistentService.saveNet(file, weightTrainer.trainNet);
         }
 
@@ -247,6 +250,11 @@ public class MlpNetMath2Test {
             System.out.println("Act & Assert");
             actAssertExpectedOutput(net, result.trainInputArrArr, result.expectedOutputArrArr, 0.075F);
         }
+    }
+
+    private File createFileName(MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum, int trainerTrainSize, int trainerPos, int additionalNeuronSize) {
+        final File file = new File("C:\\Temp\\weightTrainer-%d-%d-%d-%s.mlp".formatted(trainerPos, trainerTrainSize, additionalNeuronSize, trainLayerSizeEnum.name()));
+        return file;
     }
 
     private TrainData createNewTrainData(int trainDataPos, MlpConfiguration config, MlpLayerConfig[] layerConfigArr, final boolean useNetPool, final Random rnd) {

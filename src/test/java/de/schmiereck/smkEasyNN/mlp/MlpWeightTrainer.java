@@ -124,4 +124,9 @@ public class MlpWeightTrainer {
         //this.trainNet = MlpNetService.createNet(trainConfig, trainLayerSizeArr, rnd);
         this.trainNet = MlpNetService.createNet(trainConfig, layerConfigArr, rnd);
     }
+
+    public MlpWeightTrainer(final MlpNet trainNet, final int trainSize) {
+        this.trainNet = trainNet;
+        this.trainSize = trainSize;
+    }
 }
