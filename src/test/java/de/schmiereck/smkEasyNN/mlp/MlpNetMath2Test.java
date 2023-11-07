@@ -92,7 +92,7 @@ public class MlpNetMath2Test {
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_3() {
         final boolean useWeightDiff = false;
-        final boolean useNetPool = true;
+        final boolean useNetPool = false;
 
         //final int trainTheTrainerEpochMax = 2000;
         final int trainTheTrainerEpochMax = 400;
@@ -101,26 +101,27 @@ public class MlpNetMath2Test {
         // How many Epoches used for every Net-Slots to train.
         //final int trainTheTrainerMaxTrainPos = 8000;
         //final int trainTheTrainerMaxTrainPos = 2000;
-        final int trainTheTrainerMaxTrainPos = 1000;
+        //final int trainTheTrainerMaxTrainPos = 1000;
         //final int trainTheTrainerMaxTrainPos = 800;
         //final int trainTheTrainerMaxTrainPos = 500;
-        //final int trainTheTrainerMaxTrainPos = 200;
+        final int trainTheTrainerMaxTrainPos = 200;
         //final int trainTheTrainerMaxTrainPos = 100;
         //final int trainTheTrainerMaxTrainPos = 20;
 
         // How many Net-Slots trained in parallel.
         //final int trainTheTrainerDataSize = 2000;
-        final int trainTheTrainerDataSize = 600;
+        //final int trainTheTrainerDataSize = 600;
         //final int trainTheTrainerDataSize = 400;
         //final int trainTheTrainerDataSize = 200;
         //final int trainTheTrainerDataSize = 100;
         //final int trainTheTrainerDataSize = 40;
-        //final int trainTheTrainerDataSize = 20;
+        final int trainTheTrainerDataSize = 20;
 
-        final int trainTheNetEpochMax = 27_000;
+        //final int trainTheNetEpochMax = 27_000;
         //final int trainTheNetEpochMax = 15_000;
-        //final int trainTheNetEpochMax = 5_000;
+        final int trainTheNetEpochMax = 5_000;
         //final int trainTheNetEpochMax = 1_000;
+        //final int trainTheNetEpochMax = 500;
         //final int trainTheNetEpochMax = 100;
 
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Mini;
@@ -153,8 +154,8 @@ public class MlpNetMath2Test {
                                                                                    final float trainerLearningRate, final float trainerMomentum) {
         // Arrange
         final MlpNetMath2Test.Result result = arrangeAddResult4();
-        //final Result result = arrangeAddResult();
-        //final Result result = arrangeMultResult();
+        //final MlpNetMath2Test.Result result = arrangeSubResult4();
+        //final MlpNetMath2Test.Result result = arrangeMultResult4();
 
         final Random rnd = new Random(12345);
         //final Random rnd = new Random();
@@ -253,7 +254,9 @@ public class MlpNetMath2Test {
     }
 
     private File createFileName(MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum, int trainerTrainSize, int trainerPos, int additionalNeuronSize) {
-        final File file = new File("C:\\Temp\\weightTrainer-%d-%d-%d-%s.mlp".formatted(trainerPos, trainerTrainSize, additionalNeuronSize, trainLayerSizeEnum.name()));
+        //final String directoryName = "C:\\Temp\\";
+        final String directoryName = "./data/";
+        final File file = new File("%sweightTrainer-%d-%d-%d-%s.mlp".formatted(directoryName, trainerPos, trainerTrainSize, additionalNeuronSize, trainLayerSizeEnum.name()));
         return file;
     }
 
@@ -765,6 +768,58 @@ public class MlpNetMath2Test {
         return new MlpNetMath2Test.Result(trainInputArrArr, expectedOutputArrArr);
     }
 
+    private static MlpNetMath2Test.Result arrangeSubResult4() {
+        final float[][] trainInputArrArr = new float[][]
+                {
+                        new float[]{ 0, 0, 0, 0},
+
+                        new float[]{ 0, 0, 0, 0},
+                        new float[]{ 0, 0, 0, 1},
+                        new float[]{ 0, 0, 0, 2},
+                        new float[]{ 0, 0, 0, 3},
+
+                        new float[]{ 0, 0, 1, 0},
+                        new float[]{ 0, 0, 1, 1},
+                        new float[]{ 0, 0, 1, 2},
+                        new float[]{ 0, 0, 1, 3},
+
+                        new float[]{ 0, 0, 2, 0},
+                        new float[]{ 0, 0, 2, 1},
+                        new float[]{ 0, 0, 2, 2},
+                        new float[]{ 0, 0, 2, 3},
+
+                        new float[]{ 0, 0, 3, 0},
+                        new float[]{ 0, 0, 3, 1},
+                        new float[]{ 0, 0, 3, 2},
+                        new float[]{ 0, 0, 3, 3},
+                };
+        final float[][] expectedOutputArrArr = new float[][]
+                {
+                        new float[]{0},
+
+                        new float[]{0},
+                        new float[]{-1},
+                        new float[]{-2},
+                        new float[]{-3},
+
+                        new float[]{1},
+                        new float[]{0},
+                        new float[]{-1},
+                        new float[]{-2},
+
+                        new float[]{2},
+                        new float[]{1},
+                        new float[]{0},
+                        new float[]{-1},
+
+                        new float[]{3},
+                        new float[]{2},
+                        new float[]{1},
+                        new float[]{0},
+                };
+        return new MlpNetMath2Test.Result(trainInputArrArr, expectedOutputArrArr);
+    }
+
     private static MlpNetMath2Test.Result arrangeMultResult() {
         final float[][] trainInputArrArr = new float[][]
                 {
@@ -789,6 +844,58 @@ public class MlpNetMath2Test {
                         new float[]{3, 1},
                         new float[]{3, 2},
                         new float[]{3, 3},
+                };
+        final float[][] expectedOutputArrArr = new float[][]
+                {
+                        new float[]{0},
+
+                        new float[]{0},
+                        new float[]{0},
+                        new float[]{0},
+                        new float[]{0},
+
+                        new float[]{0},
+                        new float[]{1},
+                        new float[]{2},
+                        new float[]{3},
+
+                        new float[]{0},
+                        new float[]{2},
+                        new float[]{4},
+                        new float[]{6},
+
+                        new float[]{0},
+                        new float[]{3},
+                        new float[]{6},
+                        new float[]{9},
+                };
+        return new MlpNetMath2Test.Result(trainInputArrArr, expectedOutputArrArr);
+    }
+
+    private static MlpNetMath2Test.Result arrangeMultResult4() {
+        final float[][] trainInputArrArr = new float[][]
+                {
+                        new float[]{ 0, 0, 0, 0},
+
+                        new float[]{ 0, 0, 0, 0},
+                        new float[]{ 0, 0, 0, 1},
+                        new float[]{ 0, 0, 0, 2},
+                        new float[]{ 0, 0, 0, 3},
+
+                        new float[]{ 0, 0, 1, 0},
+                        new float[]{ 0, 0, 1, 1},
+                        new float[]{ 0, 0, 1, 2},
+                        new float[]{ 0, 0, 1, 3},
+
+                        new float[]{ 0, 0, 2, 0},
+                        new float[]{ 0, 0, 2, 1},
+                        new float[]{ 0, 0, 2, 2},
+                        new float[]{ 0, 0, 2, 3},
+
+                        new float[]{ 0, 0, 3, 0},
+                        new float[]{ 0, 0, 3, 1},
+                        new float[]{ 0, 0, 3, 2},
+                        new float[]{ 0, 0, 3, 3},
                 };
         final float[][] expectedOutputArrArr = new float[][]
                 {

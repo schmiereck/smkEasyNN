@@ -7,6 +7,7 @@ import static de.schmiereck.smkEasyNN.mlp.MlpNetService.searchInputNeuron;
 import de.schmiereck.smkEasyNN.mlp.MlpConfiguration;
 import de.schmiereck.smkEasyNN.mlp.MlpInputErrorInterface;
 import de.schmiereck.smkEasyNN.mlp.MlpInputInterface;
+import de.schmiereck.smkEasyNN.mlp.MlpInternalValueInput;
 import de.schmiereck.smkEasyNN.mlp.MlpLayer;
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
 import de.schmiereck.smkEasyNN.mlp.MlpNeuron;
@@ -34,11 +35,6 @@ public class MlpPersistentService {
         //this.clockInput = new MlpValueInput(MlpService.INTERNAL_LAYER_NR, MlpService.INTERNAL_CLOCK_INPUT_NR, MlpService.CLOCK_VALUE);
         netDocument.useAdditionalBiasInput = net.getUseAdditionalBiasInput();
         netDocument.useAdditionalClockInput = net.getUseAdditionalClockInput();
-
-        // TODO net.internalValueInputArr
-        if (Objects.nonNull(net.getInternalValueInputArr())) {
-            throw new RuntimeException("Not implemented.");
-        }
 
         netDocument.layerDataList = new ArrayList<>();
         final MlpLayer[] layerArr = net.getLayerArr();
@@ -77,16 +73,31 @@ public class MlpPersistentService {
             netDocument.layerDataList.add(layerData);
         }
 
+        final MlpInternalValueInput[] internalValueInputArr = net.getInternalValueInputArr();
+        netDocument.internalValueInputList = new ArrayList<>();
+        for (int inputPos = 0; inputPos < internalValueInputArr.length; inputPos++) {
+            final MlpInternalValueInput internalValueInput = internalValueInputArr[inputPos];
+            final InternalValueInputData internalValueInputData = new InternalValueInputData();
+
+            internalValueInputData.layerNr = internalValueInput.getLayerNr();
+            internalValueInputData.neuronNr = internalValueInput.getNeuronNr();
+            internalValueInputData.inputLayerNr = internalValueInput.inputLayerNr;
+            internalValueInputData.inputNeuronNr = internalValueInput.inputNeuronNr;
+            internalValueInputData.value = internalValueInput.getInputValue();
+
+            netDocument.internalValueInputList.add(internalValueInputData);
+        }
+
         var objectMapper = new ObjectMapper();
 
         try {
             // mapper.registerModule(new JavaTimeModule());
             objectMapper.writeValue(file, netDocument);
-        } catch (JsonMappingException e) {
+        } catch (final JsonMappingException e) {
             throw new RuntimeException(e);
-        } catch (JsonGenerationException e) {
+        } catch (final JsonGenerationException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -100,11 +111,11 @@ public class MlpPersistentService {
         try {
             netDocument = objectMapper.readValue(file, new TypeReference<>() {
             });
-        } catch (JsonMappingException e) {
+        } catch (final JsonMappingException e) {
             throw new RuntimeException(e);
-        } catch (JsonParseException e) {
+        } catch (final JsonParseException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -124,6 +135,24 @@ public class MlpPersistentService {
         }
 
         net.setLayerArr(layerArr);
+
+        final MlpInternalValueInput[] internalValueInputArr;
+        final List<InternalValueInputData> internalValueInputList = netDocument.internalValueInputList;
+        if (Objects.nonNull(internalValueInputList)) {
+            internalValueInputArr = new MlpInternalValueInput[internalValueInputList.size()];
+            for (int inputPos = 0; inputPos < internalValueInputList.size(); inputPos++) {
+                final InternalValueInputData internalValueInputData = internalValueInputList.get(inputPos);
+                final MlpInternalValueInput internalValueInput = new MlpInternalValueInput(internalValueInputData.layerNr,
+                        internalValueInputData.neuronNr, internalValueInputData.value);
+                internalValueInput.inputLayerNr = internalValueInputData.inputLayerNr;
+                internalValueInput.inputNeuronNr = internalValueInputData.inputNeuronNr;
+
+                internalValueInputArr[inputPos] = internalValueInput;
+            }
+        } else {
+            internalValueInputArr = new MlpInternalValueInput[0];
+        }
+        net.setInternalValueInputArr(internalValueInputArr);
 
         final MlpLayer inputLayer = layerArr[0];
         final MlpValueInput[] valueInputArr = createValueInputArr(inputLayer.getNeuronArr().length);

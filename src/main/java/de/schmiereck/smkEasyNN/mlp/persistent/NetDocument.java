@@ -17,4 +17,5 @@ public class NetDocument {
     public List<LayerData> layerDataList;
     public boolean useAdditionalBiasInput;
     public boolean useAdditionalClockInput;
+    public List<InternalValueInputData> internalValueInputList;
 }

@@ -95,7 +95,6 @@ public final class MlpNetService {
                 final MlpInternalValueInput valueInput = valueInputArr[neuronPos];
                 newValueInputArr[neuronPos] = new MlpInternalValueInput(valueInput.getLayerNr(), valueInput.getNeuronNr(), valueInput.getInputValue());
 
-                newValueInputArr[neuronPos].internalInput = valueInput.internalInput;
                 newValueInputArr[neuronPos].inputLayerNr = valueInput.inputLayerNr;
                 newValueInputArr[neuronPos].inputNeuronNr = valueInput.inputNeuronNr;
             }
