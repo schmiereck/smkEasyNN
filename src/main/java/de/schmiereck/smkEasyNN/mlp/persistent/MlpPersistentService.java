@@ -74,20 +74,21 @@ public class MlpPersistentService {
         }
 
         final MlpInternalValueInput[] internalValueInputArr = net.getInternalValueInputArr();
-        netDocument.internalValueInputList = new ArrayList<>();
-        for (int inputPos = 0; inputPos < internalValueInputArr.length; inputPos++) {
-            final MlpInternalValueInput internalValueInput = internalValueInputArr[inputPos];
-            final InternalValueInputData internalValueInputData = new InternalValueInputData();
+        if (Objects.nonNull(internalValueInputArr)) {
+            netDocument.internalValueInputList = new ArrayList<>();
+            for (int inputPos = 0; inputPos < internalValueInputArr.length; inputPos++) {
+                final MlpInternalValueInput internalValueInput = internalValueInputArr[inputPos];
+                final InternalValueInputData internalValueInputData = new InternalValueInputData();
 
-            internalValueInputData.layerNr = internalValueInput.getLayerNr();
-            internalValueInputData.neuronNr = internalValueInput.getNeuronNr();
-            internalValueInputData.inputLayerNr = internalValueInput.inputLayerNr;
-            internalValueInputData.inputNeuronNr = internalValueInput.inputNeuronNr;
-            internalValueInputData.value = internalValueInput.getInputValue();
+                internalValueInputData.layerNr = internalValueInput.getLayerNr();
+                internalValueInputData.neuronNr = internalValueInput.getNeuronNr();
+                internalValueInputData.inputLayerNr = internalValueInput.inputLayerNr;
+                internalValueInputData.inputNeuronNr = internalValueInput.inputNeuronNr;
+                internalValueInputData.value = internalValueInput.getInputValue();
 
-            netDocument.internalValueInputList.add(internalValueInputData);
+                netDocument.internalValueInputList.add(internalValueInputData);
+            }
         }
-
         var objectMapper = new ObjectMapper();
 
         try {

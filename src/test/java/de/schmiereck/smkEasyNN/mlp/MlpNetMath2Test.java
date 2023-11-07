@@ -94,28 +94,28 @@ public class MlpNetMath2Test {
         final boolean useWeightDiff = false;
         final boolean useNetPool = false;
 
-        //final int trainTheTrainerEpochMax = 2000;
+        //final int trainTheTrainerEpochMax = 2_000;
         final int trainTheTrainerEpochMax = 400;
         //final int trainTheTrainerEpochMax = 200;
 
         // How many Epoches used for every Net-Slots to train.
-        //final int trainTheTrainerMaxTrainPos = 8000;
-        //final int trainTheTrainerMaxTrainPos = 2000;
-        //final int trainTheTrainerMaxTrainPos = 1000;
+        //final int trainTheTrainerMaxTrainPos = 8_000;
+        //final int trainTheTrainerMaxTrainPos = 2_000;
+        final int trainTheTrainerMaxTrainPos = 1_000;
         //final int trainTheTrainerMaxTrainPos = 800;
         //final int trainTheTrainerMaxTrainPos = 500;
-        final int trainTheTrainerMaxTrainPos = 200;
+        //final int trainTheTrainerMaxTrainPos = 200;
         //final int trainTheTrainerMaxTrainPos = 100;
         //final int trainTheTrainerMaxTrainPos = 20;
 
         // How many Net-Slots trained in parallel.
-        //final int trainTheTrainerDataSize = 2000;
+        final int trainTheTrainerDataSize = 2_000;
         //final int trainTheTrainerDataSize = 600;
         //final int trainTheTrainerDataSize = 400;
         //final int trainTheTrainerDataSize = 200;
         //final int trainTheTrainerDataSize = 100;
         //final int trainTheTrainerDataSize = 40;
-        final int trainTheTrainerDataSize = 20;
+        //final int trainTheTrainerDataSize = 20;
 
         //final int trainTheNetEpochMax = 27_000;
         //final int trainTheNetEpochMax = 15_000;
@@ -127,7 +127,8 @@ public class MlpNetMath2Test {
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Mini;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
-        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
+        final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper2;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Normal;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Big;
@@ -157,8 +158,12 @@ public class MlpNetMath2Test {
         //final MlpNetMath2Test.Result result = arrangeSubResult4();
         //final MlpNetMath2Test.Result result = arrangeMultResult4();
 
-        final Random rnd = new Random(12345);
-        //final Random rnd = new Random();
+        final Random rnd;
+        if (useNetPool) {
+            rnd = new Random(12345);
+        } else {
+            rnd = new Random();
+        }
 
         // Use Netzwork-Layouts with a fixed Input-Synapse size (only connect to the nearest input neurons). Like Array-Layers.
         //final int[] layerSizeArr = new int[]{ 2, 6, 4, 1 };
@@ -178,10 +183,12 @@ public class MlpNetMath2Test {
         final MlpWeightTrainer[] weightTrainerArr = new MlpWeightTrainer[layerConfigArr.length];
         for (int trainerPos = 0; trainerPos < layerConfigArr.length; trainerPos++) {
             final File file = createFileName(trainLayerSizeEnum, trainerTrainSize, trainerPos, additionalNeuronSize);
-            final MlpNet trainNet = MlpPersistentService.loadNet(file);
-
-            //weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainerTrainSize, additionalNeuronSize, rnd, trainLayerSizeEnum);
-            weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainNet, trainerTrainSize);
+            if (file.exists()) {
+                final MlpNet trainNet = MlpPersistentService.loadNet(file);
+                weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainNet, trainerTrainSize);
+            } else {
+                weightTrainerArr[trainerPos] = new MlpWeightTrainer(trainerTrainSize, additionalNeuronSize, rnd, trainLayerSizeEnum);
+            }
             weightTrainerArr[trainerPos].useWeightDiff = useWeightDiff;
         }
 

@@ -19,6 +19,7 @@ public class MlpWeightTrainer {
         Small,
         Deeper0Small,
         Deeper1Small,
+        Deeper2Small,
         Deeper2,
         Normal,
         Big,
@@ -27,7 +28,6 @@ public class MlpWeightTrainer {
 
     public MlpWeightTrainer(final int trainSize, final int additionalNeuronSize, final Random rnd,
                             final TrainLayerSizeEnum trainLayerSizeEnum) {
-        this.trainSize = trainSize;
         final int[] trainLayerSizeArr =
                 switch (trainLayerSizeEnum) {
                     case Mini -> new int[]
@@ -66,6 +66,18 @@ public class MlpWeightTrainer {
                                     6 * trainSize,
                                     4 * trainSize,
                                     4 * trainSize,
+                                    OutArrSynapseSize * (trainSize + additionalNeuronSize)
+                            };
+                    case Deeper2Small -> new int[]
+                            {
+                                    InArrNeuronSize + (InArrSynapseSize * (trainSize + additionalNeuronSize)),
+                                    12 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    8 * trainSize,
+                                    6 * trainSize,
+                                    6 * trainSize,
+                                    6 * trainSize,
                                     OutArrSynapseSize * (trainSize + additionalNeuronSize)
                             };
                     case Deeper2 -> new int[]
@@ -123,6 +135,7 @@ public class MlpWeightTrainer {
         final MlpConfiguration trainConfig = new MlpConfiguration(true, false);
         //this.trainNet = MlpNetService.createNet(trainConfig, trainLayerSizeArr, rnd);
         this.trainNet = MlpNetService.createNet(trainConfig, layerConfigArr, rnd);
+        this.trainSize = trainSize;
     }
 
     public MlpWeightTrainer(final MlpNet trainNet, final int trainSize) {
