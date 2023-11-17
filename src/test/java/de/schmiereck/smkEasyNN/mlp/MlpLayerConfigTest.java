@@ -141,7 +141,6 @@ public class MlpLayerConfigTest {
 
         assertEquals(8, layerArr[0].neuronArr.length);
         assertEquals(3 + 1, layerArr[0].neuronArr[0].synapseList.size());
-        assertEquals(3 + 1, layerArr[0].neuronArr[0].synapseList.size());
         assertEquals(3 + 1, layerArr[0].neuronArr[1].synapseList.size());
         assertEquals(3 + 1, layerArr[0].neuronArr[2].synapseList.size());
         assertEquals(3 + 1, layerArr[0].neuronArr[3].synapseList.size());
@@ -189,6 +188,297 @@ public class MlpLayerConfigTest {
         assertEquals(0, layerArr[0].neuronArr[7].synapseList.get(3).getInput().getNeuronNr());
         assertEquals(-2, layerArr[0].neuronArr[7].synapseList.get(3).getInput().getLayerNr());
 
+    }
+
+    @Test
+    void GIVEN_Limited_inputs_5_2_true_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[1];
+        layerConfigArr[0] = new MlpLayerConfig(5);
+
+        layerConfigArr[0].setIsLimited(2, true);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        assertEquals(1, layerArr.length);
+
+        assertEquals(5, net.getValueInputArr().length);
+
+        assertEquals(5, layerArr[0].neuronArr.length);
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[0].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[1].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        assertEquals(1, layerArr[0].neuronArr[2].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[2].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[3].synapseList.size());
+        assertEquals(2, layerArr[0].neuronArr[3].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[3].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[4].synapseList.size());
+        assertEquals(3, layerArr[0].neuronArr[4].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(4, layerArr[0].neuronArr[4].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[4].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[4].synapseList.get(2).getInput().getLayerNr());  // BIAS
+    }
+
+    @Test
+    void GIVEN_Limited_inputs_5_3_true_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[1];
+        layerConfigArr[0] = new MlpLayerConfig(5);
+
+        layerConfigArr[0].setIsLimited(3, true);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        assertEquals(1, layerArr.length);
+
+        assertEquals(5, net.getValueInputArr().length);
+
+        assertEquals(5, layerArr[0].neuronArr.length);
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[0].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[0].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[1].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[1].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        assertEquals(1, layerArr[0].neuronArr[2].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[2].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[2].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[2].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[3].synapseList.size());
+        assertEquals(2, layerArr[0].neuronArr[3].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[3].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(4, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[3].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[3].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[4].synapseList.size());
+        assertEquals(2, layerArr[0].neuronArr[4].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[4].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(4, layerArr[0].neuronArr[4].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[4].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[4].synapseList.get(3).getInput().getLayerNr());  // BIAS
+    }
+
+    @Test
+    void GIVEN_Limited_inputs_4_2_true_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[1];
+        layerConfigArr[0] = new MlpLayerConfig(4);
+
+        layerConfigArr[0].setIsLimited(2, true);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        assertEquals(1, layerArr.length);
+
+        assertEquals(4, net.getValueInputArr().length);
+
+        assertEquals(4, layerArr[0].neuronArr.length);
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[0].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[1].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        assertEquals(1, layerArr[0].neuronArr[2].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[2].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getLayerNr());  // BIAS
+
+        assertEquals(2 + 1, layerArr[0].neuronArr[3].synapseList.size());
+        assertEquals(2, layerArr[0].neuronArr[3].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[3].synapseList.get(1).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getLayerNr());  // BIAS
+    }
+
+    @Test
+    void GIVEN_Limited_inputs_4_3_true_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[1];
+        layerConfigArr[0] = new MlpLayerConfig(4);
+
+        layerConfigArr[0].setIsLimited(3, true);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        assertEquals(1, layerArr.length);
+
+        assertEquals(4, net.getValueInputArr().length);
+
+        assertEquals(4, layerArr[0].neuronArr.length);
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[0].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[0].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[1].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[1].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        assertEquals(1, layerArr[0].neuronArr[2].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[2].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[2].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[2].synapseList.get(3).getInput().getLayerNr());  // BIAS
+
+        assertEquals(3 + 1, layerArr[0].neuronArr[3].synapseList.size());
+        assertEquals(1, layerArr[0].neuronArr[3].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[3].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[3].synapseList.get(3).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[3].synapseList.get(3).getInput().getLayerNr());  // BIAS
+    }
+
+    @Test
+    void GIVEN_Limited_inputs_4_4_true_THEN_all_inputs_are_connected() {
+        // Arrange
+        final Random rnd = new Random(123456);
+        //final Random rnd = new Random();
+
+        final MlpConfiguration mlpConfiguration = new MlpConfiguration(true, false);
+        final MlpLayerConfig[] layerConfigArr = new MlpLayerConfig[1];
+        layerConfigArr[0] = new MlpLayerConfig(4);
+
+        layerConfigArr[0].setIsLimited(4, true);
+
+        final MlpNet net = MlpNetService.createNet(mlpConfiguration, layerConfigArr, rnd);
+
+        // Act & Assert
+        final MlpLayer[] layerArr = net.getLayerArr();
+
+        assertEquals(1, layerArr.length);
+
+        assertEquals(4, net.getValueInputArr().length);
+
+        assertEquals(4, layerArr[0].neuronArr.length);
+
+        assertEquals(4 + 1, layerArr[0].neuronArr[0].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[0].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[0].synapseList.get(2).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[0].synapseList.get(3).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[0].synapseList.get(4).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[0].synapseList.get(4).getInput().getLayerNr());  // BIAS
+
+        assertEquals(4 + 1, layerArr[0].neuronArr[1].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[1].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[1].synapseList.get(2).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[1].synapseList.get(3).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[1].synapseList.get(4).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[1].synapseList.get(4).getInput().getLayerNr());  // BIAS
+
+        assertEquals(4 + 1, layerArr[0].neuronArr[2].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[2].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[2].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[2].synapseList.get(2).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[2].synapseList.get(3).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[2].synapseList.get(4).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[2].synapseList.get(4).getInput().getLayerNr());  // BIAS
+
+        assertEquals(4 + 1, layerArr[0].neuronArr[3].synapseList.size());
+        assertEquals(0, layerArr[0].neuronArr[3].synapseList.get(0).getInput().getNeuronNr());
+        assertEquals(1, layerArr[0].neuronArr[3].synapseList.get(1).getInput().getNeuronNr());
+        assertEquals(2, layerArr[0].neuronArr[3].synapseList.get(2).getInput().getNeuronNr());
+        assertEquals(3, layerArr[0].neuronArr[3].synapseList.get(3).getInput().getNeuronNr());
+
+        assertEquals(0, layerArr[0].neuronArr[3].synapseList.get(4).getInput().getNeuronNr());  // BIAS
+        assertEquals(-2, layerArr[0].neuronArr[3].synapseList.get(4).getInput().getLayerNr());  // BIAS
     }
 
     @Test

@@ -23,6 +23,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -90,6 +91,7 @@ public class MlpPersistentService {
             }
         }
         var objectMapper = new ObjectMapper();
+        //objectMapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
 
         try {
             // mapper.registerModule(new JavaTimeModule());

@@ -81,3 +81,6 @@ Architecture:
 * Implementing a Neural Network in Java: Training and Backpropagation issues\
   (with the template for an MLP in Answer 6) 
   * https://stackoverflow.com/questions/9951487/implementing-a-neural-network-in-java-training-and-backpropagation-issues
+* Betreff: Die seltsamen Fehlleistungen neuronaler Netze - Heidelberg Laureate Forum - SciLogs - Wissenschaftsblogs
+  * https://scilogs.spektrum.de/hlf/die-seltsamen-fehlleistungen-neuronaler-netze/
+

@@ -37,12 +37,16 @@ public class MlpNetMath2Test {
         final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
 
+        final float targetLearningRate = 0.1F;
+        final float targetMomentum = 0.6F;
+
         final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
 
         GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, useNetPool,
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
                 trainTheNetEpochMax, 4,
-                0.01F, 0.6F);
+                0.01F, 0.6F,
+                targetLearningRate, targetMomentum);
     }
 
     @Test
@@ -75,6 +79,9 @@ public class MlpNetMath2Test {
         //final int trainTheNetEpochMax = 1_000;
         //final int trainTheNetEpochMax = 100;
 
+        final float targetLearningRate = 0.1F;
+        final float targetMomentum = 0.6F;
+
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper0Small;
         //final MlpWeightTrainer.TrainLayerSizeEnum trainLayerSizeEnum = MlpWeightTrainer.TrainLayerSizeEnum.Deeper1Small;
@@ -85,23 +92,28 @@ public class MlpNetMath2Test {
         GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output(trainLayerSizeEnum, useWeightDiff, useNetPool,
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
                 trainTheNetEpochMax, 4,
-                0.01F, 0.6F);
+                0.01F, 0.6F,
+                targetLearningRate, targetMomentum);
     }
 
     @Test
     @Disabled
     void GIVEN_2_value_inputs_with_trainer_for_every_layer_THEN_add_output_test_3() {
         final boolean useWeightDiff = false;
-        final boolean useNetPool = false;
+        final boolean useNetPool = true;
 
-        //final int trainTheTrainerEpochMax = 2_000;
-        final int trainTheTrainerEpochMax = 400;
+        final int trainTheTrainerEpochMax = 2_000;
+        //final int trainTheTrainerEpochMax = 400;
         //final int trainTheTrainerEpochMax = 200;
 
         // How many Epoches used for every Net-Slots to train.
+        //final int trainTheTrainerMaxTrainPos = 200_000;
+        final int trainTheTrainerMaxTrainPos = 80_000;
+        //final int trainTheTrainerMaxTrainPos = 50_000;
         //final int trainTheTrainerMaxTrainPos = 8_000;
+        //final int trainTheTrainerMaxTrainPos = 4_000;
         //final int trainTheTrainerMaxTrainPos = 2_000;
-        final int trainTheTrainerMaxTrainPos = 1_000;
+        //final int trainTheTrainerMaxTrainPos = 1_000;
         //final int trainTheTrainerMaxTrainPos = 800;
         //final int trainTheTrainerMaxTrainPos = 500;
         //final int trainTheTrainerMaxTrainPos = 200;
@@ -109,13 +121,27 @@ public class MlpNetMath2Test {
         //final int trainTheTrainerMaxTrainPos = 20;
 
         // How many Net-Slots trained in parallel.
-        final int trainTheTrainerDataSize = 2_000;
+        //final int trainTheTrainerDataSize = 2_000;
         //final int trainTheTrainerDataSize = 600;
         //final int trainTheTrainerDataSize = 400;
         //final int trainTheTrainerDataSize = 200;
         //final int trainTheTrainerDataSize = 100;
         //final int trainTheTrainerDataSize = 40;
         //final int trainTheTrainerDataSize = 20;
+        //final int trainTheTrainerDataSize = 10;
+        //final int trainTheTrainerDataSize = 6;
+        //final int trainTheTrainerDataSize = 4;
+        final int trainTheTrainerDataSize = 3;
+        //final int trainTheTrainerDataSize = 2;
+
+        final float trainerLearningRate = 0.1F;
+        //final float trainerLearningRate = 0.05F;
+        //final float trainerLearningRate = 0.01F;
+        final float trainerMomentum = 0.9F;
+        //final float trainerMomentum = 0.6F;
+
+        final float targetLearningRate = 0.1F;
+        final float targetMomentum = 0.6F;
 
         //final int trainTheNetEpochMax = 27_000;
         //final int trainTheNetEpochMax = 15_000;
@@ -138,7 +164,8 @@ public class MlpNetMath2Test {
                 trainTheTrainerMaxTrainPos, trainTheTrainerEpochMax, trainTheTrainerDataSize,
                 trainTheNetEpochMax, 4,
                 //0.01F, 0.6F);
-                0.05F, 0.6F);
+                trainerLearningRate, trainerMomentum,
+                targetLearningRate, targetMomentum);
     }
 
     /**
@@ -152,7 +179,10 @@ public class MlpNetMath2Test {
                                                                                    final int trainTheTrainerDataSize,
                                                                                    int trainTheNetEpochMax,
                                                                                    final int trainerTrainSize,
-                                                                                   final float trainerLearningRate, final float trainerMomentum) {
+                                                                                   final float trainerLearningRate,
+                                                                                   final float trainerMomentum,
+                                                                                   final float targetLearningRate,
+                                                                                   final float targetMomentum) {
         // Arrange
         final MlpNetMath2Test.Result result = arrangeAddResult4();
         //final MlpNetMath2Test.Result result = arrangeSubResult4();
@@ -208,23 +238,23 @@ public class MlpNetMath2Test {
                 final TrainData trainData = trainDataArr[trainDataPos];
 
                 trainTheTrainerArr(trainData, rnd, result, weightTrainerArr,
-                        0.1F, 0.6F,
+                        targetLearningRate, targetMomentum,
                 trainerLearningRate, trainerMomentum);
 
                 if ((trainPos) % 100 == 0) {
-                    printTrainerMse(trainPos, weightTrainerArr);
+                    printTrainerMse(trainPos, weightTrainerArr, trainDataPos);
                 }
 
                 if (trainData.epochPos > trainTheTrainerEpochMax) {
                     // Not Successfully trained: Remove net.
                     trainDataArr[trainDataPos] = createNewTrainData(trainDataPos, config, layerConfigArr, useNetPool, rnd);
-                    System.out.printf("trainPos: %d, trainDataPos: %d - Not Successfully trained\n", trainPos, trainDataPos);
+                    System.out.printf("trainPos:%d, trainDataPos:%4d - Not Successfully trained\n", trainPos, trainDataPos);
                 } else {
                     if (trainData.successfulCounter > successfulCounterMax) {
                         //printFullResultForEpochWithTrainSize(trainData.net, result.trainInputArrArr, result.expectedOutputArrArr, trainData.epochPos, trainData.mainOutputMseErrorValue);
                         // Successfully trained: Remove net.
                         trainDataArr[trainDataPos] = createNewTrainData(trainDataPos, config, layerConfigArr, useNetPool, rnd);
-                        System.out.printf("trainPos: %d, trainDataPos: %d - Successfully trained\n", trainPos, trainDataPos);
+                        System.out.printf("trainPos:%d, trainDataPos:%4d - Successfully trained\n", trainPos, trainDataPos);
                     } else {
                         if ((trainData.epochPos + 1) % 100 == 0) {
                             //printFullResultForEpoch(trainData.net, result.trainInputArrArr, result.expectedOutputArrArr, trainData.epochPos, trainData.mainOutputMseErrorValue);
@@ -306,7 +336,7 @@ public class MlpNetMath2Test {
             //for (int trainPos = 0; trainPos < 1200; trainPos++) {
             for (int trainPos = 0; trainPos < 120; trainPos++) {
                 trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos, epochMax);
-                System.out.printf("trainPos: %d\n", trainPos);
+                System.out.printf("trainPos:%d\n", trainPos);
             }
         }
 
@@ -352,7 +382,7 @@ public class MlpNetMath2Test {
             for (int trainPos = 0; trainPos < 1200; trainPos++) {
                 //for (int trainPos = 0; trainPos < 20; trainPos++) {
                 trainTheTrainer(config, layerSizeArr, rnd, result, weightTrainer, trainLayerPos, epochMax);
-                System.out.printf("trainPos: %d\n", trainPos);
+                System.out.printf("trainPos:%d\n", trainPos);
             }
         }
 
@@ -512,8 +542,8 @@ public class MlpNetMath2Test {
                                                                        weightTrainerArr,
                         trainerLearningRate, trainerMomentum);
 
-        //if (trainData.mainOutputMseErrorValue < 0.0001F) {
-        if (trainData.mainOutputMseErrorValue < 0.05F) {
+        if (trainData.mainOutputMseErrorValue < 0.0001F) {
+        //if (trainData.mainOutputMseErrorValue < 0.05F) {
             trainData.successfulCounter++;
         } else {
             trainData.successfulCounter = 0;
@@ -521,11 +551,11 @@ public class MlpNetMath2Test {
         trainData.epochPos++;
     }
 
-    private void printTrainerMse(final int trainPos, final MlpWeightTrainer[] weightTrainerArr) {
+    private void printTrainerMse(final int trainPos, final MlpWeightTrainer[] weightTrainerArr, final int trainDataPos) {
         final String trainerMseStr = Arrays.stream(weightTrainerArr).
                 map(weightTrainer -> String.format("%.8f", weightTrainer.trainerMse)).
                 collect(Collectors.joining(", ", "[", "]"));
-        System.out.printf("trainPos: %d, trainerMse: %s\n", trainPos, trainerMseStr);
+        System.out.printf("trainPos:%d, trainDataPos:%4d, trainerMse:%s\n", trainPos, trainDataPos, trainerMseStr);
     }
 
     private void printTrainerMse(final MlpWeightTrainer[] weightTrainerArr) {

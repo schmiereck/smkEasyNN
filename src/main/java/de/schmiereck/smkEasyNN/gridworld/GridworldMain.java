@@ -6,7 +6,9 @@ import de.schmiereck.smkEasyNN.mlp.MlpConfiguration;
 import de.schmiereck.smkEasyNN.mlp.MlpLayerConfig;
 import de.schmiereck.smkEasyNN.mlp.MlpNet;
 import de.schmiereck.smkEasyNN.mlp.MlpNetService;
+import de.schmiereck.smkEasyNN.mlp.persistent.MlpPersistentService;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,64 +66,98 @@ public class GridworldMain {
             final MlpLayerConfig[] layerConfigArr;
             final int netType = netPos % 3;
             final MlpNet net;
-            switch (netType) {
-                case 0 -> {
-                    config = new MlpConfiguration(true, true);
-                    layerConfigArr = new MlpLayerConfig[6];
-                    layerConfigArr[0] = new MlpLayerConfig(64 + 1);
-                    layerConfigArr[1] = new MlpLayerConfig(164 + 1);
-                    layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+            final File netFile = createNetFile(netPos);
+            if (netFile.exists()) {
+                net = MlpPersistentService.loadNet(netFile);
+            } else {
+                switch (netType) {
+                    case 0 -> {
+                        config = new MlpConfiguration(true, true);
+                        layerConfigArr = new MlpLayerConfig[8];
+                        layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+                        layerConfigArr[0].setIsLimited(4 * 4, true);
 
-                    layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
-                    layerConfigArr[4] = new MlpLayerConfig(32);
+                        layerConfigArr[1] = new MlpLayerConfig(164 + 1);
+                        layerConfigArr[1].setIsLimited(4 * 4, true);
 
-                    layerConfigArr[5] = new MlpLayerConfig(4);
+                        layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+                        layerConfigArr[2].setIsLimited(32, true);
 
-                    net = MlpNetService.createNet(config, layerConfigArr, rnd);
+                        layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+                        layerConfigArr[3].setIsLimited(32, true);
 
-                    MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
-                }
-                case 1 -> {
-                    config = new MlpConfiguration(true, true);
-                    layerConfigArr = new MlpLayerConfig[6];
-                    layerConfigArr[0] = new MlpLayerConfig(64 + 1);
-                    layerConfigArr[1] = new MlpLayerConfig(164 + 1);
-                    layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+                        layerConfigArr[4] = new MlpLayerConfig(32);
+                        layerConfigArr[4].setIsLimited(32, true);
 
-                    layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
-                    layerConfigArr[4] = new MlpLayerConfig(32);
+                        layerConfigArr[5] = new MlpLayerConfig(32);
+                        layerConfigArr[5].setIsLimited(32, true);
 
-                    layerConfigArr[5] = new MlpLayerConfig(4);
+                        layerConfigArr[6] = new MlpLayerConfig(32);
+                        layerConfigArr[6].setIsLimited(32, true);
 
-                    net = MlpNetService.createNet(config, layerConfigArr, rnd);
+                        layerConfigArr[7] = new MlpLayerConfig(4);
 
-                    MlpNetService.createInternalInputs(net, 4, 16, 31, rnd);
-                }
-                default -> {
-                    config = new MlpConfiguration(true, rnd.nextBoolean());
-                    layerConfigArr = new MlpLayerConfig[6];
-                    layerConfigArr[0] = new MlpLayerConfig(64 + 1);
-                    layerConfigArr[1] = new MlpLayerConfig(164 + 1);
-                    layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+                        net = MlpNetService.createNet(config, layerConfigArr, rnd);
 
-                    layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
-                    layerConfigArr[4] = new MlpLayerConfig(32);
+                        MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
+                    }
+                    case 1 -> {
+                        config = new MlpConfiguration(true, true);
+                        layerConfigArr = new MlpLayerConfig[6];
+                        layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+                        layerConfigArr[0].setIsLimited(4 * 4, true);
 
-                    layerConfigArr[5] = new MlpLayerConfig(4);
+                        layerConfigArr[1] = new MlpLayerConfig(164 + 1);
+                        layerConfigArr[1].setIsLimited(4 * 4, true);
 
-                    net = MlpNetService.createNet(config, layerConfigArr, rnd);
+                        layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+                        layerConfigArr[2].setIsLimited(32, true);
 
-                    MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
+                        layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+                        layerConfigArr[3].setIsLimited(32, true);
+
+                        layerConfigArr[4] = new MlpLayerConfig(32);
+                        layerConfigArr[4].setIsLimited(32, true);
+
+                        layerConfigArr[5] = new MlpLayerConfig(4);
+
+                        net = MlpNetService.createNet(config, layerConfigArr, rnd);
+
+                        MlpNetService.createInternalInputs(net, 4, 16, 31, rnd);
+                    }
+                    default -> {
+                        config = new MlpConfiguration(true, rnd.nextBoolean());
+                        layerConfigArr = new MlpLayerConfig[6];
+                        layerConfigArr[0] = new MlpLayerConfig(64 + 1);
+                        layerConfigArr[0].setIsLimited(4 * 4, true);
+
+                        layerConfigArr[1] = new MlpLayerConfig(164 + 1);
+                        layerConfigArr[1].setIsLimited(4 * 4, true);
+
+                        layerConfigArr[2] = new MlpLayerConfig(64 * 2 + rnd.nextInt(64));
+                        layerConfigArr[2].setIsLimited(32, true);
+
+                        layerConfigArr[3] = new MlpLayerConfig(64 + rnd.nextInt(64));
+                        layerConfigArr[3].setIsLimited(32, true);
+
+                        layerConfigArr[4] = new MlpLayerConfig(32);
+                        layerConfigArr[4].setIsLimited(32, true);
+
+                        layerConfigArr[5] = new MlpLayerConfig(4);
+
+                        net = MlpNetService.createNet(config, layerConfigArr, rnd);
+
+                        MlpNetService.createInternalInputs(net, 5, 0, 3, rnd);
+                    }
                 }
             }
-
             //layerConfigArr[0].setIsArray(true,4, 4, 16, 4, 1);
             //layerConfigArr[1].setIsArray(true,4, 4, 16, 4, 1);
 
             //gameStatisticArr[netPos] = new GameStatistic(netPos);
-            final GameStatistic gameStatistic = new GameStatistic(netType, netPos);
+            final GameStatistic gameStatistic = new GameStatistic(netPos, netType, netPos);
 
-            gameStatistic.learningRate = rnd.nextFloat( 0.6F) + 0.05F;
+            gameStatistic.learningRate = rnd.nextFloat( 0.06F) + 0.01F;
             gameStatistic.momentum = rnd.nextFloat( 0.9F) + 0.05F;
                     //addForwwardInputs(netArr[netPos], 2, 1, rnd);
             //addForwwardInputs(netArr[netPos], 3, 2, rnd);
@@ -221,17 +257,26 @@ public class GridworldMain {
 
                 final MlpNet fittestNet = netArr.get(fittestGameStatistic);
                 final MlpNet newNet = copyNet(fittestNet);
-                final GameStatistic newGameStatistic = copyGameStatistic(newNetPos, fittestGameStatistic);
+                final GameStatistic newGameStatistic = copyGameStatistic(worstGameStatistic.netID, newNetPos, fittestGameStatistic);
                 newNetPos++;
 
                 netArr.remove(worstGameStatistic);
                 netArr.put(newGameStatistic, newNet);
             }
+            netArr.keySet().stream().forEach(gameStatistic -> {
+                final File netFile = createNetFile(gameStatistic.netID);
+                MlpPersistentService.saveNet(netFile, netArr.get(gameStatistic));
+            });
         }
     }
 
-    private static GameStatistic copyGameStatistic(final int newNetPos, final GameStatistic gameStatistic) {
-        final GameStatistic newGameStatistic = new GameStatistic(gameStatistic.netType, newNetPos);
+    private static File createNetFile(int netPos) {
+        final File netFile = new File("./gridworld-data/gridworld-%d.mlp".formatted(netPos));
+        return netFile;
+    }
+
+    private static GameStatistic copyGameStatistic(final int newNetID, final int newNetPos, final GameStatistic gameStatistic) {
+        final GameStatistic newGameStatistic = new GameStatistic(newNetID, gameStatistic.netType, newNetPos);
 
         newGameStatistic.moveCounter = gameStatistic.moveCounter;
         newGameStatistic.hitGoalCounter = gameStatistic.hitGoalCounter;

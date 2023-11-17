@@ -1,6 +1,7 @@
 package de.schmiereck.smkEasyNN.gridworld;
 
 public class GameStatistic {
+    public final int netID;
     public final int netType;
     public final int netPos;
     public int hitGoalCounter = 0;
@@ -20,7 +21,8 @@ public class GameStatistic {
     public float learningRate = 0.3F;
     public float momentum = 0.6F;
 
-    GameStatistic(final int netType, final int netPos) {
+    GameStatistic(final int netID, final int netType, final int netPos) {
+        this.netID = netID;
         this.netType = netType;
         this.netPos = netPos;
     }
