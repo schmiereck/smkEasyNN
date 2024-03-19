@@ -83,4 +83,8 @@ Architecture:
   * https://stackoverflow.com/questions/9951487/implementing-a-neural-network-in-java-training-and-backpropagation-issues
 * Betreff: Die seltsamen Fehlleistungen neuronaler Netze - Heidelberg Laureate Forum - SciLogs - Wissenschaftsblogs
   * https://scilogs.spektrum.de/hlf/die-seltsamen-fehlleistungen-neuronaler-netze/
+* Stephen Wolfram sucht nach der Weltformel der Physik - Spektrum der Wissenschaft
+  * https://www.spektrum.de/news/stephen-wolfram-sucht-nach-der-weltformel-der-physik/2203229
+* Missing Link: Stephen Wolfram über die Rolle der KI in der Forschung (Teil 2) | heise online
+  * https://www.heise.de/hintergrund/Missing-Link-Stephen-Wolfram-ueber-die-Rolle-der-KI-in-der-Forschung-Teil-2-9650643.html 
 
