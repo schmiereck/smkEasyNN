@@ -51,7 +51,7 @@ public class MlpNetValueToValueBottleneckTest {
         // better Results: lower mutationRate (/10), bigger population size (*10), bigger epoche size (*10)
         final float minMutationRate = 0.015F;
         final float maxMutationRate = 0.2F;
-        final int populationSize = 1600;
+        final int populationSize = 3_200;
         final int epocheSize = 16_000;
         final float copyPercent = 0.0025F;
         final int epochMax = 8000;

@@ -9,7 +9,7 @@ public class GenNetTrainService {
 
     static GenNet runTrainNet(final GenNet genNet, final float mutationRate, final int populationSize,
                               final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
-        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr, rnd);
+        return runTrainNet(genNet, 0.0F, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr, rnd);
     }
 
     static GenNet runTrainNet(final int[] layerSizeArr, final float minMutationRate, final float maxMutationRate, final int populationSize,
