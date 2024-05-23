@@ -31,11 +31,15 @@ public class GenCountMain {
         final GenNet genNet = GenNetService.createNet(layerSizeArr, rnd);
 
         // better Results: lower mutationRate (/10), bigger population size (*10), bigger epoche size (*10)
-        final float mutationRate = 0.15F;
-        final int populationSize = 60;
-        final int epocheSize = 6_000;
+        final float minMutationRate = 0.014F;
+        final float maxMutationRate = 0.18F;
+        final float copyPercent = 0.011F;
+        final int populationSize = 800;
+        final int epocheSize = 1_000;
 
-        final GenNet trainedGenNet = GenNetTrainService.runTrainNet(genNet, mutationRate, populationSize, epocheSize, 0.3F, expectedOutputArrArr, trainInputArrArr, rnd);
+        final GenNet trainedGenNet = GenNetTrainService.runTrainNet(genNet,
+                minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent,
+                expectedOutputArrArr, trainInputArrArr, rnd);
 
         showWinner(trainedGenNet, expectedOutputArrArr, trainInputArrArr);
     }

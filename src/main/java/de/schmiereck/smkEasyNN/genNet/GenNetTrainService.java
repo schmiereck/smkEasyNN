@@ -4,16 +4,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class GenNetTrainService {
 
     static GenNet runTrainNet(final GenNet genNet, final float mutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
-        return runTrainNet(genNet, 0.0F, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr, rnd);
+                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Random rnd) {
+        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+                rnd);
+    }
+
+    static GenNet runTrainNet(final GenNet genNet, final float minMutationRate, final float maxMutationRate, final int populationSize,
+                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Random rnd) {
+        return runTrainNet(genNet, minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+                (epochePos) -> System.out.printf("Epoch %8d:", epochePos),
+                (error) -> System.out.printf(" %5.3f", error),
+                () -> System.out.println(),
+                rnd);
+    }
+
+    static GenNet runTrainNet(final GenNet genNet, final float mutationRate, final int populationSize,
+                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Consumer<Integer> printEpoch,
+                              final Consumer<Float> printError,
+                              final Runnable printEndline,
+                              final Random rnd) {
+        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+                printEpoch, printError, printEndline,
+                rnd);
     }
 
     static GenNet runTrainNet(final int[] layerSizeArr, final float minMutationRate, final float maxMutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Consumer<Integer> printEpoch,
+                              final Consumer<Float> printError,
+                              final Runnable printEndline,
+                              final Random rnd) {
         final List<GenNet> genNetList = new ArrayList<>();
 
         for (int netPos = 0; netPos < populationSize; netPos++) {
@@ -21,11 +49,17 @@ public class GenNetTrainService {
             genNetList.add(genNet);
         }
 
-        return runTrainNet(genNetList, minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr, rnd);
+        return runTrainNet(genNetList, minMutationRate, maxMutationRate, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+                printEpoch, printError, printEndline,
+                rnd);
     }
 
     static GenNet runTrainNet(final GenNet genNet, final float minMutationRate, final float maxMutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Consumer<Integer> printEpoch,
+                              final Consumer<Float> printError,
+                              final Runnable printEndline,
+                              final Random rnd) {
         final List<GenNet> genNetList = new ArrayList<>();
 
         for (int netPos = 0; netPos < populationSize; netPos++) {
@@ -35,20 +69,26 @@ public class GenNetTrainService {
             genNetList.add(mutatedGenNet);
         }
 
-        return runTrainNet(genNetList, minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr, rnd);
+        return runTrainNet(genNetList, minMutationRate, maxMutationRate, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+                printEpoch, printError, printEndline,
+                rnd);
     }
 
-    static GenNet runTrainNet(final List<GenNet> genNetList, final float minMutationRate, final float maxMutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr, final Random rnd) {
+    static GenNet runTrainNet(final List<GenNet> genNetList, final float minMutationRate, final float maxMutationRate,
+                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Consumer<Integer> printEpoch,
+                              final Consumer<Float> printError,
+                              final Runnable printEndline,
+                              final Random rnd) {
         for (int epochePos = 0; epochePos < epocheSize; epochePos++) {
-            System.out.printf("Epoch %8d:", epochePos);
+            printEpoch.accept(epochePos);
 
             calcErrorAndSort(genNetList, expectedOutputArrArr, trainInputArrArr);
 
             genNetList.forEach(mutatedGenNet -> {
-                System.out.printf(" %5.3f", mutatedGenNet.error);
+                printError.accept(mutatedGenNet.error);
             });
-            System.out.println();
+            printEndline.run();
 
             if (epochePos >= epocheSize - 1) {
                 break;
@@ -62,7 +102,7 @@ public class GenNetTrainService {
         genNetList.forEach(mutatedGenNet -> {
             calcNetInOutError(mutatedGenNet, expectedOutputArrArr, trainInputArrArr);
         });
-        genNetList.sort((o1, o2) -> Float.compare(o1.error, o2.error));
+        genNetList.sort((o1Net, o2Net) -> Float.compare(o1Net.error, o2Net.error));
     }
 
     private static void calcNetInOutError(final GenNet genNet, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr) {
@@ -82,6 +122,7 @@ public class GenNetTrainService {
 
     private static void calcNextGeneration(final List<GenNet> genNetList, final float minMutationRate, final float maxMutationRate, final float copyPercent, final Random rnd) {
         final float mutationRate = calcMutationRate(minMutationRate, maxMutationRate, rnd);
+        final float mutationRate2 = calcMutationRate2(minMutationRate, maxMutationRate, rnd);
         final int copySize = calcMutationCount(genNetList.size(), copyPercent, 1);
         final int selectSize = genNetList.size() - copySize;
 
@@ -94,21 +135,45 @@ public class GenNetTrainService {
 
         nextGenNetList.addAll(copyGenNetList);
         for (int selectCnt = 0; selectCnt < selectSize; selectCnt++) {
-            final int netSelectPos = rnd.nextInt(selectCnt + 1);
-            //final int netSelectPos = selectCnt;
-            final GenNet net = selectGenNetList.get(netSelectPos);
-            final GenNet mutatedNet = createMutatedNet(net, mutationRate, rnd);
+            //final GenNet net = selectNet(selectGenNetList, selectCnt, rnd);
+            final GenNet net = selectNet2(selectGenNetList, selectCnt, selectSize, rnd);
+            final float usedMutationRate;
+            if (rnd.nextBoolean()) {
+                usedMutationRate = mutationRate;
+            } else {
+                usedMutationRate = mutationRate2;
+            }
+            final GenNet mutatedNet = createMutatedNet(net, usedMutationRate, rnd);
             nextGenNetList.add(mutatedNet);
         }
         genNetList.clear();
         genNetList.addAll(nextGenNetList);
     }
 
-    private static float calcMutationRate(float minMutationRate, float maxMutationRate, Random rnd) {
-        return rnd.nextFloat(minMutationRate, maxMutationRate);
+    private static GenNet selectNet(final List<GenNet> selectGenNetList, final int selectCnt, final Random rnd) {
+        final int netSelectPos = rnd.nextInt(selectCnt + 1);
+        //final int netSelectPos = selectCnt;
+        final GenNet net = selectGenNetList.get(netSelectPos);
+        return net;
     }
 
-    private static float calcMutationRate2(float minMutationRate, float maxMutationRate, Random rnd) {
+    private static GenNet selectNet2(final List<GenNet> genNetList, final int selectCnt, final int selectSize, final Random rnd) {
+        final int maxSelectCnt = (genNetList.size() * (selectCnt + 1)) / selectSize;
+        final int netSelectPos = rnd.nextInt(maxSelectCnt);
+        //final int netSelectPos = selectCnt;
+        final GenNet net = genNetList.get(netSelectPos);
+        return net;
+    }
+
+    private static float calcMutationRate(final float minMutationRate, final float maxMutationRate, final Random rnd) {
+        if (minMutationRate == maxMutationRate) {
+            return rnd.nextFloat(maxMutationRate);
+        } else {
+            return rnd.nextFloat(minMutationRate, maxMutationRate);
+        }
+    }
+
+    private static float calcMutationRate2(final float minMutationRate, final float maxMutationRate, final Random rnd) {
         //final float mutationRate = rnd.nextFloat(minMutationRate, maxMutationRate);
         final float mutationRate;
         if (rnd.nextBoolean()) {

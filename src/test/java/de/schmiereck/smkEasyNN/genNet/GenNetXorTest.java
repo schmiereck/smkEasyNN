@@ -51,12 +51,16 @@ public class GenNetXorTest {
         }
 
         // better Results: lower mutationRate (/10), bigger population size (*10), bigger epoche size (*10)
-        final float mutationRate = 0.1F;
+        final float minMutationRate = 0.1F;//0.014F;
+        final float maxMutationRate = 0.18F;//0.18F;
+        final float copyPercent = 0.011F;
         final int populationSize = 60;
-        final int epocheSize = 1_500;
+        final int epocheSize = 1_000;
         final int epochMax = 1500;
 
-        final GenNet trainedGenNet = GenNetTrainService.runTrainNet(genNet, mutationRate, populationSize, epocheSize, 0.0F, expectedOutputArrArr, trainInputArrArr, rnd);
+        final GenNet trainedGenNet = GenNetTrainService.runTrainNet(genNet,
+                minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent,
+                expectedOutputArrArr, trainInputArrArr, rnd);
 
         // Act & Assert
         System.out.println("Act & Assert 1");
@@ -109,12 +113,16 @@ public class GenNetXorTest {
         }
 
         // better Results: lower mutationRate (/10), bigger population size (*10), bigger epoche size (*10)
-        final float mutationRate = 0.15F;
+        final float minMutationRate = 0.1F;//0.014F;
+        final float maxMutationRate = 0.18F;//0.18F;
+        final float copyPercent = 0.011F;
         final int populationSize = 60;
-        final int epocheSize = 1_500;
+        final int epocheSize = 1_000;
         final int epochMax = 1500;
 
-        final GenNet trainedGenNet = GenNetTrainService.runTrainNet(genNet, mutationRate, populationSize, epocheSize, 0.3F, expectedOutputArrArr, trainInputArrArr, rnd);
+        final GenNet trainedGenNet = GenNetTrainService.runTrainNet(genNet,
+                minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent,
+                expectedOutputArrArr, trainInputArrArr, rnd);
 
         // Act & Assert
         Assertions.assertEquals(2, genNet.inputNeuronList.size());
