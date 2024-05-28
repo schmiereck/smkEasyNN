@@ -151,7 +151,6 @@ public class HexGridController {
                     partColor = Color.CORAL;
                     for (final HexDir hexDir : HexDir.values()) {
                         hexCellModel.dirArr[hexDir.ordinal()].setStroke(FIELD_DIR_COLOR);
-
                     }
                 } else {
                     double fieldSum = 0.0D;

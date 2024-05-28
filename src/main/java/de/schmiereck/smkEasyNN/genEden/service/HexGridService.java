@@ -13,9 +13,9 @@ public class HexGridService {
     public HexGridService() {
         this.hexGrid.getGridNode(2, 7).setOutPart(new Part());
         this.hexGrid.getGridNode(12, 14).setOutPart(new Part());
-        final int partCount = (hexGrid.xSize * hexGrid.ySize) / 30;
+        final int partCount = (hexGrid.xSize * hexGrid.ySize) / 28;
         for (int pos = 0; pos < partCount; pos++) {
-            final int xPos = rnd.nextInt(this.hexGrid.xSize/3);
+            final int xPos = rnd.nextInt(this.hexGrid.xSize / 3);
             final int yPos = rnd.nextInt(this.hexGrid.ySize);
             final GridNode targetGridNode = this.hexGrid.getGridNode(xPos, yPos);
             if (Objects.isNull(targetGridNode.getOutPart())) {
