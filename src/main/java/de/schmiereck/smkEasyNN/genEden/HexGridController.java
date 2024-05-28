@@ -11,7 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
 
 import java.util.Objects;
 
@@ -22,9 +21,10 @@ public class HexGridController {
     public static final double X_OFFSET_1 = (1.5D);
     public static final double Y_SPACE = (Math.sqrt(3) / 2.0D);
 
-    public static final double SCALE = 2.0D;
+    public static final double SCALE = 1.0D;//2.0D;
     public static final double STROKE_WIDTH = 1.0D * SCALE;
     public static final double FIELD_STROKE_WIDTH = 2.0D * SCALE;
+    public static final Color FIELD_DIR_COLOR = Color.color(1.0D, 1.0D, 0.0D);
 
     private HexGridService hexGridService;
     private LifeService lifeService;
@@ -73,13 +73,13 @@ public class HexGridController {
             for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
                 final GridNode gridNode = this.hexGridService.retrieveGridNode(xPos, yPos);
                 HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
-                if (Objects.nonNull(gridNode.getPart())) {
+                if (Objects.nonNull(gridNode.getOutPart())) {
                     hexCellModel.partModel = new PartModel();
                 } else {
                     hexCellModel.partModel = null;
                 }
-                for (final InDir inDir : InDir.values()) {
-                    hexCellModel.fieldArr[inDir.ordinal()] = gridNode.getInField(inDir).outValue;
+                for (final HexDir hexDir : HexDir.values()) {
+                    hexCellModel.fieldArr[hexDir.ordinal()] = gridNode.getField(hexDir).outValue;
                 }
             }
         }
@@ -127,6 +127,7 @@ public class HexGridController {
         for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
             for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
                 final double offsetX = yPos % 2 == 0 ? X_OFFSET_0 : hexGridModel.size * X_OFFSET_1;
+
                 final Polygon hexagon = createHexagon(xBordOffset, yBordOffset, offsetX, hexGridModel.size - STROKE_WIDTH, xPos, yPos);
                 pane.getChildren().add(hexagon);
 
@@ -134,6 +135,7 @@ public class HexGridController {
                 for (int edgePos = 0; edgePos < 6; edgePos++) {
                     pane.getChildren().add(dirArr[edgePos]);
                 }
+
                 hexGridModel.grid[xPos][yPos] = new HexCellModel(hexagon, dirArr);
             }
         }
@@ -147,21 +149,25 @@ public class HexGridController {
                 final Color partColor;
                 if (Objects.nonNull(hexGridModel.grid[xPos][yPos].partModel)) {
                     partColor = Color.CORAL;
+                    for (final HexDir hexDir : HexDir.values()) {
+                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(FIELD_DIR_COLOR);
+
+                    }
                 } else {
                     double fieldSum = 0.0D;
-                    for (final InDir inDir : InDir.values()) {
-                        fieldSum += hexCellModel.fieldArr[inDir.ordinal()] / 2.0D; // 6.0D;
-                        double field = hexCellModel.fieldArr[inDir.ordinal()];
+                    for (final HexDir hexDir : HexDir.values()) {
+                        fieldSum += hexCellModel.fieldArr[hexDir.ordinal()] / 2.0D; // 6.0D;
+                        double field = hexCellModel.fieldArr[hexDir.ordinal()];
                         //if (field > 0.0D) {
                         //    hexCellModel.dirArr[inDir.ordinal()].setStroke(Color.BLUE);//color(0.0D, 0.0D, field / 2.0D));
                         //} else {
                         //    hexCellModel.dirArr[inDir.ordinal()].setStroke(Color.BLACK);
                         //}
-                        hexCellModel.dirArr[inDir.ordinal()].setStroke(Color.color(0.0D, 0.0D, Math.tanh(field)));
+                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(Color.color(1.0D, 1.0D, 1.0D - Math.tanh(field)));
                     }
                     //partColor = Color.gray(fieldSum);
                     //partColor = Color.color(fieldSum, 0, 0);
-                    partColor = Color.BLACK;
+                    partColor = Color.WHITE;
                 }
                 hexagon.setFill(partColor);
             }
@@ -177,8 +183,8 @@ public class HexGridController {
         }
         hexagon.setLayoutX(xBordOffset + (xPos * (hexGridModel.size * X_SPACE)) + offsetX);
         hexagon.setLayoutY(yBordOffset + (yPos * (hexGridModel.size * Y_SPACE)));
-        hexagon.setFill(Color.LIGHTGRAY);
-        hexagon.setStroke(Color.GRAY);
+        hexagon.setFill(Color.WHITE);
+        hexagon.setStroke(Color.gray(0.975D));
         hexagon.setStrokeWidth(STROKE_WIDTH);
         return hexagon;
     }

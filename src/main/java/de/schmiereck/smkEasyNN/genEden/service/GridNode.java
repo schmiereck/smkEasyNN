@@ -3,14 +3,15 @@ package de.schmiereck.smkEasyNN.genEden.service;
 public class GridNode {
     private final int xPos;
     private final int yPos;
-    private Part part;
-    private Field[] inFieldArr = new Field[InDir.values().length];
+    private Part inPart;
+    private Part outPart;
+    private Field[] fieldArr = new Field[HexDir.values().length];
 
     public GridNode(final int xPos, final int yPos) {
         this.xPos = xPos;
         this.yPos = yPos;
-        for (final InDir inDir : InDir.values()) {
-            this.inFieldArr[inDir.ordinal()] = new Field();
+        for (final HexDir hexDir : HexDir.values()) {
+            this.fieldArr[hexDir.ordinal()] = new Field();
         }
     }
 
@@ -22,15 +23,23 @@ public class GridNode {
         return this.yPos;
     }
 
-    public void setPart(final Part part) {
-        this.part = part;
+    public void setInPart(final Part inPart) {
+        this.inPart = inPart;
     }
 
-    public Part getPart() {
-        return this.part;
+    public Part getInPart() {
+        return this.inPart;
     }
 
-    public Field getInField(final InDir inDir) {
-        return this.inFieldArr[inDir.ordinal()];
+    public void setOutPart(final Part outPart) {
+        this.outPart = outPart;
+    }
+
+    public Part getOutPart() {
+        return this.outPart;
+    }
+
+    public Field getField(final HexDir hexDir) {
+        return this.fieldArr[hexDir.ordinal()];
     }
 }
