@@ -7,23 +7,27 @@ public class HexGridService {
     private HexGrid hexGrid = new HexGrid(30*2, 30*3);
     private int stepCount = 0;
     private int partCount = 0;
-    private static int MAX_MOVE_CNT = 4;
-    private static final Random rnd = new Random();
+    static final Random rnd = new Random();
+    private final DemoPartService demoPartService;
+    private final GeneticPartService geneticPartService;
 
     public HexGridService() {
-        this.hexGrid.getGridNode(2, 7).setOutPart(new Part());
-        this.hexGrid.getGridNode(12, 14).setOutPart(new Part());
-        final int partCount = (hexGrid.xSize * hexGrid.ySize) / 28;
-        for (int pos = 0; pos < partCount; pos++) {
-            final int xPos = rnd.nextInt(this.hexGrid.xSize / 3);
-            final int yPos = rnd.nextInt(this.hexGrid.ySize);
-            final GridNode targetGridNode = this.hexGrid.getGridNode(xPos, yPos);
-            if (Objects.isNull(targetGridNode.getOutPart())) {
-                final Part part = new Part();
-                part.moveCnt = rnd.nextInt(MAX_MOVE_CNT);
-                targetGridNode.setOutPart(part);
-            }
-        }
+        this.demoPartService = new DemoPartService(this);
+        this.geneticPartService = new GeneticPartService(this);
+
+        this.hexGrid.getGridNode(2, 7).setOutPart(this.demoPartService.createDemoPart());
+        this.hexGrid.getGridNode(12, 14).setOutPart(this.demoPartService.createDemoPart());
+
+        this.demoPartService.initDemoParts();
+        //this.geneticPartService.initDemoParts();
+    }
+
+    int getYGridSize() {
+        return this.hexGrid.ySize;
+    }
+
+    int getXGridSize() {
+        return this.hexGrid.xSize;
     }
 
     public int retrieveStepCount() {
@@ -121,8 +125,8 @@ public class HexGridService {
     private void calcGrid() {
         //--------------------------------------------------------------------------------------------------------------
         // Field: Out -> In
-        for (int yPos = 0; yPos < this.hexGrid.ySize; yPos++) {
-            for (int xPos = 0; xPos < this.hexGrid.xSize; xPos++) {
+        for (int yPos = 0; yPos < this.getYGridSize(); yPos++) {
+            for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
                 final Part part = gridNode.getOutPart();
                 //if (Objects.isNull(part))
@@ -157,8 +161,8 @@ public class HexGridService {
         }
         //--------------------------------------------------------------------------------------------------------------
         // Field: In -> Out
-        for (int yPos = 0; yPos < this.hexGrid.ySize; yPos++) {
-            for (int xPos = 0; xPos < this.hexGrid.xSize; xPos++) {
+        for (int yPos = 0; yPos < this.getYGridSize(); yPos++) {
+            for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
                 for (final HexDir hexDir : HexDir.values()) {
                     final Field field = gridNode.getField(hexDir);
@@ -169,8 +173,8 @@ public class HexGridService {
         }
         //--------------------------------------------------------------------------------------------------------------
         // Part: Out -> In
-        for (int yPos = 0; yPos < this.hexGrid.ySize; yPos++) {
-            for (int xPos = 0; xPos < this.hexGrid.xSize; xPos++) {
+        for (int yPos = 0; yPos < this.getYGridSize(); yPos++) {
+            for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
                 this.calcPart(gridNode);
             }
@@ -180,8 +184,8 @@ public class HexGridService {
         // Part-Field: Out
         // Part: In -> Out
         this.partCount = 0;
-        for (int yPos = 0; yPos < this.hexGrid.ySize; yPos++) {
-            for (int xPos = 0; xPos < this.hexGrid.xSize; xPos++) {
+        for (int yPos = 0; yPos < this.getYGridSize(); yPos++) {
+            for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
                 final Part outPart = gridNode.getOutPart();
                 if (Objects.nonNull(outPart)) {
@@ -217,7 +221,7 @@ public class HexGridService {
         return HexDir.values()[(hexDir.ordinal() + dirOff + HexDir.values().length) % HexDir.values().length];
     }
 
-    private HexDir calcOppositeDir(final HexDir hexDir) {
+    static HexDir calcOppositeDir(final HexDir hexDir) {
         final HexDir outDir =
                 switch (hexDir) {
                     case InDir0 -> HexDir.InDir3;
@@ -233,46 +237,14 @@ public class HexGridService {
     private void calcPart(final GridNode sourceGridNode) {
         final Part part = sourceGridNode.getOutPart();
         if (Objects.nonNull(part)) {
-            final GridNode targetGridNode;
-            if (part.moveCnt >= MAX_MOVE_CNT) {
-                //double targetFieldValue = 0.0D;//Double.MAX_VALUE;
-                double targetFieldValue = Double.MAX_VALUE;
-                HexDir targetDir = null;
-                final int startDirOrdinal;
-                if (Objects.isNull(part.lastDir)) {
-                    startDirOrdinal = rnd.nextInt(HexDir.values().length);
-                } else {
-                    startDirOrdinal = part.lastDir.ordinal();
-                }
-                for (final HexDir posHexDir : HexDir.values()) {
-                    final HexDir hexDir = HexDir.values()[(startDirOrdinal + posHexDir.ordinal()) % HexDir.values().length];
-                    final GridNode moveGridNode = this.retrieveGridNode(sourceGridNode.getXPos(), sourceGridNode.getYPos(), hexDir);
-                    if (Objects.isNull(moveGridNode.getInPart()) && Objects.isNull(moveGridNode.getOutPart())) {
-                        final HexDir oppositeHexDir = calcOppositeDir(hexDir);
-                        final double dirFieldValue = moveGridNode.getField(oppositeHexDir).outValue;
-                        if (dirFieldValue < targetFieldValue) {
-                            targetFieldValue = dirFieldValue;
-                            targetDir = hexDir;
-                        }
-                    }
-                }
-                final HexDir moveDir;
-                if (Objects.isNull(targetDir)) {
-                    moveDir = HexDir.values()[rnd.nextInt(HexDir.values().length)];
-                } else {
-                    moveDir = targetDir;
-                }
-
-                part.lastDir = moveDir;
-                part.moveCnt = 0;
-                targetGridNode = this.retrieveGridNode(sourceGridNode.getXPos(), sourceGridNode.getYPos(), moveDir);
+            if (part instanceof DemoPart) {
+                this.demoPartService.calcPart(sourceGridNode, (DemoPart) part);
             } else {
-                part.moveCnt++;
-                targetGridNode = sourceGridNode;
-            }
-
-            if (Objects.isNull(targetGridNode.getInPart())) {
-                targetGridNode.setInPart(part);
+                if (part instanceof GeneticPart) {
+                    this.geneticPartService.calcPart(sourceGridNode, (GeneticPart) part);
+                } else {
+                    throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
+                }
             }
         }
     }
