@@ -12,6 +12,9 @@ public class DemoPartService {
     }
 
     public void initDemoParts() {
+        this.hexGridService.retrieveGridNode(2, 7).setOutPart(this.createDemoPart());
+        this.hexGridService.retrieveGridNode(12, 14).setOutPart(this.createDemoPart());
+
         final int partCount = (this.hexGridService.getXGridSize() * this.hexGridService.getYGridSize()) / 28;
         for (int pos = 0; pos < partCount; pos++) {
             final int xPos = HexGridService.rnd.nextInt(this.hexGridService.getXGridSize() / 3);
@@ -25,7 +28,14 @@ public class DemoPartService {
     }
 
     public Part createDemoPart() {
-        final DemoPart part = new DemoPart();
+        final double[] visibleValueArr = new double[] {
+                0.5D,
+                0.5D,
+                //HexGridService.rnd.nextDouble(0.25D) + 0.75D,
+                //HexGridService.rnd.nextDouble(0.25D) + 0.75D
+                1.0D
+        };
+        final DemoPart part = new DemoPart(visibleValueArr);
         part.moveCnt = HexGridService.rnd.nextInt(MAX_MOVE_CNT);
         return part;
     }
@@ -47,7 +57,7 @@ public class DemoPartService {
                 final GridNode moveGridNode = this.hexGridService.retrieveGridNode(sourceGridNode.getXPos(), sourceGridNode.getYPos(), hexDir);
                 if (Objects.isNull(moveGridNode.getInPart()) && Objects.isNull(moveGridNode.getOutPart())) {
                     final HexDir oppositeHexDir = HexGridService.calcOppositeDir(hexDir);
-                    final double dirFieldValue = moveGridNode.getField(oppositeHexDir).outValue;
+                    final double dirFieldValue = sumFieldArr(moveGridNode.getField(oppositeHexDir).outValueArr);
                     if (dirFieldValue < targetFieldValue) {
                         targetFieldValue = dirFieldValue;
                         targetDir = hexDir;
@@ -72,5 +82,9 @@ public class DemoPartService {
         if (Objects.isNull(targetGridNode.getInPart())) {
             targetGridNode.setInPart(part);
         }
+    }
+
+    private static double sumFieldArr(final double[] outValueArr) {
+        return outValueArr[0] + outValueArr[1] + outValueArr[2];
     }
 }

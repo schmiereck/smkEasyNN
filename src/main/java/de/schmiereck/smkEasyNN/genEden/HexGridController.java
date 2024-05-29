@@ -72,14 +72,17 @@ public class HexGridController {
         for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
             for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
                 final GridNode gridNode = this.hexGridService.retrieveGridNode(xPos, yPos);
-                HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
-                if (Objects.nonNull(gridNode.getOutPart())) {
-                    hexCellModel.partModel = new PartModel();
+                final Part outPart = gridNode.getOutPart();
+                final HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
+                if (Objects.nonNull(outPart)) {
+                    hexCellModel.partModel = new PartModel(outPart.getVisibleValueArr());
                 } else {
                     hexCellModel.partModel = null;
                 }
                 for (final HexDir hexDir : HexDir.values()) {
-                    hexCellModel.fieldArr[hexDir.ordinal()] = gridNode.getField(hexDir).outValue;
+                    hexCellModel.fieldArrArr[hexDir.ordinal()][0] = gridNode.getField(hexDir).outValueArr[0];
+                    hexCellModel.fieldArrArr[hexDir.ordinal()][1] = gridNode.getField(hexDir).outValueArr[1];
+                    hexCellModel.fieldArrArr[hexDir.ordinal()][2] = gridNode.getField(hexDir).outValueArr[2];
                 }
             }
         }
@@ -147,22 +150,31 @@ public class HexGridController {
                 final HexCellModel hexCellModel = hexGridModel.grid[xPos][yPos];
                 final Polygon hexagon = hexCellModel.hexagon;
                 final Color partColor;
-                if (Objects.nonNull(hexGridModel.grid[xPos][yPos].partModel)) {
-                    partColor = Color.CORAL;
+                final PartModel partModel = hexGridModel.grid[xPos][yPos].partModel;
+                if (Objects.nonNull(partModel)) {
+                    //partColor = Color.CORAL;
+                    partColor = Color.color(
+                            1.0D - (partModel.visibleValueArr[0]),
+                            1.0D - (partModel.visibleValueArr[1]),
+                            1.0D - (partModel.visibleValueArr[2]));
                     for (final HexDir hexDir : HexDir.values()) {
                         hexCellModel.dirArr[hexDir.ordinal()].setStroke(FIELD_DIR_COLOR);
                     }
                 } else {
-                    double fieldSum = 0.0D;
                     for (final HexDir hexDir : HexDir.values()) {
-                        fieldSum += hexCellModel.fieldArr[hexDir.ordinal()] / 2.0D; // 6.0D;
-                        double field = hexCellModel.fieldArr[hexDir.ordinal()];
+                        final double[] fieldArr = hexCellModel.fieldArrArr[hexDir.ordinal()];
                         //if (field > 0.0D) {
                         //    hexCellModel.dirArr[inDir.ordinal()].setStroke(Color.BLUE);//color(0.0D, 0.0D, field / 2.0D));
                         //} else {
                         //    hexCellModel.dirArr[inDir.ordinal()].setStroke(Color.BLACK);
                         //}
-                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(Color.color(1.0D, 1.0D, 1.0D - Math.tanh(field)));
+                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(Color.color(
+                                1.0D - (fieldArr[0]),
+                                1.0D - (fieldArr[1]),
+                                1.0D - (fieldArr[2])));
+                        //1.0D - Math.tanh(fieldArr[0]),
+                        //1.0D - Math.tanh(fieldArr[1]),
+                        //1.0D - Math.tanh(fieldArr[2])));
                     }
                     //partColor = Color.gray(fieldSum);
                     //partColor = Color.color(fieldSum, 0, 0);

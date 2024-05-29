@@ -165,7 +165,7 @@ public class GenNetTrainService {
         return net;
     }
 
-    private static float calcMutationRate(final float minMutationRate, final float maxMutationRate, final Random rnd) {
+    public static float calcMutationRate(final float minMutationRate, final float maxMutationRate, final Random rnd) {
         if (minMutationRate == maxMutationRate) {
             return rnd.nextFloat(maxMutationRate);
         } else {

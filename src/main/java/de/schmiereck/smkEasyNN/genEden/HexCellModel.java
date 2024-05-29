@@ -9,7 +9,7 @@ public class HexCellModel {
     final Polygon hexagon;
     final Line dirArr[];
     PartModel partModel;
-    double fieldArr[] = new double[HexDir.values().length];
+    double fieldArrArr[][] = new double[HexDir.values().length][3];
 
     public HexCellModel(final Polygon hexagon, final Line dirArr[]) {
         this.hexagon = hexagon;
