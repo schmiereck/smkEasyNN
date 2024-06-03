@@ -1,5 +1,7 @@
 package de.schmiereck.smkEasyNN.genEden.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class DemoPartService {
@@ -11,7 +13,8 @@ public class DemoPartService {
         this.hexGridService = hexGridService;
     }
 
-    public void initDemoParts() {
+    public List<Part> initDemoParts() {
+        final List<Part> partList = new ArrayList<>();
         this.hexGridService.retrieveGridNode(2, 7).setOutPart(this.createDemoPart());
         this.hexGridService.retrieveGridNode(12, 14).setOutPart(this.createDemoPart());
 
@@ -23,8 +26,10 @@ public class DemoPartService {
             if (Objects.isNull(targetGridNode.getOutPart())) {
                 final Part part = this.createDemoPart();
                 targetGridNode.setOutPart(part);
+                partList.add(part);
             }
         }
+        return partList;
     }
 
     public Part createDemoPart() {

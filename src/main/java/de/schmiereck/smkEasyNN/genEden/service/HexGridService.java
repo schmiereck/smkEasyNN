@@ -13,13 +13,18 @@ public class HexGridService {
     static final Random rnd = new Random();
     private final DemoPartService demoPartService;
     private final GeneticPartService geneticPartService;
+    public static boolean demoMode = false;
 
     public HexGridService() {
         this.demoPartService = new DemoPartService(this);
         this.geneticPartService = new GeneticPartService(this);
 
-        //this.demoPartService.initDemoParts();
-        this.geneticPartService.initGeneticParts();
+        if (demoMode) {
+            this.partList = this.demoPartService.initDemoParts();
+        } else {
+            this.partList = this.geneticPartService.initGeneticParts();
+        }
+        this.partCount = this.partList.size();
     }
 
     int getYGridSize() {
@@ -40,6 +45,26 @@ public class HexGridService {
 
     public List<Part> retrievePartList() {
         return this.partList;
+    }
+
+    public void submitPartList(final List<Part> partList) {
+        this.partCount = 0;
+        this.partList.clear();
+        for (int yPos = 0; yPos < this.getYGridSize(); yPos++) {
+            for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
+                final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
+                final Part outPart = gridNode.getOutPart();
+                if (Objects.nonNull(outPart)) {
+                    gridNode.setOutPart(null);
+                }
+            }
+        }
+        partList.forEach(part -> {
+            final GridNode gridNode = this.retrieveGridNode(rnd.nextInt(this.getXGridSize()), rnd.nextInt(this.getYGridSize()));
+            gridNode.setOutPart(part);
+            this.partList.add(part);
+            this.partCount++;
+        });
     }
 
     public HexGrid retrieveHexGrid() {
@@ -188,7 +213,11 @@ public class HexGridService {
         for (int yPos = 0; yPos < this.getYGridSize(); yPos++) {
             for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
-                this.calcPart(gridNode);
+                if (demoMode) {
+                    this.calcDemoPart(gridNode);
+                } else {
+                    this.calcGeneticPart(gridNode);
+                }
             }
         }
         //--------------------------------------------------------------------------------------------------------------
@@ -225,7 +254,9 @@ public class HexGridService {
                 }
             }
         }
-        this.geneticPartService.calc();
+        if (!demoMode) {
+            this.geneticPartService.calc();
+        }
     }
 
     private static void calcInField(final GridNode outGridNode, final HexDir hexDir, final double[] fieldValueArr, final double factor) {
@@ -261,17 +292,24 @@ public class HexGridService {
         return outDir;
     }
 
-    private void calcPart(final GridNode sourceGridNode) {
+    private void calcGeneticPart(final GridNode sourceGridNode) {
+        final Part part = sourceGridNode.getOutPart();
+        if (Objects.nonNull(part)) {
+            if (part instanceof GeneticPart) {
+                this.geneticPartService.calcPart(sourceGridNode, (GeneticPart) part);
+            } else {
+                throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
+            }
+        }
+    }
+
+    private void calcDemoPart(final GridNode sourceGridNode) {
         final Part part = sourceGridNode.getOutPart();
         if (Objects.nonNull(part)) {
             if (part instanceof DemoPart) {
                 this.demoPartService.calcPart(sourceGridNode, (DemoPart) part);
             } else {
-                if (part instanceof GeneticPart) {
-                    this.geneticPartService.calcPart(sourceGridNode, (GeneticPart) part);
-                } else {
-                    throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
-                }
+                throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
             }
         }
     }

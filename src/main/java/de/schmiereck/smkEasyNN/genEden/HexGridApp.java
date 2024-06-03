@@ -9,14 +9,14 @@ import javafx.stage.Stage;
 public class HexGridApp extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("HexGrid.fxml"));
+    public void start(final Stage primaryStage) throws Exception {
+        final Parent root = FXMLLoader.load(getClass().getResource("HexGrid.fxml"));
         primaryStage.setTitle("Hex Grid");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         launch(args);
     }
 }

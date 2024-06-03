@@ -1,6 +1,8 @@
 package de.schmiereck.smkEasyNN.genEden;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.schmiereck.smkEasyNN.genEden.service.*;
+import de.schmiereck.smkEasyNN.genEden.service.persistent.GeneticPersistentService;
 import de.schmiereck.smkEasyNN.genEden.view.PartModel;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
@@ -11,7 +13,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
+import java.io.File;
+import java.util.List;
 import java.util.Objects;
 
 public class HexGridController {
@@ -37,7 +43,11 @@ public class HexGridController {
     private Label counterText;
 
     @FXML
-    private Pane pane;
+    private Pane mainPane;
+
+    private final FileChooser fileChooser = new FileChooser();
+    private final String directoryName = "./data/";
+    private File lastFile = new File("%sgenetic-a.genEden.json".formatted(directoryName));
 
     public HexGridController() {
         this.hexGridService = new HexGridService();
@@ -132,11 +142,11 @@ public class HexGridController {
                 final double offsetX = yPos % 2 == 0 ? X_OFFSET_0 : hexGridModel.size * X_OFFSET_1;
 
                 final Polygon hexagon = createHexagon(xBordOffset, yBordOffset, offsetX, hexGridModel.size - STROKE_WIDTH, xPos, yPos);
-                pane.getChildren().add(hexagon);
+                this.mainPane.getChildren().add(hexagon);
 
                 final Line dirArr[] = createDirArr(xBordOffset, yBordOffset, offsetX, hexGridModel.size, xPos, yPos);
                 for (int edgePos = 0; edgePos < 6; edgePos++) {
-                    pane.getChildren().add(dirArr[edgePos]);
+                    this.mainPane.getChildren().add(dirArr[edgePos]);
                 }
 
                 hexGridModel.grid[xPos][yPos] = new HexCellModel(hexagon, dirArr);
@@ -219,6 +229,86 @@ public class HexGridController {
             dirArr[edgePos].setStrokeLineCap(StrokeLineCap.BUTT);
         }
         return dirArr;
+    }
+
+    @FXML
+    protected void onSaveButtonClick() {
+        final Window window = this.mainPane.getScene().getWindow();
+
+        this.fileChooser.setInitialDirectory(this.lastFile.getAbsoluteFile().getParentFile());
+        this.fileChooser.setInitialFileName(this.lastFile.getAbsoluteFile().getName());
+
+        final File file = this.fileChooser.showSaveDialog(window);
+        if (file != null) {
+            this.lastFile = file;
+            //final List<LifePart> lifePartList = this.lifeService.getLifePartList();
+            //final GenomDocument genomDocument = new GenomDocument();
+            //genomDocument.genomList = lifePartList.stream().map(lifePart -> lifePart.getBrain().getGenom()).collect(Collectors.toList());
+
+            GeneticPersistentService.saveNet(this.lastFile, this.hexGridService.retrievePartList().stream().map(part -> (GeneticPart) part).toList());
+
+            //var objectMapper = new ObjectMapper();
+
+            //final SimpleModule module = new SimpleModule();
+            //module.addDeserializer(Genom.class, new GenomDeserializer());
+
+            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+            /*
+            try {
+                // mapper.registerModule(new JavaTimeModule());
+                objectMapper.writeValue(file, genomDocument);
+            } catch (JsonMappingException e) {
+                throw new RuntimeException(e);
+            } catch (JsonGenerationException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            */
+        }
+    }
+
+    @FXML
+    protected void onLoadButtonClick() {
+        final Window window = this.mainPane.getScene().getWindow();
+
+        this.fileChooser.setInitialDirectory(this.lastFile.getAbsoluteFile().getParentFile());
+        this.fileChooser.setInitialFileName(this.lastFile.getAbsoluteFile().getName());
+
+        final File file = this.fileChooser.showOpenDialog(window);
+        if (file != null) {
+            this.lastFile = file;
+            //final GenomDocument genomDocument;
+
+            final List<GeneticPart> geneticPartList = GeneticPersistentService.loadNet(this.lastFile);
+
+            this.hexGridService.submitPartList(geneticPartList.stream().map(part -> (Part) part).toList());
+
+            //var objectMapper = new ObjectMapper();
+            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE);
+            //objectMapper.enable(MapperFeature.REQUIRE_TYPE_ID_FOR_SUBTYPES);
+            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+            /*
+            try {
+                genomDocument = objectMapper.readValue(file, new TypeReference<GenomDocument>() {
+                });
+            } catch (JsonMappingException e) {
+                throw new RuntimeException(e);
+            } catch (JsonParseException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            this.lifeService.initializeByGenomList(genomDocument.genomList);
+            */
+
+            this.updateHexGridModel(this.hexGridModel);
+            this.updateView();
+        }
     }
 
 }
