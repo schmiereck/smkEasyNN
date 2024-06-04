@@ -66,7 +66,11 @@ public class GenNetService {
     }
 
     static void createGenNetSynapse(final GenNeuron inGenNeuron, final GenNeuron outGenNeuron, final Random rnd) {
-        final GenSynapse genSynapse = new GenSynapse(inGenNeuron, rnd.nextFloat(1.0F) - 0.5F);
+        createGenNetSynapse(inGenNeuron, outGenNeuron, rnd.nextFloat(1.0F) - 0.5F);
+    }
+
+    public static void createGenNetSynapse(final GenNeuron inGenNeuron, final GenNeuron outGenNeuron, final float weight) {
+        final GenSynapse genSynapse = new GenSynapse(inGenNeuron, weight);
         if (Objects.isNull(outGenNeuron.inputSynapseList)) {
             outGenNeuron.inputSynapseList = new ArrayList<>();
         }
@@ -80,6 +84,22 @@ public class GenNetService {
         }
         genNeuron.neuronIndex = genNet.neuronList.size();
         genNet.neuronList.add(genNeuron);
+    }
+
+    public static void submitNewNeuron(final GenNet genNet, final int insertNeuronPos, final GenNeuron genNeuron) {
+        switch (genNeuron.neuronType) {
+            case Input -> genNet.inputNeuronList.add(genNeuron);
+            case Output -> genNet.outputNeuronList.add(genNeuron);
+        }
+        genNeuron.neuronIndex = insertNeuronPos;
+        genNet.neuronList.add(insertNeuronPos, genNeuron);
+        for (int neuronPos = insertNeuronPos + 1; neuronPos < genNet.neuronList.size(); neuronPos++) {
+            genNet.neuronList.get(neuronPos).neuronIndex = neuronPos;
+        }
+    }
+
+    public static GenNeuron retrieveNeuron(final GenNet genNet, final int pos) {
+        return genNet.neuronList.get(pos);
     }
 
     public static GenNeuron retrieveInputNeuron(final GenNet genNet, final int pos) {

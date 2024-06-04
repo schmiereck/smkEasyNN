@@ -1,6 +1,5 @@
 package de.schmiereck.smkEasyNN.genEden;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.schmiereck.smkEasyNN.genEden.service.*;
 import de.schmiereck.smkEasyNN.genEden.service.persistent.GeneticPersistentService;
 import de.schmiereck.smkEasyNN.genEden.view.PartModel;
@@ -17,7 +16,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.io.File;
-import java.util.List;
 import java.util.Objects;
 
 public class HexGridController {
@@ -90,7 +88,7 @@ public class HexGridController {
                 final Part outPart = gridNode.getOutPart();
                 final HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
                 if (Objects.nonNull(outPart)) {
-                    hexCellModel.partModel = new PartModel(outPart.getVisibleValueArr());
+                    hexCellModel.partModel = new PartModel(outPart.getValueFieldArr());
                     if (outPart instanceof GeneticPart) {
                         final GeneticPart geneticPart = (GeneticPart) outPart;
                         hexCellModel.partModel.moveDir = geneticPart.getMoveDir();
@@ -99,9 +97,16 @@ public class HexGridController {
                     hexCellModel.partModel = null;
                 }
                 for (final HexDir hexDir : HexDir.values()) {
-                    hexCellModel.fieldArrArr[hexDir.ordinal()][0] = gridNode.getField(hexDir).outValueArr[0];
-                    hexCellModel.fieldArrArr[hexDir.ordinal()][1] = gridNode.getField(hexDir).outValueArr[1];
-                    hexCellModel.fieldArrArr[hexDir.ordinal()][2] = gridNode.getField(hexDir).outValueArr[2];
+                    final Field field = gridNode.getField(hexDir);
+                    if (false) {
+                        hexCellModel.fieldArrArr[hexDir.ordinal()][0] = field.outValueArr[0];
+                        hexCellModel.fieldArrArr[hexDir.ordinal()][1] = field.outValueArr[1];
+                        hexCellModel.fieldArrArr[hexDir.ordinal()][2] = field.outValueArr[2];
+                    } else {
+                        hexCellModel.fieldArrArr[hexDir.ordinal()][0] = Math.abs(Math.tanh(field.outComArr[0]));
+                        hexCellModel.fieldArrArr[hexDir.ordinal()][1] = Math.abs(Math.tanh(field.outComArr[1]));
+                        hexCellModel.fieldArrArr[hexDir.ordinal()][2] = Math.abs(Math.tanh(field.outComArr[2]));
+                    }
                 }
             }
         }

@@ -61,7 +61,7 @@ public class DemoPartService {
                 final HexDir hexDir = HexDir.values()[(startDirOrdinal + posHexDir.ordinal()) % HexDir.values().length];
                 final GridNode moveGridNode = this.hexGridService.retrieveGridNode(sourceGridNode.getXPos(), sourceGridNode.getYPos(), hexDir);
                 if (Objects.isNull(moveGridNode.getInPart()) && Objects.isNull(moveGridNode.getOutPart())) {
-                    final HexDir oppositeHexDir = HexGridService.calcOppositeDir(hexDir);
+                    final HexDir oppositeHexDir = HexDirUtils.calcOppositeDir(hexDir);
                     final double dirFieldValue = sumFieldArr(moveGridNode.getField(oppositeHexDir).outValueArr);
                     if (dirFieldValue < targetFieldValue) {
                         targetFieldValue = dirFieldValue;

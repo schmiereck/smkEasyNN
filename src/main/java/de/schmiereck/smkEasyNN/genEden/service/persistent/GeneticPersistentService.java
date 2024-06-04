@@ -6,11 +6,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.schmiereck.smkEasyNN.genEden.service.GeneticPart;
-import de.schmiereck.smkEasyNN.genEden.service.Part;
 import de.schmiereck.smkEasyNN.genNet.GenNet;
 import de.schmiereck.smkEasyNN.genNet.GenNeuron;
 import de.schmiereck.smkEasyNN.genNet.GenSynapse;
-import de.schmiereck.smkEasyNN.mlp.persistent.NetDocument;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +24,7 @@ public class GeneticPersistentService {
         doc.generationCount = generationCount;
         doc.geneticPartList = geneticPartList.stream().map(geneticPart -> {
             final PerGeneticPart perGeneticPart = new PerGeneticPart();
-            perGeneticPart.visibleValueArr = geneticPart.getVisibleValueArr();
+            perGeneticPart.visibleValueArr = geneticPart.getValueFieldArr();
             perGeneticPart.moveDir = geneticPart.getMoveDir();
             perGeneticPart.size = geneticPart.getSize();
             perGeneticPart.energie = geneticPart.getEnergie();
