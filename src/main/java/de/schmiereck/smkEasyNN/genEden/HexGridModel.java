@@ -8,6 +8,7 @@ public class HexGridModel {
     final HexCellModel grid[][];
     public int stepCount;
     public int partCount;
+    public int generationCount;
 
     public HexGridModel(final int xSize, final int ySize, final double size) {
         this.xSize = xSize;

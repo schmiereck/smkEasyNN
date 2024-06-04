@@ -9,5 +9,7 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GeneticDocument {
+    public int stepCount;
+    public int generationCount;
     public List<PerGeneticPart> geneticPartList;
 }

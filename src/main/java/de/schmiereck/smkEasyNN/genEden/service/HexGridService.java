@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Random;
 
 public class HexGridService {
-    private HexGrid hexGrid = new HexGrid(30*2, 30*3);
+    private HexGrid hexGrid;
     private int stepCount = 0;
     private int partCount = 0;
     private List<Part> partList = new ArrayList<>();
@@ -18,13 +18,31 @@ public class HexGridService {
     public HexGridService() {
         this.demoPartService = new DemoPartService(this);
         this.geneticPartService = new GeneticPartService(this);
+    }
+
+    public void init(final int xSize, final int ySize) {
+        this.hexGrid = new HexGrid(xSize, ySize);
 
         if (demoMode) {
             this.partList = this.demoPartService.initDemoParts();
         } else {
+            for (int xPos = 0; xPos < 10; xPos++) {
+                createBlocker(5 + xPos, 10);
+            }
+            for (int yPos = 0; yPos < 40; yPos += 4) {
+                createBlocker(25, 14 + yPos);
+            }
             this.partList = this.geneticPartService.initGeneticParts();
         }
         this.partCount = this.partList.size();
+    }
+
+    private void createBlocker(final int xPos, final int yPos) {
+        final GridNode targetGridNode = this.retrieveGridNode(xPos, yPos);
+        if (Objects.isNull(targetGridNode.getOutPart())) {
+            final Part part = new BlockerPart(new double[] { 0.5D, 0.5D, 0.5D });
+            targetGridNode.setOutPart(part);
+        }
     }
 
     int getYGridSize() {
@@ -54,16 +72,21 @@ public class HexGridService {
             for (int xPos = 0; xPos < this.getXGridSize(); xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
                 final Part outPart = gridNode.getOutPart();
-                if (Objects.nonNull(outPart)) {
+                if (Objects.nonNull(outPart) && outPart instanceof GeneticPart) {
                     gridNode.setOutPart(null);
                 }
             }
         }
         partList.forEach(part -> {
-            final GridNode gridNode = this.retrieveGridNode(rnd.nextInt(this.getXGridSize()), rnd.nextInt(this.getYGridSize()));
-            gridNode.setOutPart(part);
-            this.partList.add(part);
-            this.partCount++;
+            do {
+                final GridNode gridNode = this.retrieveGridNode(rnd.nextInt(this.getXGridSize()), rnd.nextInt(this.getYGridSize()));
+                if (Objects.isNull(gridNode.getOutPart())) {
+                    gridNode.setOutPart(part);
+                    this.partList.add(part);
+                    this.partCount++;
+                    break;
+                }
+            } while (true);
         });
     }
 
@@ -298,7 +321,11 @@ public class HexGridService {
             if (part instanceof GeneticPart) {
                 this.geneticPartService.calcPart(sourceGridNode, (GeneticPart) part);
             } else {
-                throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
+                if (part instanceof BlockerPart) {
+                    sourceGridNode.setInPart(part);
+                } else {
+                    throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
+                }
             }
         }
     }
@@ -312,5 +339,13 @@ public class HexGridService {
                 throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
             }
         }
+    }
+
+    public GeneticPartService getGeneticPartService() {
+        return this.geneticPartService;
+    }
+
+    public void submitStepCount(final int stepCount) {
+        this.stepCount = stepCount;
     }
 }

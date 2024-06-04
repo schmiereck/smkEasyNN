@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class GeneticPersistentService {
-    public static void saveNet(final File file, final List<GeneticPart> geneticPartList) {
+    public static void saveNet(final File file, final List<GeneticPart> geneticPartList, final int stepCount, final int generationCount) {
         final GeneticDocument doc = new GeneticDocument();
 
+        doc.stepCount = stepCount;
+        doc.generationCount = generationCount;
         doc.geneticPartList = geneticPartList.stream().map(geneticPart -> {
             final PerGeneticPart perGeneticPart = new PerGeneticPart();
             perGeneticPart.visibleValueArr = geneticPart.getVisibleValueArr();
@@ -34,6 +36,12 @@ public class GeneticPersistentService {
         }).toList();
         var objectMapper = new ObjectMapper();
         //objectMapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+        //final SimpleModule module = new SimpleModule();
+        //module.addDeserializer(Genom.class, new GenomDeserializer());
+
+        //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+        //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+        //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
 
         try {
             // mapper.registerModule(new JavaTimeModule());
@@ -86,12 +94,16 @@ public class GeneticPersistentService {
         return perGenSynapseList;
     }
 
-    public static List<GeneticPart> loadNet(final File file) {
+    public record LoadNetResult(List<GeneticPart> geneticPartList, int stepCount, int generationCount) {
+    }
+
+    public static LoadNetResult loadNet(final File file) {
         final GeneticDocument doc;
 
         var objectMapper = new ObjectMapper();
 
         try {
+            //genomDocument = objectMapper.readValue(file, new TypeReference<GenomDocument>() {
             doc = objectMapper.readValue(file, new TypeReference<>() {
             });
         } catch (final JsonMappingException e) {
@@ -101,6 +113,11 @@ public class GeneticPersistentService {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+        //var objectMapper = new ObjectMapper();
+        //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE);
+        //objectMapper.enable(MapperFeature.REQUIRE_TYPE_ID_FOR_SUBTYPES);
+        //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+        //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
 
         final List<GeneticPart> geneticPartList = doc.geneticPartList.stream().map(perGeneticPart -> {
             final GeneticPart geneticPart = new GeneticPart(perGeneticPart.visibleValueArr);
@@ -112,7 +129,7 @@ public class GeneticPersistentService {
             return geneticPart;
         }).toList();
 
-        return geneticPartList;
+        return new LoadNetResult(geneticPartList, doc.stepCount, doc.generationCount);
     }
 
     private static GenNet createGenNet(final PerGenNet perGenNet) {

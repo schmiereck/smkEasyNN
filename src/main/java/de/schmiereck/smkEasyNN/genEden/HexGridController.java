@@ -27,7 +27,8 @@ public class HexGridController {
     public static final double X_OFFSET_1 = (1.5D);
     public static final double Y_SPACE = (Math.sqrt(3) / 2.0D);
 
-    public static final double SCALE = 1.0D;//2.0D;
+    //public static final double SCALE = 1.0D;//2.0D;
+    public static final double SCALE = 0.75D;//2.0D;
     public static final double STROKE_WIDTH = 1.0D * SCALE;
     public static final double FIELD_STROKE_WIDTH = 2.0D * SCALE;
     public static final Color FIELD_DIR_COLOR = Color.color(1.0D, 1.0D, 0.0D);
@@ -56,6 +57,9 @@ public class HexGridController {
 
     @FXML
     public void initialize() {
+        this.hexGridService.init(30*2, 35*3);
+        //this.hexGridService.init(40*2, 40*3);
+
         final HexGrid hexGrid = this.hexGridService.retrieveHexGrid();
 
         this.hexGridModel = new HexGridModel(hexGrid.getXSize(), hexGrid.getYSize(), 10.0D * SCALE);
@@ -78,6 +82,7 @@ public class HexGridController {
     private void updateHexGridModel(final HexGridModel hexGridModel) {
         hexGridModel.stepCount = this.hexGridService.retrieveStepCount();
         hexGridModel.partCount = this.hexGridService.retrievePartCount();
+        hexGridModel.generationCount = this.hexGridService.getGeneticPartService().retrieveGenerationCount();
 
         for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
             for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
@@ -86,6 +91,10 @@ public class HexGridController {
                 final HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
                 if (Objects.nonNull(outPart)) {
                     hexCellModel.partModel = new PartModel(outPart.getVisibleValueArr());
+                    if (outPart instanceof GeneticPart) {
+                        final GeneticPart geneticPart = (GeneticPart) outPart;
+                        hexCellModel.partModel.moveDir = geneticPart.getMoveDir();
+                    }
                 } else {
                     hexCellModel.partModel = null;
                 }
@@ -128,7 +137,8 @@ public class HexGridController {
     }
 
     public void updateView() {
-        this.counterText.setText(String.format("Step: %d (Parts: %,d)", this.hexGridModel.stepCount, this.hexGridModel.partCount));
+        this.counterText.setText(String.format("Step: %d (Parts: %,d), Generation: %d",
+                this.hexGridModel.stepCount, this.hexGridModel.partCount, this.hexGridModel.generationCount));
 
         this.updateHexGrid(this.hexGridModel);
     }
@@ -168,7 +178,13 @@ public class HexGridController {
                             1.0D - (partModel.visibleValueArr[1]),
                             1.0D - (partModel.visibleValueArr[2]));
                     for (final HexDir hexDir : HexDir.values()) {
-                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(FIELD_DIR_COLOR);
+                        final Color strokeColor;
+                        if (hexDir == partModel.moveDir) {
+                            strokeColor = partColor;
+                        } else  {
+                            strokeColor = FIELD_DIR_COLOR;
+                        }
+                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(strokeColor);
                     }
                 } else {
                     for (final HexDir hexDir : HexDir.values()) {
@@ -241,32 +257,13 @@ public class HexGridController {
         final File file = this.fileChooser.showSaveDialog(window);
         if (file != null) {
             this.lastFile = file;
-            //final List<LifePart> lifePartList = this.lifeService.getLifePartList();
-            //final GenomDocument genomDocument = new GenomDocument();
-            //genomDocument.genomList = lifePartList.stream().map(lifePart -> lifePart.getBrain().getGenom()).collect(Collectors.toList());
 
-            GeneticPersistentService.saveNet(this.lastFile, this.hexGridService.retrievePartList().stream().map(part -> (GeneticPart) part).toList());
-
-            //var objectMapper = new ObjectMapper();
-
-            //final SimpleModule module = new SimpleModule();
-            //module.addDeserializer(Genom.class, new GenomDeserializer());
-
-            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
-            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
-            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
-            /*
-            try {
-                // mapper.registerModule(new JavaTimeModule());
-                objectMapper.writeValue(file, genomDocument);
-            } catch (JsonMappingException e) {
-                throw new RuntimeException(e);
-            } catch (JsonGenerationException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            */
+            GeneticPersistentService.saveNet(this.lastFile, this.hexGridService.retrievePartList().
+                    stream().
+                    filter(part -> part instanceof GeneticPart).
+                    map(part -> (GeneticPart) part).toList(),
+                    this.hexGridService.retrieveStepCount(),
+                    this.hexGridService.getGeneticPartService().retrieveGenerationCount());
         }
     }
 
@@ -280,31 +277,12 @@ public class HexGridController {
         final File file = this.fileChooser.showOpenDialog(window);
         if (file != null) {
             this.lastFile = file;
-            //final GenomDocument genomDocument;
 
-            final List<GeneticPart> geneticPartList = GeneticPersistentService.loadNet(this.lastFile);
+            final GeneticPersistentService.LoadNetResult loadNetResult = GeneticPersistentService.loadNet(this.lastFile);
 
-            this.hexGridService.submitPartList(geneticPartList.stream().map(part -> (Part) part).toList());
-
-            //var objectMapper = new ObjectMapper();
-            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE);
-            //objectMapper.enable(MapperFeature.REQUIRE_TYPE_ID_FOR_SUBTYPES);
-            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
-            //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
-            /*
-            try {
-                genomDocument = objectMapper.readValue(file, new TypeReference<GenomDocument>() {
-                });
-            } catch (JsonMappingException e) {
-                throw new RuntimeException(e);
-            } catch (JsonParseException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            this.lifeService.initializeByGenomList(genomDocument.genomList);
-            */
+            this.hexGridService.submitPartList(loadNetResult.geneticPartList().stream().map(part -> (Part) part).toList());
+            this.hexGridService.submitStepCount(loadNetResult.stepCount());
+            this.hexGridService.getGeneticPartService().submitGenerationCount(loadNetResult.generationCount());
 
             this.updateHexGridModel(this.hexGridModel);
             this.updateView();
