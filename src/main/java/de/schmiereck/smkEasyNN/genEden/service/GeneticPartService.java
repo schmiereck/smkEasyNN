@@ -331,13 +331,13 @@ public class GeneticPartService {
         return Math.min(maxValue, Math.max(minValue, newValue));
     }
 
-    private int addEnergie(final GeneticPart part, final int value) {
+    int addEnergie(final EnergyPart part, final int value) {
         final int usedValue = Math.min(part.size - part.energie, value);
         part.energie += usedValue;
         return value - usedValue;
     }
 
-    private int consumeEnergie(final GeneticPart part, final int value) {
+    int consumeEnergie(final EnergyPart part, final int value) {
         final int usedValue = Math.min(part.energie, value);
         part.energie -= usedValue;
         return usedValue;
@@ -402,4 +402,17 @@ public class GeneticPartService {
         this.generationCount = generationCount;
     }
 
+    public void calcBeginNext() {
+        for (int pos = 0; pos < 4; pos++) {
+            final GridNode outGridNode = this.hexGridService.retrieveGridNode(
+                    HexGridService.rnd.nextInt(this.hexGridService.getXGridSize()),
+                    HexGridService.rnd.nextInt(this.hexGridService.getYGridSize() / 5));
+            final Part targetPart = outGridNode.getOutPart();
+            if (Objects.isNull(targetPart)) {
+                final EnergyPart newEnergyPart = new EnergyPart(new double[] { 0.0D, 0.5D, 0.5D });
+                newEnergyPart.setEnergie(24);
+                outGridNode.setOutPart(newEnergyPart);
+            }
+        }
+    }
 }

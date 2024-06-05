@@ -32,7 +32,6 @@ public class HexGridController {
     public static final Color FIELD_DIR_COLOR = Color.color(1.0D, 1.0D, 0.0D);
 
     private HexGridService hexGridService;
-    private LifeService lifeService;
 
     private HexGridModel hexGridModel;
 
@@ -50,7 +49,6 @@ public class HexGridController {
 
     public HexGridController() {
         this.hexGridService = new HexGridService();
-        this.lifeService = new LifeService(this.hexGridService);
     }
 
     @FXML
@@ -98,7 +96,7 @@ public class HexGridController {
                 }
                 for (final HexDir hexDir : HexDir.values()) {
                     final Field field = gridNode.getField(hexDir);
-                    if (false) {
+                    if (HexGridService.demoMode) {
                         hexCellModel.fieldArrArr[hexDir.ordinal()][0] = field.outValueArr[0];
                         hexCellModel.fieldArrArr[hexDir.ordinal()][1] = field.outValueArr[1];
                         hexCellModel.fieldArrArr[hexDir.ordinal()][2] = field.outValueArr[2];
@@ -134,7 +132,7 @@ public class HexGridController {
     }
 
     private void runLife() {
-        this.lifeService.runLife();
+        this.hexGridService.calcNext();
 
         this.updateHexGridModel(this.hexGridModel);
 
