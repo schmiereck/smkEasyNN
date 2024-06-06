@@ -16,7 +16,7 @@ public class HexGridService {
     private final DemoPartService demoPartService;
     private final GeneticPartService geneticPartService;
     public static boolean demoMode = false;
-    public static boolean threadMode = true;
+    public static boolean threadMode = false;
 
     public HexGridService() {
         this.demoPartService = new DemoPartService(this);
@@ -165,7 +165,9 @@ public class HexGridService {
     }
 
     public void calcNext() {
-        this.geneticPartService.calcBeginNext();
+        if (!demoMode) {
+            this.geneticPartService.calcBeginNext();
+        }
 
         this.calcGrid();
 
@@ -356,14 +358,14 @@ public class HexGridService {
             if (part instanceof GeneticPart geneticPart) {
                 this.geneticPartService.calcPart(sourceGridNode, geneticPart);
             } else {
-                if (part instanceof BlockerPart) {
-                    sourceGridNode.setInPart(part);
+                if (part instanceof EnergyPart energyPart) {
+                    if (energyPart.energie > 0) {
+                        this.geneticPartService.consumeEnergie(energyPart, 1);
+                        sourceGridNode.setInPart(part);
+                    }
                 } else {
-                    if (part instanceof EnergyPart energyPart) {
-                        if (energyPart.energie > 0) {
-                            this.geneticPartService.consumeEnergie(energyPart, 1);
-                            sourceGridNode.setInPart(part);
-                        }
+                    if (part instanceof BlockerPart) {
+                        sourceGridNode.setInPart(part);
                     } else {
                         throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
                     }
@@ -375,8 +377,8 @@ public class HexGridService {
     private void calcDemoPart(final GridNode sourceGridNode) {
         final Part part = sourceGridNode.getOutPart();
         if (Objects.nonNull(part)) {
-            if (part instanceof DemoPart) {
-                this.demoPartService.calcPart(sourceGridNode, (DemoPart) part);
+            if (part instanceof DemoPart demoPart) {
+                this.demoPartService.calcPart(sourceGridNode, demoPart);
             } else {
                 throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(part.getClass().getSimpleName()));
             }

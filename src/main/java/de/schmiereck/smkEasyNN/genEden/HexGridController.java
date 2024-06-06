@@ -53,7 +53,7 @@ public class HexGridController {
 
     @FXML
     public void initialize() {
-        this.hexGridService.init(30*2, 35*3);
+        this.hexGridService.init(30*2, 27*4);
         //this.hexGridService.init(40*2, 40*3);
 
         final HexGrid hexGrid = this.hexGridService.retrieveHexGrid();
