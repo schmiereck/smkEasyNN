@@ -29,6 +29,7 @@ public class GeneticPartService {
     private int targetPopulationPartCount;
 
     private int generationCount;
+    public static boolean threadMode = true;
 
     public GeneticPartService(final HexGridService hexGridService) {
         this.hexGridService = hexGridService;
@@ -52,10 +53,9 @@ public class GeneticPartService {
 
     private final int[] genNetLayerSizeArr = new int[]{
             IN_COUNT,
-            IN_COUNT,
+            IN_COUNT + OUT_COUNT,
+            IN_COUNT / 2 + OUT_COUNT,
             IN_COUNT / 2 + OUT_COUNT / 2,
-            IN_COUNT / 2 + OUT_COUNT / 2,
-            OUT_COUNT,
             OUT_COUNT };
 
     public Part createGeneticPart() {
@@ -82,6 +82,8 @@ public class GeneticPartService {
         }
     }
 
+    private final HexGridFillPopParallelProcessor fillPopProc = new HexGridFillPopParallelProcessor();
+
     public void fillPartPopulation(final int targetPopulationSize) {
         final List<Part> partList = this.hexGridService.retrievePartList().
                 stream().
@@ -90,17 +92,33 @@ public class GeneticPartService {
         partList.sort((part1, part2) -> {
             final GeneticPart aGeneticPart = (GeneticPart) part1;
             final GeneticPart bGeneticPart = (GeneticPart) part2;
-            return Integer.compare(bGeneticPart.energie * bGeneticPart.age, aGeneticPart.energie * aGeneticPart.age);
+            //return Integer.compare(bGeneticPart.energie * bGeneticPart.age, aGeneticPart.energie * aGeneticPart.age);
+            return Integer.compare(
+                    bGeneticPart.energie + bGeneticPart.age / 10,
+                    aGeneticPart.energie + aGeneticPart.age / 10);
         });
 
         // TODO Thread this.
 
         final int partCount = targetPopulationSize - partList.size();
-        for (int cnt = 0; cnt < partCount; cnt++) {
+        final int startCountPos = 0;
+        final int endCountPos = partCount - 1;
+
+        if (threadMode) {
+            fillPopProc.fillPopHexGrid(this, partList, partCount);
+        } else {
+            this.fillPartPopulation(partList, startCountPos, endCountPos);
+        }
+
+        this.generationCount++;
+    }
+
+    public void fillPartPopulation(final List<Part> partList, final int startCountPos, final int endCountPos) {
+        for (int cnt = startCountPos; cnt <= endCountPos; cnt++) {
             final Part newPart;
             final int maxXPos;
             final int maxYPos;
-            if (partList.size() > 0) {
+            if (!partList.isEmpty()) {
                 if (HexGridService.rnd.nextInt(10) >= 1) {
                     final GeneticPart sourcePart;
                     if (HexGridService.rnd.nextInt(10) >= 1) {
@@ -108,8 +126,12 @@ public class GeneticPartService {
                     } else {
                         sourcePart = (GeneticPart) partList.get(HexGridService.rnd.nextInt(partList.size()));
                     }
-                    final int newEnergie = HexGridService.rnd.nextInt(sourcePart.size / 4, sourcePart.size / 2);
-                    newPart = this.mutateGeneticPart(sourcePart, newEnergie, 0.014F, 0.15F);
+                    if (HexGridService.rnd.nextBoolean()) {
+                        final int newEnergie = HexGridService.rnd.nextInt(sourcePart.size / 6, sourcePart.size / 4);
+                        newPart = this.mutateGeneticPart(sourcePart, newEnergie, 0.014F, 0.15F);
+                    } else {
+                        newPart = this.copyGeneticPart(sourcePart);
+                    }
                     maxXPos = this.hexGridService.getXGridSize() - (this.hexGridService.getXGridSize() / 8);
                     maxYPos = this.hexGridService.getYGridSize() - (this.hexGridService.getYGridSize() / 5);
                 } else {
@@ -132,15 +154,22 @@ public class GeneticPartService {
                 }
             } while (true);
         }
-        this.generationCount++;
+    }
+
+    public void calcPartNetInput(final GridNode sourceGridNode, final GeneticPart part) {
+        if (part.energie > 0) {
+            this.consumeEnergie(part, 1);
+            this.checkPartConfiguration(part);
+            this.calcPartNet(sourceGridNode, part);
+        }
     }
 
     public void calcPart(final GridNode sourceGridNode, final GeneticPart part) {
         boolean printed = false;
         if (part.energie > 0) {
-            this.consumeEnergie(part, 1);
-            this.checkPartConfiguration(part);
-            this.calcPartNet(sourceGridNode, part);
+            //this.consumeEnergie(part, 1);
+            //this.checkPartConfiguration(part);
+            //this.calcPartNet(sourceGridNode, part);
 
             final int rotateValue = this.calcRotate(part);
             if (rotateValue != 0) {
@@ -322,6 +351,22 @@ public class GeneticPartService {
         return newPart;
     }
 
+    private GeneticPart copyGeneticPart(final GeneticPart sourcePart) {
+        final double[] sourceVisibleValueArr = sourcePart.getValueFieldArr();
+        final double[] visibleValueArr = new double[] {
+                sourceVisibleValueArr[0],
+                sourceVisibleValueArr[1],
+                sourceVisibleValueArr[2]
+        };
+        final GeneticPart newPart = new GeneticPart(visibleValueArr);
+        newPart.age = sourcePart.age;
+        newPart.moveDir = sourcePart.moveDir;
+        newPart.size = sourcePart.size;
+        newPart.energie = sourcePart.energie;
+        newPart.genNet = GenNetTrainService.createCopyNet(sourcePart.genNet);
+        return newPart;
+    }
+
     private GeneticPart mutateGeneticPart(final GeneticPart sourcePart, final int newEnergie, final float minMutationRate, final float maxMutationRate) {
         final double[] sourceVisibleValueArr = sourcePart.getValueFieldArr();
         final double[] visibleValueArr = new double[] {
@@ -331,7 +376,7 @@ public class GeneticPartService {
         };
         final float mutationRate = GenNetTrainService.calcMutationRate(minMutationRate, maxMutationRate, HexGridService.rnd);
         final GeneticPart newPart = new GeneticPart(visibleValueArr);
-        newPart.age = 1;
+        newPart.age = sourcePart.age / 2;
         newPart.moveDir = sourcePart.moveDir;
         newPart.size = this.mutateValue(MIN_SIZE, MAX_SIZE, 1, sourcePart.size);
         newPart.energie = newEnergie;

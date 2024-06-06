@@ -16,7 +16,7 @@ public class HexGridService {
     private final DemoPartService demoPartService;
     private final GeneticPartService geneticPartService;
     public static boolean demoMode = false;
-    public static boolean threadMode = false;
+    public static boolean threadMode = true;
 
     public HexGridService() {
         this.demoPartService = new DemoPartService(this);
@@ -177,7 +177,7 @@ public class HexGridService {
         this.stepCount++;
     }
 
-    private final HexGridParallelProcessor proc = new HexGridParallelProcessor();
+    private final HexGridCalcParallelProcessor proc = new HexGridCalcParallelProcessor();
 
     /**
      * Calculate the next grid.
@@ -195,83 +195,32 @@ public class HexGridService {
     }
 
     void calcGrid(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+        this.calcGridPartNetInput(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridFieldOutToIn(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridFieldInToOut(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridPartOutIn(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridOut(xStartPos, yStartPos, xEndPos, yEndPos);
     }
 
-    public void calcGridOut(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
-        // Reset Part: Out
-        // Part-Field: Out
-        // Part: In -> Out
-        this.partCount = 0;
-        this.partList.clear();
+    /**
+     * 0. Part: Out -> Net-Input
+     */
+    public void calcGridPartNetInput(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
         for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
             for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
-                final Part outPart = gridNode.getOutPart();
-                if (Objects.nonNull(outPart)) {
-                    gridNode.setOutPart(null);
-                }
-                final Part inPart = gridNode.getInPart();
-                if (Objects.nonNull(inPart)) {
-                    gridNode.setInPart(null);
-                    gridNode.setOutPart(inPart);
-
-                    //final InDir inDir = InDir.InDir5; {
-                    for (final HexDir hexDir : HexDir.values()) {
-                        //final GridNode outGridNode = this.retrieveGridNode(xPos, yPos, hexDir);
-                        //final Field field = outGridNode.getField((hexDir));
-                        final Field field = gridNode.getField((hexDir));
-
-                        final double[] visibleValueArr = inPart.getValueFieldArr();
-                        field.outValueArr[0] = visibleValueArr[0];
-                        field.outValueArr[1] = visibleValueArr[1];
-                        field.outValueArr[2] = visibleValueArr[2];
-
-                        final double[] comFieldArr = inPart.getComFieldArr();
-                        field.outComArr[0] = comFieldArr[0];
-                        field.outComArr[1] = comFieldArr[1];
-                        field.outComArr[2] = comFieldArr[2];
-                    }
-                    this.partCount++;
-                    this.partList.add(inPart);
+                if (!demoMode) {
+                    this.calcGeneticPartNetInput(gridNode); // TODO Callback Funktion to GeneticPartService.
                 }
             }
         }
     }
 
-    public void calcGridPartOutIn(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
-        // Part: Out -> In
-        for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
-            for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
-                final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
-                if (demoMode) {
-                    this.calcDemoPart(gridNode);
-                } else {
-                    this.calcGeneticPart(gridNode); // TODO Callback Funktion to GeneticPartService.
-                }
-            }
-        }
-    }
-
-    public void calcGridFieldInToOut(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
-        // Field: In -> Out
-        for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
-            for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
-                final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
-                for (final HexDir hexDir : HexDir.values()) {
-                    final Field field = gridNode.getField(hexDir);
-                    transferFieldInToOut(field);
-                    resetInField(field);
-                }
-            }
-        }
-    }
-
+    /**
+     * 1. Field: Out -> In
+     */
     public void calcGridFieldOutToIn(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
-        // Field: Out -> In
+        //
         for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
             for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
@@ -338,6 +287,80 @@ public class HexGridService {
         }
     }
 
+    /**
+     * 2. Field: In -> Out
+     */
+    public void calcGridFieldInToOut(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+        for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
+            for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
+                final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
+                for (final HexDir hexDir : HexDir.values()) {
+                    final Field field = gridNode.getField(hexDir);
+                    transferFieldInToOut(field);
+                    resetInField(field);
+                }
+            }
+        }
+    }
+
+    /**
+     * 3. Part: Out -> In
+     */
+    public void calcGridPartOutIn(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+        for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
+            for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
+                final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
+                if (demoMode) {
+                    this.calcDemoPart(gridNode);
+                } else {
+                    this.calcGeneticPart(gridNode); // TODO Callback Funktion to GeneticPartService.
+                }
+            }
+        }
+    }
+
+    /**
+     * 4. Part: Reset Out
+     *    Part: In -> Out
+     *    Part-Field: Out
+     */
+    public void calcGridOut(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+        this.partCount = 0;
+        this.partList.clear();
+        for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
+            for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
+                final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
+                final Part outPart = gridNode.getOutPart();
+                if (Objects.nonNull(outPart)) {
+                    gridNode.setOutPart(null);
+                }
+                final Part inPart = gridNode.getInPart();
+                if (Objects.nonNull(inPart)) {
+                    gridNode.setInPart(null);
+                    gridNode.setOutPart(inPart);
+
+                    for (final HexDir hexDir : HexDir.values()) {
+                        //final GridNode outGridNode = this.retrieveGridNode(xPos, yPos, hexDir);
+                        //final Field field = outGridNode.getField(hexDir);
+                        final Field field = gridNode.getField(hexDir);
+
+                        final double[] visibleValueArr = inPart.getValueFieldArr();
+                        field.outValueArr[0] = visibleValueArr[0];
+                        field.outValueArr[1] = visibleValueArr[1];
+                        field.outValueArr[2] = visibleValueArr[2];
+
+                        final double[] comFieldArr = inPart.getComFieldArr();
+                        field.outComArr[0] = comFieldArr[0];
+                        field.outComArr[1] = comFieldArr[1];
+                        field.outComArr[2] = comFieldArr[2];
+                    }
+                    this.partCount++;
+                    this.partList.add(inPart);
+                }
+            }
+        }
+    }
+
     private static void calcInValueField(final GridNode outGridNode, final HexDir hexDir, final Field outField, final double factor) {
         if (Objects.isNull(outGridNode.getOutPart())) {
             final Field inField = outGridNode.getField(hexDir);
@@ -349,6 +372,15 @@ public class HexGridService {
         if (Objects.isNull(outGridNode.getOutPart())) {
             final Field inField = outGridNode.getField(hexDir);
             transferComFieldOutToIn(outField, inField, factor);
+        }
+    }
+
+    private void calcGeneticPartNetInput(final GridNode sourceGridNode) {
+        final Part part = sourceGridNode.getOutPart();
+        if (Objects.nonNull(part)) {
+            if (part instanceof GeneticPart geneticPart) {
+                this.geneticPartService.calcPartNetInput(sourceGridNode, geneticPart);
+            }
         }
     }
 

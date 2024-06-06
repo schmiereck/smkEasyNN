@@ -196,6 +196,10 @@ public class GenNetTrainService {
         return error;
     }
 
+    public static GenNet createCopyNet(final GenNet net) {
+        return GenNetService.copyNet(net);
+    }
+
     public static GenNet createMutatedNet(final GenNet net, final float mutationRate, final Random rnd) {
         final GenNet mutatedNet = GenNetService.copyNet(net);
         return mutateNet(mutatedNet, mutationRate, rnd);

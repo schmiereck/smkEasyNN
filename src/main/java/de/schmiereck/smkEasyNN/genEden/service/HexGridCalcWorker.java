@@ -1,6 +1,6 @@
 package de.schmiereck.smkEasyNN.genEden.service;
 
-public class HexGridWorker implements Runnable {
+public class HexGridCalcWorker implements Runnable {
     final WorkInterface workInterface;
     private final HexGridService hexGridService;
     private final int xStartGridPos;
@@ -13,7 +13,7 @@ public class HexGridWorker implements Runnable {
         void work(final HexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos);
     }
 
-    public HexGridWorker(final WorkInterface workInterface, final HexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos) {
+    public HexGridCalcWorker(final WorkInterface workInterface, final HexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos) {
         this.workInterface = workInterface;
         this.hexGridService = hexGridService;
         this.xStartGridPos = xStartGridPos;

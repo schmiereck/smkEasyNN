@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class DemoPartService {
-    private static int MAX_MOVE_CNT = 4;
+    private static int MAX_MOVE_CNT = 1;
 
     private final HexGridService hexGridService;
 
