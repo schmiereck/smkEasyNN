@@ -435,11 +435,11 @@ public class GeneticPartService {
         }
     }
 
-    private static final int ADULT_AGE = 200;
+    private static final int ADULT_AGE = 100;
 
     private boolean calcPopulate(final GeneticPart part, final HexDir hexDir) {
         final boolean ret;
-        if (part.energie > (part.size - (part.size / 4))) {
+        if (part.energie > (part.size - (part.size / 2))) {
             if (part.age > ADULT_AGE) {
                 final float outputValue = GenNetService.retrieveOutputValue(part.genNet, OUT_POPULATE[hexDir.ordinal()]);
                 ret = outputValue > 0.5F;
@@ -469,7 +469,7 @@ public class GeneticPartService {
         for (int pos = 0; pos < 3; pos++) {
             final GridNode outGridNode = this.hexGridService.retrieveGridNode(
                     HexGridService.rnd.nextInt(this.hexGridService.getXGridSize()),
-                    this.hexGridService.getYGridSize() - HexGridService.rnd.nextInt(this.hexGridService.getYGridSize() / 5));
+                    this.hexGridService.getYGridSize() - HexGridService.rnd.nextInt(this.hexGridService.getYGridSize() / 3));
             final Part targetPart = outGridNode.getOutPart();
             if (Objects.isNull(targetPart)) {
                 final EnergyPart newEnergyPart = new EnergyPart(new double[] { 0.0D, 0.5D, 0.5D });
