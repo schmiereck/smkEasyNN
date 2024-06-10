@@ -2,6 +2,7 @@ package de.schmiereck.smkEasyNN.genEden.service;
 
 import de.schmiereck.smkEasyNN.genNet.GenNetService;
 import de.schmiereck.smkEasyNN.genNet.GenNetTrainService;
+import de.schmiereck.smkEasyNN.genNet.GenNetTrainService.GenNetMutateConfig;
 import de.schmiereck.smkEasyNN.genNet.GenNeuron;
 
 import java.util.ArrayList;
@@ -11,9 +12,9 @@ import java.util.stream.Collectors;
 
 import static de.schmiereck.smkEasyNN.genEden.service.HexDirUtils.calcOppositeDir;
 
-public class GeneticPartService {
+public class GeneticPartService implements PartServiceInterface {
     private static final int MIN_SIZE = 100;
-    private static final int MAX_SIZE = 1200;
+    private static final int MAX_SIZE = 1200*2;
 
     /**
      * Higher values gives smaller populations.
@@ -29,15 +30,25 @@ public class GeneticPartService {
     private int targetPopulationPartCount;
 
     private int generationCount;
-    public static boolean threadMode = true;
+    public static boolean threadMode = false;
 
     public GeneticPartService(final HexGridService hexGridService) {
         this.hexGridService = hexGridService;
     }
 
-    public List<Part> initGeneticParts() {
+    @Override
+    public List<Part> initParts() {
         final List<Part> partList = new ArrayList<>();
-        this.targetPopulationPartCount = (this.hexGridService.getXGridSize() * this.hexGridService.getYGridSize()) / POPULATION_DIV;
+
+        for (int xPos = 0; xPos < 10; xPos++) {
+            this.createBlocker(5 + xPos, 10);
+        }
+        for (int yPos = 0; yPos < 40; yPos += 4) {
+            this.createBlocker(25, 14 + yPos);
+        }
+
+        //this.targetPopulationPartCount = (this.hexGridService.getXGridSize() * this.hexGridService.getYGridSize()) / POPULATION_DIV;
+        this.targetPopulationPartCount = 900; // 6480 = 30*2 * 27*4, 2160 = 6480 / 3
         for (int pos = 0; pos < this.targetPopulationPartCount; pos++) {
             final int xPos = HexGridService.rnd.nextInt(this.hexGridService.getXGridSize() / 2);
             final int yPos = HexGridService.rnd.nextInt(this.hexGridService.getYGridSize());
@@ -49,6 +60,14 @@ public class GeneticPartService {
             }
         }
         return partList;
+    }
+
+    private void createBlocker(final int xPos, final int yPos) {
+        final GridNode targetGridNode = this.hexGridService.retrieveGridNode(xPos, yPos);
+        if (Objects.isNull(targetGridNode.getOutPart())) {
+            final Part part = new BlockerPart(new double[] { 0.5D, 0.5D, 0.5D });
+            targetGridNode.setOutPart(part);
+        }
     }
 
     private final int[] genNetLayerSizeArr = new int[]{
@@ -67,17 +86,24 @@ public class GeneticPartService {
         final GeneticPart part = new GeneticPart(visibleValueArr);
         part.moveDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
         part.size = HexGridService.rnd.nextInt(MIN_SIZE, MAX_SIZE);
-        part.energie = HexGridService.rnd.nextInt(part.size / 4, part.size / 2);
+        part.energie = HexGridService.rnd.nextInt(part.size / 2, part.size / 1);
 
         part.genNet = GenNetService.createNet(genNetLayerSizeArr, HexGridService.rnd);
 
         return part;
     }
 
-    public void calc() {
+    private int diffToTargetPartSize = 500;
+
+    @Override
+    public void calcParts() {
         final int diffToTargetPartCount = this.targetPopulationPartCount - this.hexGridService.retrievePartCount();
 
-        if (diffToTargetPartCount > (this.targetPopulationPartCount - (this.targetPopulationPartCount / FILL_POPULATION_DIV))) {
+        //if (diffToTargetPartCount > (this.targetPopulationPartCount - (this.targetPopulationPartCount / FILL_POPULATION_DIV))) {
+        if (diffToTargetPartCount > diffToTargetPartSize) {
+            if (diffToTargetPartSize > 10) {
+                diffToTargetPartSize--;
+            }
             this.fillPartPopulation(this.targetPopulationPartCount);
         }
     }
@@ -118,6 +144,8 @@ public class GeneticPartService {
             final Part newPart;
             final int maxXPos;
             final int maxYPos;
+            int xPos;
+            int yPos;
             if (!partList.isEmpty()) {
                 if (HexGridService.rnd.nextInt(10) >= 1) {
                     final GeneticPart sourcePart;
@@ -127,45 +155,76 @@ public class GeneticPartService {
                         sourcePart = (GeneticPart) partList.get(HexGridService.rnd.nextInt(partList.size()));
                     }
                     if (HexGridService.rnd.nextBoolean()) {
-                        final int newEnergie = HexGridService.rnd.nextInt(sourcePart.size / 6, sourcePart.size / 4);
+                        //final int newEnergie = HexGridService.rnd.nextInt(sourcePart.size / 6, sourcePart.size / 4);
+                        //final int newEnergie = HexGridService.rnd.nextInt(sourcePart.size / 2, sourcePart.size / 1);
+                        final int newEnergie = sourcePart.getEnergie();
                         newPart = this.mutateGeneticPart(sourcePart, newEnergie, 0.014F, 0.15F);
                     } else {
                         newPart = this.copyGeneticPart(sourcePart);
                     }
                     maxXPos = this.hexGridService.getXGridSize() - (this.hexGridService.getXGridSize() / 8);
                     maxYPos = this.hexGridService.getYGridSize() - (this.hexGridService.getYGridSize() / 5);
+                    xPos = sourcePart.getGridNode().getXPos();
+                    yPos = sourcePart.getGridNode().getYPos();
                 } else {
                     newPart = this.createGeneticPart();
                     maxXPos = this.hexGridService.getXGridSize();
                     maxYPos = this.hexGridService.getYGridSize();
+                    xPos = HexGridService.rnd.nextInt(maxXPos / 1) * 1;
+                    yPos = HexGridService.rnd.nextInt(maxYPos / 3) * 3;
                 }
             } else {
                 newPart = this.createGeneticPart();
                 maxXPos = this.hexGridService.getXGridSize();
                 maxYPos = this.hexGridService.getYGridSize();
+                xPos = HexGridService.rnd.nextInt(maxXPos / 1) * 1;
+                yPos = HexGridService.rnd.nextInt(maxYPos / 3) * 3;
             }
             do {
-                final int xPos = HexGridService.rnd.nextInt(maxXPos / 1) * 1;
-                final int yPos = HexGridService.rnd.nextInt(maxYPos / 3) * 3;
                 final GridNode targetGridNode = this.hexGridService.retrieveGridNode(xPos, yPos);
                 if (Objects.isNull(targetGridNode.getOutPart())) {
                     targetGridNode.setOutPart(newPart);
                     break;
                 }
+                xPos = HexGridService.rnd.nextInt(maxXPos / 1) * 1;
+                yPos = HexGridService.rnd.nextInt(maxYPos / 3) * 3;
             } while (true);
         }
     }
 
     public void calcPartNetInput(final GridNode sourceGridNode, final GeneticPart part) {
         if (part.energie > 0) {
-            this.consumeEnergie(part, 1);
-            this.checkPartConfiguration(part);
+            this.consumeEnergie(part, 1); // TODO Depend on size of GenNet.
+            //this.checkPartConfiguration(part); // TODO Move to Persistence.
             this.calcPartNet(sourceGridNode, part);
         }
     }
 
-    public void calcPart(final GridNode sourceGridNode, final GeneticPart part) {
-        boolean printed = false;
+    /**
+     * 3. Part: Out -> In
+     */
+    @Override
+    public void calcPartOutToIn(final GridNode sourceGridNode, final Part outPart) {
+        if (outPart instanceof GeneticPart geneticPart) {
+            this.calcGeneticPart(sourceGridNode, geneticPart);
+        } else {
+            if (outPart instanceof EnergyPart energyPart) {
+                if (energyPart.energie > 0) {
+                    this.consumeEnergie(energyPart, 1);
+                    sourceGridNode.setInPart(outPart);
+                }
+            } else {
+                if (outPart instanceof BlockerPart) {
+                    sourceGridNode.setInPart(outPart);
+                } else {
+                    throw new RuntimeException("Unexpected Part-Type \"%s\".".formatted(outPart.getClass().getSimpleName()));
+                }
+            }
+        }
+    }
+
+    public void calcGeneticPart(final GridNode sourceGridNode, final GeneticPart part) {
+        //boolean printed = false;
         if (part.energie > 0) {
             //this.consumeEnergie(part, 1);
             //this.checkPartConfiguration(part);
@@ -175,18 +234,18 @@ public class GeneticPartService {
             if (rotateValue != 0) {
                 part.moveDir = HexDirUtils.calcRotateDir(part.moveDir, rotateValue);
                 this.consumeEnergie(part, 1);
-                if (printed == false) System.out.println();
-                System.out.printf("\tRotate: %,d", rotateValue);
-                printed = true;
+                //if (printed == false) System.out.println();
+                //System.out.printf("\tRotate: %,d", rotateValue);
+                //printed = true;
             }
 
             final GridNode targetGridNode;
             if (this.calcMove(part)) {
                 targetGridNode = this.hexGridService.retrieveGridNode(sourceGridNode.getXPos(), sourceGridNode.getYPos(), part.moveDir);
                 this.consumeEnergie(part, 1);
-                if (printed == false) System.out.println();
-                System.out.printf("\tMove: %s", part.moveDir.name());
-                printed = true;
+                //if (printed == false) System.out.println();
+                //System.out.printf("\tMove: %s", part.moveDir.name());
+                //printed = true;
             } else {
                 targetGridNode = sourceGridNode;
             }
@@ -197,11 +256,13 @@ public class GeneticPartService {
                 final GridNode attackedGridNode = this.hexGridService.retrieveGridNode(sourceGridNode.getXPos(), sourceGridNode.getYPos(), part.moveDir);
                 final Part attackedPart = attackedGridNode.getOutPart();
                 if (Objects.nonNull(attackedPart) && attackedPart instanceof EnergyPart attackedEnergyPart) {
-                    final int eatValue = this.consumeEnergie(attackedEnergyPart, Math.min((attackedEnergyPart.energie / 2) + 1, attackValue)); // 10 is temporary
-                    this.addEnergie(part, costAttackValue + eatValue);
-                    if (printed == false) System.out.println();
-                    System.out.printf("\tAttack: %3d\tEat: %3d", attackValue, eatValue);
-                    printed = true;
+                    //final int eatValue = this.consumeEnergie(attackedEnergyPart, Math.min((attackedEnergyPart.energie / 2) + 1, attackValue)); // 10 is temporary
+                    final int eatValue = this.consumeEnergie(attackedEnergyPart, attackValue);
+                    final int notEatValue = this.addEnergie(part, costAttackValue + eatValue);
+                    this.addEnergie(attackedEnergyPart, notEatValue);
+                    //if (printed == false) System.out.println();
+                    //System.out.printf("\tAttack: %3d\tEat: %3d", attackValue, eatValue);
+                    //printed = true;
                 }
             }
 
@@ -213,9 +274,9 @@ public class GeneticPartService {
                         final GeneticPart newPart = this.populateGeneticPart(part);
                         outGridNode.setInPart(newPart);
                         this.consumeEnergie(part, newPart.energie);
-                        if (printed == false) System.out.println();
-                        System.out.printf("\tPop: %s", hexDir.name());
-                        printed = true;
+                        //if (printed == false) System.out.println();
+                        //System.out.printf("\tPop: %s", hexDir.name());
+                        //printed = true;
                     } else {
                         this.consumeEnergie(part, 6);
                     }
@@ -230,7 +291,7 @@ public class GeneticPartService {
                 sourceGridNode.setInPart(part);
             }
         }
-        if (printed) System.out.println(); else System.out.print("-");
+        //if (printed) System.out.println(); else System.out.print("-");
     }
 
     private static final int IN_THIS_ENERGIE = 0;
@@ -367,6 +428,8 @@ public class GeneticPartService {
         return newPart;
     }
 
+    private static final GenNetMutateConfig genNetMutateConfig = new GenNetMutateConfig(true);
+
     private GeneticPart mutateGeneticPart(final GeneticPart sourcePart, final int newEnergie, final float minMutationRate, final float maxMutationRate) {
         final double[] sourceVisibleValueArr = sourcePart.getValueFieldArr();
         final double[] visibleValueArr = new double[] {
@@ -380,12 +443,12 @@ public class GeneticPartService {
         newPart.moveDir = sourcePart.moveDir;
         newPart.size = this.mutateValue(MIN_SIZE, MAX_SIZE, 1, sourcePart.size);
         newPart.energie = newEnergie;
-        newPart.genNet = GenNetTrainService.createMutatedNet(sourcePart.genNet, mutationRate, HexGridService.rnd);
+        newPart.genNet = GenNetTrainService.createMutatedNet(sourcePart.genNet, mutationRate, genNetMutateConfig, HexGridService.rnd);
         return newPart;
     }
 
     private int mutateValue(final int minValue, final int maxValue, final int mutateValue, final int value) {
-        final int newValue = value + HexGridService.rnd.nextInt(mutateValue * 2) - mutateValue;
+        final int newValue = value + HexGridService.rnd.nextInt(mutateValue * 2 + 1) - mutateValue;
         return Math.min(maxValue, Math.max(minValue, newValue));
     }
 
@@ -457,14 +520,17 @@ public class GeneticPartService {
         return (int) (outputValue * part.size);
     }
 
+    @Override
     public int retrieveGenerationCount() {
         return this.generationCount;
     }
 
+    @Override
     public void submitGenerationCount(final int generationCount) {
         this.generationCount = generationCount;
     }
 
+    @Override
     public void calcBeginNext() {
         for (int pos = 0; pos < 3; pos++) {
             final GridNode outGridNode = this.hexGridService.retrieveGridNode(
@@ -473,9 +539,17 @@ public class GeneticPartService {
             final Part targetPart = outGridNode.getOutPart();
             if (Objects.isNull(targetPart)) {
                 final EnergyPart newEnergyPart = new EnergyPart(new double[] { 0.0D, 0.5D, 0.5D });
-                newEnergyPart.setEnergie(32);
+                newEnergyPart.setEnergie(32*2);
                 outGridNode.setOutPart(newEnergyPart);
             }
         }
     }
+
+    @Override
+    public void calcPartInput(final GridNode sourceGridNode, final Part part) {
+        if (part instanceof GeneticPart geneticPart) {
+            this.calcPartNetInput(sourceGridNode, geneticPart);
+        }
+    }
+
 }

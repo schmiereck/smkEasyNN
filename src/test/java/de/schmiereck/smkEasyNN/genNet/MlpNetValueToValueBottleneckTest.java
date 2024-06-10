@@ -78,6 +78,7 @@ public class MlpNetValueToValueBottleneckTest {
                 // Führen Sie hier Ihre Berechnung durch
                 final GenNet trainedGenNet = GenNetTrainService.runTrainNet(layerSizeArr,
                         minMutationRate, maxMutationRateValue, populationSize, epocheSize, copyPercent,
+                        GenNetTrainService.DefaultGenNetMutateConfig,
                         expectedOutputArrArr, trainInputArrArr,
                         (epochPos) -> {},
                         (error) -> {},

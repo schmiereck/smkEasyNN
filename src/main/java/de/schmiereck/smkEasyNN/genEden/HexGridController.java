@@ -2,8 +2,10 @@ package de.schmiereck.smkEasyNN.genEden;
 
 import de.schmiereck.smkEasyNN.genEden.service.*;
 import de.schmiereck.smkEasyNN.genEden.service.persistent.GeneticPersistentService;
+import de.schmiereck.smkEasyNN.genEden.view.HexGridViewParallelProcessor;
 import de.schmiereck.smkEasyNN.genEden.view.PartModel;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -26,9 +28,9 @@ public class HexGridController {
     public static final double Y_SPACE = (Math.sqrt(3) / 2.0D);
 
     //public static final double SCALE = 1.0D;//2.0D;
-    public static final double SCALE = 0.75D;//2.0D;
-    public static final double STROKE_WIDTH = 1.0D * SCALE;
-    public static final double FIELD_STROKE_WIDTH = 2.0D * SCALE;
+    public static double SCALE = 0.75D;//2.0D;
+    public static double STROKE_WIDTH = 1.0D * SCALE;
+    public static double FIELD_STROKE_WIDTH = 2.0D * SCALE;
     public static final Color FIELD_DIR_COLOR = Color.color(1.0D, 1.0D, 0.0D);
 
     private HexGridService hexGridService;
@@ -47,19 +49,39 @@ public class HexGridController {
     private final String directoryName = "./data/";
     private File lastFile = new File("%sgenetic-a.genEden.json".formatted(directoryName));
 
+    public static boolean demoMode = false;
+    private final ServiceContext serviceContext;
+    public static boolean threadMode = true;
+
     public HexGridController() {
-        this.hexGridService = new HexGridService();
+        this.serviceContext = new ServiceContext();
+        this.hexGridService = new HexGridService(this.serviceContext);
+        final PartServiceInterface partService;
+        if (HexGridController.demoMode) {
+            partService = new DemoPartService(this.hexGridService);
+        } else {
+            partService = new GeneticPartService(this.hexGridService);
+        }
+        this.serviceContext.setPartService(partService);
     }
 
     @FXML
     public void initialize() {
-        this.hexGridService.init(30*2, 27*4);
-        //this.hexGridService.init(40*2, 40*3);
+        if (HexGridController.demoMode) {
+            this.hexGridService.init(50*2, 46*4);
+            SCALE = 0.75D * 0.6D;
+        } else {
+            this.hexGridService.init(35*2, 27*4);
+            //this.hexGridService.init(40*2, 40*3);
+            SCALE = 0.75D;//2.0D;
+        }
+        STROKE_WIDTH = 1.0D * SCALE;
+        FIELD_STROKE_WIDTH = 2.0D * SCALE;
 
         final HexGrid hexGrid = this.hexGridService.retrieveHexGrid();
 
         this.hexGridModel = new HexGridModel(hexGrid.getXSize(), hexGrid.getYSize(), 10.0D * SCALE);
-        this.initHexGrid(this.hexGridModel);
+        this.initHexGridModel(this.hexGridModel);
 
         this.updateHexGridModel(this.hexGridModel);
 
@@ -78,7 +100,7 @@ public class HexGridController {
     private void updateHexGridModel(final HexGridModel hexGridModel) {
         hexGridModel.stepCount = this.hexGridService.retrieveStepCount();
         hexGridModel.partCount = this.hexGridService.retrievePartCount();
-        hexGridModel.generationCount = this.hexGridService.getGeneticPartService().retrieveGenerationCount();
+        hexGridModel.generationCount = this.serviceContext.getPartService().retrieveGenerationCount();
 
         for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
             for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
@@ -86,17 +108,19 @@ public class HexGridController {
                 final Part outPart = gridNode.getOutPart();
                 final HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
                 if (Objects.nonNull(outPart)) {
-                    hexCellModel.partModel = new PartModel(outPart.getValueFieldArr());
+                    hexCellModel.partModel.isPart = true;
+                    hexCellModel.partModel.visibleValueArr = outPart.getValueFieldArr();
                     if (outPart instanceof GeneticPart) {
                         final GeneticPart geneticPart = (GeneticPart) outPart;
                         hexCellModel.partModel.moveDir = geneticPart.getMoveDir();
                     }
                 } else {
-                    hexCellModel.partModel = null;
+                    hexCellModel.partModel.isPart = false;
+                    hexCellModel.partModel.visibleValueArr = null;
                 }
                 for (final HexDir hexDir : HexDir.values()) {
                     final Field field = gridNode.getField(hexDir);
-                    if (HexGridService.demoMode) {
+                    if (HexGridController.demoMode) {
                         hexCellModel.fieldArrArr[hexDir.ordinal()][0] = field.outValueArr[0];
                         hexCellModel.fieldArrArr[hexDir.ordinal()][1] = field.outValueArr[1];
                         hexCellModel.fieldArrArr[hexDir.ordinal()][2] = field.outValueArr[2];
@@ -139,14 +163,20 @@ public class HexGridController {
         this.updateView();
     }
 
+    private final HexGridViewParallelProcessor hexGridViewProc = new HexGridViewParallelProcessor();
+
     public void updateView() {
         this.counterText.setText(String.format("Step: %d (Parts: %,d), Generation: %d",
                 this.hexGridModel.stepCount, this.hexGridModel.partCount, this.hexGridModel.generationCount));
 
-        this.updateHexGrid(this.hexGridModel);
+        if (threadMode) {
+            this.hexGridViewProc.processHexGrid(this, this.hexGridModel);
+        } else {
+            this.updateHexGridView(this.hexGridModel, 0, 0, hexGridModel.xSize - 1, hexGridModel.ySize - 1);
+        }
     }
 
-    private void initHexGrid(final HexGridModel hexGridModel) {
+    private void initHexGridModel(final HexGridModel hexGridModel) {
         final double xBordOffset = hexGridModel.size + (STROKE_WIDTH / 2.0D);
         final double yBordOffset = hexGridModel.size * Y_SPACE + (STROKE_WIDTH / 2.0D);
 
@@ -162,21 +192,26 @@ public class HexGridController {
                     this.mainPane.getChildren().add(dirArr[edgePos]);
                 }
 
-                hexGridModel.grid[xPos][yPos] = new HexCellModel(hexagon, dirArr);
+                final HexCellModel hexCellModel = new HexCellModel(hexagon, dirArr);
+                hexCellModel.partModel = new PartModel();
+                hexGridModel.grid[xPos][yPos] = hexCellModel;
             }
         }
     }
 
-    private void updateHexGrid(final HexGridModel hexGridModel) {
-        for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
-            for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
+    private final static ColorCache colorCache = new ColorCache();
+
+    public void updateHexGridView(final HexGridModel hexGridModel, final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+        for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
+            for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
                 final HexCellModel hexCellModel = hexGridModel.grid[xPos][yPos];
                 final Polygon hexagon = hexCellModel.hexagon;
                 final Color partColor;
                 final PartModel partModel = hexGridModel.grid[xPos][yPos].partModel;
-                if (Objects.nonNull(partModel)) {
+                if (partModel.isPart) {
                     //partColor = Color.CORAL;
-                    partColor = Color.color(
+                    //partColor = Color.color(
+                    partColor = colorCache.retrieveColor(
                             1.0D - (partModel.visibleValueArr[0]),
                             1.0D - (partModel.visibleValueArr[1]),
                             1.0D - (partModel.visibleValueArr[2]));
@@ -197,10 +232,12 @@ public class HexGridController {
                         //} else {
                         //    hexCellModel.dirArr[inDir.ordinal()].setStroke(Color.BLACK);
                         //}
-                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(Color.color(
-                                1.0D - (fieldArr[0]),
-                                1.0D - (fieldArr[1]),
-                                1.0D - (fieldArr[2])));
+                        hexCellModel.dirArr[hexDir.ordinal()].setStroke(
+                                //Color.color(
+                                colorCache.retrieveColor(
+                                        Math.abs(1.0D - (fieldArr[0])),
+                                        Math.abs(1.0D - (fieldArr[1])),
+                                        Math.abs(1.0D - (fieldArr[2]))));
                         //1.0D - Math.tanh(fieldArr[0]),
                         //1.0D - Math.tanh(fieldArr[1]),
                         //1.0D - Math.tanh(fieldArr[2])));
@@ -266,7 +303,7 @@ public class HexGridController {
                     filter(part -> part instanceof GeneticPart).
                     map(part -> (GeneticPart) part).toList(),
                     this.hexGridService.retrieveStepCount(),
-                    this.hexGridService.getGeneticPartService().retrieveGenerationCount());
+                    this.serviceContext.getPartService().retrieveGenerationCount());
         }
     }
 
@@ -285,7 +322,7 @@ public class HexGridController {
 
             this.hexGridService.submitPartList(loadNetResult.geneticPartList().stream().map(part -> (Part) part).toList());
             this.hexGridService.submitStepCount(loadNetResult.stepCount());
-            this.hexGridService.getGeneticPartService().submitGenerationCount(loadNetResult.generationCount());
+            this.serviceContext.getPartService().submitGenerationCount(loadNetResult.generationCount());
 
             this.updateHexGridModel(this.hexGridModel);
             this.updateView();

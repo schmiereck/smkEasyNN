@@ -6,19 +6,54 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static de.schmiereck.smkEasyNN.genNet.GenNetService.createGenNetSynapse;
+import static de.schmiereck.smkEasyNN.genNet.GenNetService.submitNewNeuron;
+
 public class GenNetTrainService {
+    public record GenNetMutateConfig(boolean changeNet) {}
+    public static final GenNetMutateConfig DefaultGenNetMutateConfig = new GenNetMutateConfig(false);
+
+    private final static int ChangeNetMutationRate = 4;
+    private final static int ChangeNetRemoveNeuronMutationRate = 10;
+    private final static int ChangeNetNewNeuronMutationRate = 5;
 
     static GenNet runTrainNet(final GenNet genNet, final float mutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final int epocheSize, final float copyPercent,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
                               final Random rnd) {
-        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+        return runTrainNet(genNet, mutationRate, populationSize, epocheSize, copyPercent,
+                DefaultGenNetMutateConfig,
+                expectedOutputArrArr,  trainInputArrArr, rnd);
+    }
+
+    static GenNet runTrainNet(final GenNet genNet, final float mutationRate, final int populationSize,
+                              final int epocheSize, final float copyPercent,
+                              final GenNetMutateConfig config,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Random rnd) {
+        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, config,
+                expectedOutputArrArr, trainInputArrArr,
                 rnd);
     }
 
     static GenNet runTrainNet(final GenNet genNet, final float minMutationRate, final float maxMutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final int epocheSize, final float copyPercent,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
                               final Random rnd) {
-        return runTrainNet(genNet, minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+        return runTrainNet(genNet, minMutationRate, maxMutationRate, populationSize,
+                epocheSize, copyPercent,
+                DefaultGenNetMutateConfig,
+                expectedOutputArrArr, trainInputArrArr,
+                rnd);
+    }
+
+    static GenNet runTrainNet(final GenNet genNet, final float minMutationRate, final float maxMutationRate, final int populationSize,
+                              final int epocheSize, final float copyPercent,
+                              final GenNetMutateConfig config,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final Random rnd) {
+        return runTrainNet(genNet, minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent, config,
+                expectedOutputArrArr, trainInputArrArr,
                 (epochePos) -> System.out.printf("Epoch %8d:", epochePos),
                 (error) -> System.out.printf(" %5.3f", error),
                 () -> System.out.println(),
@@ -26,18 +61,23 @@ public class GenNetTrainService {
     }
 
     static GenNet runTrainNet(final GenNet genNet, final float mutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final int epocheSize, final float copyPercent,
+                              final GenNetMutateConfig config,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
                               final Consumer<Integer> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
                               final Random rnd) {
-        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+        return runTrainNet(genNet, mutationRate, mutationRate, populationSize, epocheSize, copyPercent, config,
+                expectedOutputArrArr, trainInputArrArr,
                 printEpoch, printError, printEndline,
                 rnd);
     }
 
     static GenNet runTrainNet(final int[] layerSizeArr, final float minMutationRate, final float maxMutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final int epocheSize, final float copyPercent,
+                              final GenNetMutateConfig config,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
                               final Consumer<Integer> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
@@ -49,13 +89,16 @@ public class GenNetTrainService {
             genNetList.add(genNet);
         }
 
-        return runTrainNet(genNetList, minMutationRate, maxMutationRate, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+        return runTrainNet(genNetList, minMutationRate, maxMutationRate, epocheSize, copyPercent, config,
+                expectedOutputArrArr, trainInputArrArr,
                 printEpoch, printError, printEndline,
                 rnd);
     }
 
     static GenNet runTrainNet(final GenNet genNet, final float minMutationRate, final float maxMutationRate, final int populationSize,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final int epocheSize, final float copyPercent,
+                              final GenNetMutateConfig config,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
                               final Consumer<Integer> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
@@ -69,13 +112,16 @@ public class GenNetTrainService {
             genNetList.add(mutatedGenNet);
         }
 
-        return runTrainNet(genNetList, minMutationRate, maxMutationRate, epocheSize, copyPercent, expectedOutputArrArr, trainInputArrArr,
+        return runTrainNet(genNetList, minMutationRate, maxMutationRate, epocheSize, copyPercent, config,
+                expectedOutputArrArr, trainInputArrArr,
                 printEpoch, printError, printEndline,
                 rnd);
     }
 
     static GenNet runTrainNet(final List<GenNet> genNetList, final float minMutationRate, final float maxMutationRate,
-                              final int epocheSize, final float copyPercent, final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
+                              final int epocheSize, final float copyPercent,
+                              final GenNetMutateConfig config,
+                              final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
                               final Consumer<Integer> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
@@ -93,7 +139,7 @@ public class GenNetTrainService {
             if (epochePos >= epocheSize - 1) {
                 break;
             }
-            calcNextGeneration(genNetList, minMutationRate, maxMutationRate, copyPercent, rnd);
+            calcNextGeneration(genNetList, minMutationRate, maxMutationRate, copyPercent, config, rnd);
         }
         return genNetList.get(0);
     }
@@ -120,7 +166,9 @@ public class GenNetTrainService {
         }
     }
 
-    private static void calcNextGeneration(final List<GenNet> genNetList, final float minMutationRate, final float maxMutationRate, final float copyPercent, final Random rnd) {
+    private static void calcNextGeneration(final List<GenNet> genNetList,
+                                           final float minMutationRate, final float maxMutationRate, final float copyPercent, final GenNetMutateConfig config,
+                                           final Random rnd) {
         final float mutationRate = calcMutationRate(minMutationRate, maxMutationRate, rnd);
         final float mutationRate2 = calcMutationRate2(minMutationRate, maxMutationRate, rnd);
         final int copySize = calcMutationCount(genNetList.size(), copyPercent, 1);
@@ -143,7 +191,7 @@ public class GenNetTrainService {
             } else {
                 usedMutationRate = mutationRate2;
             }
-            final GenNet mutatedNet = createMutatedNet(net, usedMutationRate, rnd);
+            final GenNet mutatedNet = createMutatedNet(net, usedMutationRate, config, rnd);
             nextGenNetList.add(mutatedNet);
         }
         genNetList.clear();
@@ -201,11 +249,15 @@ public class GenNetTrainService {
     }
 
     public static GenNet createMutatedNet(final GenNet net, final float mutationRate, final Random rnd) {
-        final GenNet mutatedNet = GenNetService.copyNet(net);
-        return mutateNet(mutatedNet, mutationRate, rnd);
+        return createMutatedNet(net, mutationRate, DefaultGenNetMutateConfig, rnd);
     }
 
-    public static GenNet mutateNet(final GenNet net, final float mutationRate, final Random rnd) {
+    public static GenNet createMutatedNet(final GenNet net, final float mutationRate, final GenNetMutateConfig config, final Random rnd) {
+        final GenNet mutatedNet = GenNetService.copyNet(net);
+        return mutateNet(mutatedNet, mutationRate, config, rnd);
+    }
+
+    public static GenNet mutateNet(final GenNet net, final float mutationRate, final GenNetMutateConfig config, final Random rnd) {
         final int mutationCount = calcMutationCount(net, mutationRate);
         for (int pos = 0; pos < mutationCount; pos++) {
             //switch (rnd.nextInt(5)) {
@@ -217,10 +269,23 @@ public class GenNetTrainService {
                 case 1 -> mutateWeight(net, mutationRate, rnd);
                 // Bias modification
                 case 2 -> mutateBias(net, mutationRate, rnd);
-                // New Synapse
-                case 3 -> mutateNewSynapse(net);
-                // New Neuron
-                case 4 -> mutateNewNeuron(net);
+            }
+        }
+        if (config.changeNet()) {
+            if (rnd.nextInt(ChangeNetMutationRate) == 0) {
+                switch (rnd.nextInt(5)) {
+                    // Nothing
+                    case 0 -> {
+                    }
+                    // New Synapse
+                    case 1 -> mutateNewSynapse(net, rnd);
+                    // New Neuron
+                    case 2 -> mutateNewNeuron(net, rnd);
+                    // Remove Synapse
+                    case 3 -> mutateRemoveSynapse(net, rnd);
+                    // Remove Neuron
+                    case 4 -> mutateRemoveNeuron(net, rnd);
+                }
             }
         }
         return net;
@@ -245,7 +310,7 @@ public class GenNetTrainService {
 
     private static void mutateWeight(final GenNet mutatedNet, final float mutationRate, final Random rnd) {
         final GenNeuron neuron = mutatedNet.neuronList.get(rnd.nextInt(mutatedNet.neuronList.size()));
-        if (Objects.nonNull(neuron.inputSynapseList)) {
+        if (Objects.nonNull(neuron.inputSynapseList) && !neuron.inputSynapseList.isEmpty()) {
             final GenSynapse synapse = neuron.inputSynapseList.get(rnd.nextInt(neuron.inputSynapseList.size()));
             //synapse.weight += rnd.nextFloat(1.0F) - 0.5F;
             //synapse.weight += rnd.nextFloat(0.5F) - 0.25F;
@@ -255,11 +320,74 @@ public class GenNetTrainService {
         }
     }
 
-    private static void mutateNewNeuron(final GenNet mutatedNet) {
+    private static void mutateNewNeuron(final GenNet mutatedNet, final Random rnd) {
+        if (rnd.nextInt(ChangeNetNewNeuronMutationRate) == 0) {
+            // Insert new Neuron in existing synapse connection:
+            final GenNeuron outNeuron = mutatedNet.neuronList.get(rnd.nextInt(mutatedNet.neuronList.size()));
+            if (outNeuron.getNeuronType() != GenNeuron.NeuronType.Input) {
+                if (Objects.nonNull(outNeuron.inputSynapseList) && !outNeuron.inputSynapseList.isEmpty()) {
+                    final int inSynapsePos = rnd.nextInt(outNeuron.inputSynapseList.size());
+                    final GenSynapse inSynapse = outNeuron.inputSynapseList.get(inSynapsePos);
+                    final GenNeuron inNeuron = inSynapse.getInGenNeuron();
+                    // inNeuron <--inSynapse-- outNeuron
 
+                    final GenNeuron newNeuron = new GenNeuron(GenNeuron.NeuronType.Hidden, 0.0F);
+                    submitNewNeuron(mutatedNet, outNeuron.neuronIndex, newNeuron);
+                    inSynapse.inGenNeuron = newNeuron;
+                    createGenNetSynapse(inNeuron, newNeuron, 1.0F);
+                    // inNeuron <--newSynapse-- newNeuron <--inSynapse-- outNeuron
+                }
+            }
+        }
     }
 
-    private static void mutateNewSynapse(final GenNet mutatedNet) {
+    private static void mutateNewSynapse(final GenNet mutatedNet, final Random rnd) {
+        // Insert new Neuron between random Neurons:
+        final GenNeuron inNeuron = mutatedNet.neuronList.get(rnd.nextInt(mutatedNet.neuronList.size()));
+        final GenNeuron outNeuron = mutatedNet.neuronList.get(
+                rnd.nextInt(Math.max(mutatedNet.inputNeuronList.size(), inNeuron.neuronIndex),
+                        mutatedNet.neuronList.size()));
+        if (outNeuron.getNeuronType() != GenNeuron.NeuronType.Input) {
+            if (Objects.isNull(outNeuron.inputSynapseList)) {
+                outNeuron.inputSynapseList = new ArrayList<>();
+            }
+            createGenNetSynapse(inNeuron, outNeuron, 0.0F);
+        }
+    }
 
+    private static void mutateRemoveNeuron(final GenNet mutatedNet, final Random rnd) {
+        if (rnd.nextInt(ChangeNetRemoveNeuronMutationRate) == 0) {
+            final int startHiddenNeuronPos = mutatedNet.inputNeuronList.size();
+            final int hiddenNeuronSize = mutatedNet.neuronList.size() - startHiddenNeuronPos - mutatedNet.outputNeuronList.size();
+            if (hiddenNeuronSize > 0) {
+                final int removedNeuronPos = startHiddenNeuronPos + rnd.nextInt(hiddenNeuronSize);
+                final GenNeuron removedNeuron = mutatedNet.neuronList.get(removedNeuronPos);
+                removedNeuron.inputSynapseList.forEach(inSynapse -> {
+                    inSynapse.inGenNeuron = null;
+                });
+                removedNeuron.inputSynapseList.clear();
+                for (int neuronPos = removedNeuronPos + 1; neuronPos < mutatedNet.neuronList.size(); neuronPos++) {
+                    final GenNeuron nextNeuron = mutatedNet.neuronList.get(neuronPos);
+                    nextNeuron.neuronIndex--;
+                    for (int synapsePos = 0; synapsePos < nextNeuron.inputSynapseList.size(); synapsePos++) {
+                        final GenSynapse synapse = nextNeuron.inputSynapseList.get(synapsePos);
+                        if (synapse.inGenNeuron == removedNeuron) {
+                            nextNeuron.inputSynapseList.remove(synapsePos);
+                            synapsePos--;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void mutateRemoveSynapse(final GenNet mutatedNet, final Random rnd) {
+        final GenNeuron outNeuron = mutatedNet.neuronList.get(rnd.nextInt(mutatedNet.neuronList.size()));
+        if (Objects.nonNull(outNeuron.inputSynapseList) && !outNeuron.inputSynapseList.isEmpty()) {
+            final int inSynapsePos = rnd.nextInt(outNeuron.inputSynapseList.size());
+            final GenSynapse inSynapse = outNeuron.inputSynapseList.get(inSynapsePos);
+            inSynapse.inGenNeuron = null;
+            outNeuron.inputSynapseList.remove(inSynapsePos);
+        }
     }
 }

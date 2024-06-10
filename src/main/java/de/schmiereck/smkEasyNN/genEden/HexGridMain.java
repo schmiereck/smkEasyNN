@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 
 public class HexGridMain {
     public static void main(String[] args) {
-        HexGridService.demoMode = false;
+        HexGridController.demoMode = false;
         HexGridApp.main(args);
     }
 }

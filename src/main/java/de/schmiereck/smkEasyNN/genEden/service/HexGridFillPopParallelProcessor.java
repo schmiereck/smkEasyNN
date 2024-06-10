@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HexGridFillPopParallelProcessor {
-    private static final int NUM_THREADS = Math.min(1, Runtime.getRuntime().availableProcessors() - 2);
+    private static final int NUM_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
 
     public void fillPopHexGrid(final GeneticPartService geneticPartService, final List<Part> partList, final int partCount) {
         final ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);

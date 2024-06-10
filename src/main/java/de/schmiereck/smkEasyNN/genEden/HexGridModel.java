@@ -1,8 +1,8 @@
 package de.schmiereck.smkEasyNN.genEden;
 
 public class HexGridModel {
-    final int ySize;
-    final int xSize;
+    public final int ySize;
+    public final int xSize;
     final double size;
 
     final HexCellModel grid[][];
