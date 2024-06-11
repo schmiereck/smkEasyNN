@@ -6,14 +6,15 @@ import de.schmiereck.smkEasyNN.genEden.view.HexGridViewParallelProcessor;
 import de.schmiereck.smkEasyNN.genEden.view.PartModel;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -21,16 +22,6 @@ import java.io.File;
 import java.util.Objects;
 
 public class HexGridController {
-
-    public static final double X_SPACE = (2.0D + 1.0D);
-    public static final double X_OFFSET_0 = (0.5D);
-    public static final double X_OFFSET_1 = (1.5D);
-    public static final double Y_SPACE = (Math.sqrt(3) / 2.0D);
-
-    //public static final double SCALE = 1.0D;//2.0D;
-    public static double SCALE = 0.75D;//2.0D;
-    public static double STROKE_WIDTH = 1.0D * SCALE;
-    public static double FIELD_STROKE_WIDTH = 2.0D * SCALE;
     public static final Color FIELD_DIR_COLOR = Color.color(1.0D, 1.0D, 0.0D);
 
     private HexGridService hexGridService;
@@ -65,27 +56,82 @@ public class HexGridController {
         this.serviceContext.setPartService(partService);
     }
 
+    private static void calcScale(final HexGridModel hexGridModel, final double newScale) {
+        HexGridModel.SCALE = newScale;//2.0D;
+        HexGridModel.STROKE_WIDTH = 1.0D * HexGridModel.SCALE;
+        HexGridModel.FIELD_STROKE_WIDTH = 2.0D * HexGridModel.SCALE;
+        hexGridModel.xBordOffset = hexGridModel.size + (HexGridModel.STROKE_WIDTH / 2.0D);
+        hexGridModel.yBordOffset = hexGridModel.size * HexGridModel.Y_SPACE + (HexGridModel.STROKE_WIDTH / 2.0D);
+    }
+
     @FXML
     public void initialize() {
         if (HexGridController.demoMode) {
             this.hexGridService.init(50*2, 46*4);
-            SCALE = 0.75D * 0.6D;
         } else {
             this.hexGridService.init(35*2, 27*4);
             //this.hexGridService.init(40*2, 40*3);
-            SCALE = 0.75D;//2.0D;
         }
-        STROKE_WIDTH = 1.0D * SCALE;
-        FIELD_STROKE_WIDTH = 2.0D * SCALE;
 
         final HexGrid hexGrid = this.hexGridService.retrieveHexGrid();
 
-        this.hexGridModel = new HexGridModel(hexGrid.getXSize(), hexGrid.getYSize(), 10.0D * SCALE);
-        this.initHexGridModel(this.hexGridModel);
+        this.hexGridModel = new HexGridModel(hexGrid.getXSize(), hexGrid.getYSize(), 10.0D * HexGridModel.SCALE);
+        if (HexGridController.demoMode) {
+            calcScale(this.hexGridModel, 0.75D * 0.6D);
+        } else {
+            calcScale(this.hexGridModel, 0.75D);//2.0D;
+        }
+
+        this.initHexGridModel(this.hexGridModel, this.mainPane);
 
         this.updateHexGridModel(this.hexGridModel);
 
         this.updateView();
+
+        //--------------------------------------------------------------------------------------------------------------
+        final ObjectProperty<Point2D> dragLastMouseCoordinates = new SimpleObjectProperty<>();
+        final ObjectProperty<Boolean> dragOperation = new SimpleObjectProperty<>();
+        dragOperation.set(Boolean.FALSE);
+
+        this.mainPane.setOnMouseClicked(event -> {
+            if (dragOperation.get() == Boolean.FALSE) {
+                final Point2D sceneCoords = new Point2D(event.getSceneX(), event.getSceneY());
+                final Point2D anchorPaneCoords = mainPane.sceneToLocal(sceneCoords);
+                final double x = anchorPaneCoords.getX() - this.hexGridModel.xBordOffset;
+                final double y = anchorPaneCoords.getY() - this.hexGridModel.yBordOffset;
+
+                //final double offsetX = yPos % 2 == 0 ? HexGridModel.X_OFFSET_0 : hexGridModel.size * HexGridModel.X_OFFSET_1;
+                //hexagon.setLayoutX(xBordOffset + (xPos * (hexGridModel.size * X_SPACE)) + offsetX);
+                //hexagon.setLayoutY(yBordOffset + (yPos * (hexGridModel.size * Y_SPACE)));
+
+                final double offsetX = (((int)(y / hexGridModel.size)) % 2) == 0 ? hexGridModel.size * HexGridModel.X_OFFSET_0 : hexGridModel.size * HexGridModel.X_OFFSET_1;
+                //final int posX = (int) ((x - hexGridModel.size) / (hexGridModel.size * HexGridModel.X_SPACE));// - ((int)this.hexGridModel.xBordOffset);
+                //final int posY = (int) ((y - hexGridModel.size) / (hexGridModel.size * HexGridModel.Y_SPACE));// - ((int)this.hexGridModel.yBordOffset);
+                //final int posX = (int) ((x + hexGridModel.size / 2 - ((int)this.hexGridModel.xBordOffset)) / (hexGridModel.size * HexGridModel.X_SPACE));// - ((int)this.hexGridModel.xBordOffset);
+                //final int posY = (int) ((y + hexGridModel.size / 2 - ((int)this.hexGridModel.yBordOffset)) / (hexGridModel.size * HexGridModel.Y_SPACE));// - ((int)this.hexGridModel.yBordOffset);
+                final int posX = (int) ((x + offsetX) / (hexGridModel.size * HexGridModel.X_SPACE));// - ((int)this.hexGridModel.xBordOffset);
+                final int posY = (int) ((y) / (hexGridModel.size * HexGridModel.Y_SPACE));// - ((int)this.hexGridModel.yBordOffset);
+                HexCellModel hexCellModel = this.hexGridModel.grid[posX][posY];
+                if (hexCellModel.partModel.isPart) {
+                    if (this.hexGridModel.selectedHexCellModel == hexCellModel) {
+                        this.hexGridModel.selectedHexCellModel = null;
+                    } else {
+                        this.hexGridModel.selectedHexCellModel = hexCellModel;
+                    }
+                    this.updateView();
+                } else {
+                    if (Objects.nonNull(this.hexGridModel.selectedHexCellModel)) {
+                        this.hexGridModel.selectedHexCellModel = null;
+                        this.updateView();
+                    }
+                }
+
+                event.consume();
+            } else {
+                dragOperation.set(Boolean.FALSE);
+            }
+        });
+
     }
 
     @FXML
@@ -155,6 +201,37 @@ public class HexGridController {
         }
     }
 
+    private void initHexGridModel(final HexGridModel hexGridModel, final Pane mainPane) {
+        //final double xBordOffset = hexGridModel.size + (HexGridModel.STROKE_WIDTH / 2.0D);
+        //final double yBordOffset = hexGridModel.size * HexGridModel.Y_SPACE + (HexGridModel.STROKE_WIDTH / 2.0D);
+
+        for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
+            for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
+                final double offsetX = yPos % 2 == 0 ? hexGridModel.size * HexGridModel.X_OFFSET_0 : hexGridModel.size * HexGridModel.X_OFFSET_1;
+
+                final Polygon hexagon = createHexagon(this.hexGridModel, hexGridModel.xBordOffset, hexGridModel.yBordOffset, offsetX, hexGridModel.size - HexGridModel.STROKE_WIDTH, xPos, yPos);
+                mainPane.getChildren().add(hexagon);
+
+                final Line dirArr[] = createDirArr(hexGridModel.xBordOffset, hexGridModel.yBordOffset, offsetX, hexGridModel.size, xPos, yPos);
+                for (int edgePos = 0; edgePos < 6; edgePos++) {
+                    mainPane.getChildren().add(dirArr[edgePos]);
+                }
+
+                final HexCellModel hexCellModel = new HexCellModel(hexagon, dirArr);
+                hexCellModel.partModel = new PartModel();
+                hexGridModel.grid[xPos][yPos] = hexCellModel;
+            }
+        }
+        final Circle circle = new Circle(hexGridModel.size);
+        circle.setFill(null);
+        circle.setStroke(Color.DARKRED);
+        circle.setCenterX(0.0D);
+        circle.setCenterY(0.0D);
+        circle.setVisible(false);
+        mainPane.getChildren().add(circle);
+        hexGridModel.selectionMarkerShape = circle;
+    }
+
     private void runLife() {
         this.hexGridService.calcNext();
 
@@ -174,28 +251,15 @@ public class HexGridController {
         } else {
             this.updateHexGridView(this.hexGridModel, 0, 0, hexGridModel.xSize - 1, hexGridModel.ySize - 1);
         }
-    }
 
-    private void initHexGridModel(final HexGridModel hexGridModel) {
-        final double xBordOffset = hexGridModel.size + (STROKE_WIDTH / 2.0D);
-        final double yBordOffset = hexGridModel.size * Y_SPACE + (STROKE_WIDTH / 2.0D);
-
-        for (int yPos = 0; yPos < hexGridModel.ySize; yPos++) {
-            for (int xPos = 0; xPos < hexGridModel.xSize; xPos++) {
-                final double offsetX = yPos % 2 == 0 ? X_OFFSET_0 : hexGridModel.size * X_OFFSET_1;
-
-                final Polygon hexagon = createHexagon(xBordOffset, yBordOffset, offsetX, hexGridModel.size - STROKE_WIDTH, xPos, yPos);
-                this.mainPane.getChildren().add(hexagon);
-
-                final Line dirArr[] = createDirArr(xBordOffset, yBordOffset, offsetX, hexGridModel.size, xPos, yPos);
-                for (int edgePos = 0; edgePos < 6; edgePos++) {
-                    this.mainPane.getChildren().add(dirArr[edgePos]);
-                }
-
-                final HexCellModel hexCellModel = new HexCellModel(hexagon, dirArr);
-                hexCellModel.partModel = new PartModel();
-                hexGridModel.grid[xPos][yPos] = hexCellModel;
-            }
+        final HexCellModel selectedHexCellModel = this.hexGridModel.selectedHexCellModel;
+        final Circle selectionMarkerShape = hexGridModel.selectionMarkerShape;
+        if (Objects.nonNull(selectedHexCellModel)) {
+            selectionMarkerShape.setCenterX(selectedHexCellModel.hexagon.getLayoutX());
+            selectionMarkerShape.setCenterY(selectedHexCellModel.hexagon.getLayoutY());
+            selectionMarkerShape.setVisible(true);
+        } else {
+            selectionMarkerShape.setVisible(false);
         }
     }
 
@@ -251,25 +315,25 @@ public class HexGridController {
         }
     }
 
-    private Polygon createHexagon(final double xBordOffset, final double yBordOffset, final double offsetX,
+    private Polygon createHexagon(final HexGridModel hexGridModel, final double xBordOffset, final double yBordOffset, final double offsetX,
                                   final double size, final int xPos, final int yPos) {
         final Polygon hexagon = new Polygon();
         for (int edgePos = 0; edgePos < 6; edgePos++) {
             final double x = edgePos * Math.PI / 3;
             hexagon.getPoints().addAll(size * Math.cos(x), size * Math.sin(x));
         }
-        hexagon.setLayoutX(xBordOffset + (xPos * (hexGridModel.size * X_SPACE)) + offsetX);
-        hexagon.setLayoutY(yBordOffset + (yPos * (hexGridModel.size * Y_SPACE)));
+        hexagon.setLayoutX(xBordOffset + (xPos * (hexGridModel.size * HexGridModel.X_SPACE)) + offsetX);
+        hexagon.setLayoutY(yBordOffset + (yPos * (hexGridModel.size * HexGridModel.Y_SPACE)));
         hexagon.setFill(Color.WHITE);
         hexagon.setStroke(Color.gray(0.975D));
-        hexagon.setStrokeWidth(STROKE_WIDTH);
+        hexagon.setStrokeWidth(HexGridModel.STROKE_WIDTH);
         return hexagon;
     }
 
     private Line[] createDirArr(final double xBordOffset, final double yBordOffset, final double offsetX,
                                 final double size, final int xPos, final int yPos) {
-        final double startSize = FIELD_STROKE_WIDTH;
-        final double endSize = size - (FIELD_STROKE_WIDTH * 1.35D);
+        final double startSize = HexGridModel.FIELD_STROKE_WIDTH;
+        final double endSize = size - (HexGridModel.FIELD_STROKE_WIDTH * 1.35D);
         final Line[] dirArr = new Line[6];
         for (int edgePos = 0; edgePos < 6; edgePos++) {
             final int edge = (edgePos - 1);
@@ -278,10 +342,10 @@ public class HexGridController {
             final double y = Math.sin(d);
             dirArr[edgePos] = new Line(startSize * x, startSize * y,
                     endSize * x, endSize * y);
-            dirArr[edgePos].setLayoutX(xBordOffset + (xPos * (hexGridModel.size * X_SPACE)) + offsetX);
-            dirArr[edgePos].setLayoutY(yBordOffset + (yPos * (hexGridModel.size * Y_SPACE)));
+            dirArr[edgePos].setLayoutX(xBordOffset + (xPos * (hexGridModel.size * HexGridModel.X_SPACE)) + offsetX);
+            dirArr[edgePos].setLayoutY(yBordOffset + (yPos * (hexGridModel.size * HexGridModel.Y_SPACE)));
             dirArr[edgePos].setStroke(Color.GREEN);
-            dirArr[edgePos].setStrokeWidth(FIELD_STROKE_WIDTH);
+            dirArr[edgePos].setStrokeWidth(HexGridModel.FIELD_STROKE_WIDTH);
             dirArr[edgePos].setStrokeLineCap(StrokeLineCap.BUTT);
         }
         return dirArr;

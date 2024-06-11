@@ -2,9 +2,11 @@ package de.schmiereck.smkEasyNN.genEden;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.prefs.Preferences;
@@ -27,10 +29,30 @@ public class HexGridApp extends Application {
         primaryStage.setScene(new Scene(root));
 
         if (this.prefs.getBoolean(PREF_USED, false)) {
-            primaryStage.setX(this.prefs.getDouble(PREF_WINDOW_X, 200.0));
-            primaryStage.setY(this.prefs.getDouble(PREF_WINDOW_Y, 200.0));
-            primaryStage.setWidth(this.prefs.getDouble(PREF_WINDOW_WIDTH, 800.0));
-            primaryStage.setHeight(this.prefs.getDouble(PREF_WINDOW_HEIGHT, 600.0));
+            double windowX = this.prefs.getDouble(PREF_WINDOW_X, 200.0D);
+            double windowY = this.prefs.getDouble(PREF_WINDOW_Y, 200.0D);
+            final double windowWidth = this.prefs.getDouble(PREF_WINDOW_WIDTH, 800.0D);
+            final double windowHeight = this.prefs.getDouble(PREF_WINDOW_HEIGHT, 600.0D);
+
+            // Get the bounds of the visual bounds of the screen
+            final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+            // Check if the window coordinates are within the screen bounds
+            if (windowX < screenBounds.getMinX()) {
+                windowX = 0.0D;
+            } else if (windowX + windowWidth > screenBounds.getMaxX()) {
+                windowX = Math.max(0.0D, screenBounds.getMaxX() - windowWidth);
+            }
+            if (windowY < screenBounds.getMinY()) {
+                windowY = 0.0D;
+            } else if (windowY + windowHeight > screenBounds.getMaxY()) {
+                windowY = Math.max(0.0D, screenBounds.getMaxY() - windowHeight);
+            }
+
+            primaryStage.setX(windowX);
+            primaryStage.setY(windowY);
+            primaryStage.setWidth(windowWidth);
+            primaryStage.setHeight(windowHeight);
         }
 
         primaryStage.getIcons().add(new Image("file:./icon.png"));
