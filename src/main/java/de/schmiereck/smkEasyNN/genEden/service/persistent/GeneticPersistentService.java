@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static de.schmiereck.smkEasyNN.genEden.service.Part.calcNextPartNr;
+
 public class GeneticPersistentService {
     public static void saveNet(final File file, final List<GeneticPart> geneticPartList, final int stepCount, final int generationCount) {
         final GeneticDocument doc = new GeneticDocument();
@@ -118,7 +120,7 @@ public class GeneticPersistentService {
         //objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
 
         final List<GeneticPart> geneticPartList = doc.geneticPartList.stream().map(perGeneticPart -> {
-            final GeneticPart geneticPart = new GeneticPart(perGeneticPart.visibleValueArr);
+            final GeneticPart geneticPart = new GeneticPart(calcNextPartNr(), perGeneticPart.visibleValueArr);
             geneticPart.setMoveDir(perGeneticPart.moveDir);
             geneticPart.setSize(perGeneticPart.size);
             geneticPart.setEnergie(perGeneticPart.energie);

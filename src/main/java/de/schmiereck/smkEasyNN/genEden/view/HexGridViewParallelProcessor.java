@@ -2,13 +2,11 @@ package de.schmiereck.smkEasyNN.genEden.view;
 
 import de.schmiereck.smkEasyNN.genEden.HexGridController;
 import de.schmiereck.smkEasyNN.genEden.HexGridModel;
-import de.schmiereck.smkEasyNN.genEden.service.HexGridCalcWorker;
-import de.schmiereck.smkEasyNN.genEden.service.HexGridService;
 import javafx.application.Platform;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class HexGridViewParallelProcessor {
     private static final int NUM_THREADS = Math.max(1, (Runtime.getRuntime().availableProcessors() - 2) / 4);
@@ -27,6 +25,7 @@ public class HexGridViewParallelProcessor {
 
     private static void runWorker(final ExecutorService executor, final HexGridModel hexGridModel, final int ySegmentSize, final int xGridSize, final int yGridSize, final HexGridViewWorker.WorkInterface workInterface) {
         final CountDownLatch latch = new CountDownLatch(NUM_THREADS);
+        //final List<Future<?>> futures = new ArrayList<>();
 
         for (int threadPos = 0; threadPos < NUM_THREADS; threadPos++) {
             final int xStartGridPos = 0;
@@ -51,6 +50,27 @@ public class HexGridViewParallelProcessor {
                     latch.countDown();
                 }
             });
+
+//            executor.submit(() -> {
+//                try {
+//                    final CountDownLatch innerLatch = new CountDownLatch(1);
+//                    Platform.runLater(() -> {
+//                        worker.run();
+//                        innerLatch.countDown();
+//                    });
+//                    innerLatch.await();
+//                } catch (final Exception e) {
+//                    throw new RuntimeException("HexGridViewParallelProcessor.runWorker - InterruptedException", e);
+//                } finally {
+//                    latch.countDown();
+//                }
+//            });
+
+//            Future<?> future = executor.submit(() -> {
+//                Platform.runLater(worker::run);
+//            });
+//
+//            futures.add(future);
         }
 
         //executor.shutdown();
@@ -60,10 +80,19 @@ public class HexGridViewParallelProcessor {
 //        } catch (final InterruptedException e) {
 //            // Handle exception
 //        }
+
         try {
             latch.await();
         } catch (final InterruptedException e) {
             // Handle exception
         }
+
+//        for (Future<?> future : futures) {
+//            try {
+//                future.get();
+//            } catch (InterruptedException | ExecutionException e) {
+//                // Handle exception
+//            }
+//        }
     }
 }

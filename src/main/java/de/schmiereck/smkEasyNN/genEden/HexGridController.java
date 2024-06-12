@@ -42,7 +42,7 @@ public class HexGridController {
 
     public static boolean demoMode = false;
     private final ServiceContext serviceContext;
-    public static boolean threadMode = true;
+    public static boolean threadMode = false;
 
     public HexGridController() {
         this.serviceContext = new ServiceContext();
@@ -67,7 +67,7 @@ public class HexGridController {
     @FXML
     public void initialize() {
         if (HexGridController.demoMode) {
-            this.hexGridService.init(50*2, 46*4);
+            this.hexGridService.init(33*2, 30*4);
         } else {
             this.hexGridService.init(35*2, 27*4);
             //this.hexGridService.init(40*2, 40*3);
@@ -113,14 +113,17 @@ public class HexGridController {
                 final int posY = (int) ((y) / (hexGridModel.size * HexGridModel.Y_SPACE));// - ((int)this.hexGridModel.yBordOffset);
                 HexCellModel hexCellModel = this.hexGridModel.grid[posX][posY];
                 if (hexCellModel.partModel.isPart) {
-                    if (this.hexGridModel.selectedHexCellModel == hexCellModel) {
+                    if (this.hexGridModel.selectedPartNr == hexCellModel.partModel.partNr) {
+                        this.hexGridModel.selectedPartNr = -1;
                         this.hexGridModel.selectedHexCellModel = null;
                     } else {
+                        this.hexGridModel.selectedPartNr = hexCellModel.partModel.partNr;
                         this.hexGridModel.selectedHexCellModel = hexCellModel;
                     }
                     this.updateView();
                 } else {
-                    if (Objects.nonNull(this.hexGridModel.selectedHexCellModel)) {
+                    if (this.hexGridModel.selectedPartNr != -1) {
+                        this.hexGridModel.selectedPartNr = -1;
                         this.hexGridModel.selectedHexCellModel = null;
                         this.updateView();
                     }
@@ -155,13 +158,17 @@ public class HexGridController {
                 final HexCellModel hexCellModel = this.hexGridModel.grid[xPos][yPos];
                 if (Objects.nonNull(outPart)) {
                     hexCellModel.partModel.isPart = true;
+                    hexCellModel.partModel.partNr = outPart.getPartNr();
                     hexCellModel.partModel.visibleValueArr = outPart.getValueFieldArr();
-                    if (outPart instanceof GeneticPart) {
-                        final GeneticPart geneticPart = (GeneticPart) outPart;
-                        hexCellModel.partModel.moveDir = geneticPart.getMoveDir();
+                    if (outPart instanceof GeneticPart outGeneticPart) {
+                        hexCellModel.partModel.moveDir = outGeneticPart.getMoveDir();
+                    }
+                    if (this.hexGridModel.selectedPartNr == hexCellModel.partModel.partNr) {
+                        this.hexGridModel.selectedHexCellModel = hexCellModel;
                     }
                 } else {
                     hexCellModel.partModel.isPart = false;
+                    hexCellModel.partModel.partNr = -1;
                     hexCellModel.partModel.visibleValueArr = null;
                 }
                 for (final HexDir hexDir : HexDir.values()) {
@@ -246,20 +253,20 @@ public class HexGridController {
         this.counterText.setText(String.format("Step: %d (Parts: %,d), Generation: %d",
                 this.hexGridModel.stepCount, this.hexGridModel.partCount, this.hexGridModel.generationCount));
 
-        if (threadMode) {
-            this.hexGridViewProc.processHexGrid(this, this.hexGridModel);
-        } else {
-            this.updateHexGridView(this.hexGridModel, 0, 0, hexGridModel.xSize - 1, hexGridModel.ySize - 1);
-        }
-
         final HexCellModel selectedHexCellModel = this.hexGridModel.selectedHexCellModel;
-        final Circle selectionMarkerShape = hexGridModel.selectionMarkerShape;
+        final Circle selectionMarkerShape = this.hexGridModel.selectionMarkerShape;
         if (Objects.nonNull(selectedHexCellModel)) {
             selectionMarkerShape.setCenterX(selectedHexCellModel.hexagon.getLayoutX());
             selectionMarkerShape.setCenterY(selectedHexCellModel.hexagon.getLayoutY());
             selectionMarkerShape.setVisible(true);
         } else {
             selectionMarkerShape.setVisible(false);
+        }
+
+        if (threadMode) {
+            this.hexGridViewProc.processHexGrid(this, this.hexGridModel);
+        } else {
+            this.updateHexGridView(this.hexGridModel, 0, 0, hexGridModel.xSize - 1, hexGridModel.ySize - 1);
         }
     }
 

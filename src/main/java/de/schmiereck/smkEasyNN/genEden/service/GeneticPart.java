@@ -7,8 +7,8 @@ public class GeneticPart extends EnergyPart {
     int age = 0;
     GenNet genNet;
 
-    public GeneticPart(final double[] visibleValueArr) {
-        super(visibleValueArr);
+    public GeneticPart(final int partNr, final double[] visibleValueArr) {
+        super(partNr, visibleValueArr);
     }
 
     public HexDir getMoveDir() {

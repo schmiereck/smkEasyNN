@@ -1,7 +1,7 @@
 package de.schmiereck.smkEasyNN.genEden.service;
 
 public class BlockerPart extends Part {
-    public BlockerPart(double[] visibleValueArr) {
-        super(visibleValueArr);
+    public BlockerPart(final int partNr, double[] visibleValueArr) {
+        super(partNr, visibleValueArr);
     }
 }

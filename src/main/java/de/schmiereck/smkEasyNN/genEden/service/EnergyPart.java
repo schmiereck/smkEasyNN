@@ -4,8 +4,8 @@ public class EnergyPart extends Part {
     int size = 0;
     int energie = 0;
 
-    public EnergyPart(final double[] valueFieldArr) {
-        super(valueFieldArr);
+    public EnergyPart(final int partNr, final double[] valueFieldArr) {
+        super(partNr, valueFieldArr);
     }
 
     public int getSize() {

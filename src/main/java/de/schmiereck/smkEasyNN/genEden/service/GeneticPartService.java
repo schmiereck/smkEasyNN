@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static de.schmiereck.smkEasyNN.genEden.service.HexDirUtils.calcOppositeDir;
+import static de.schmiereck.smkEasyNN.genEden.service.Part.calcNextPartNr;
 
 public class GeneticPartService implements PartServiceInterface {
     private static final int MIN_SIZE = 100;
@@ -40,7 +41,7 @@ public class GeneticPartService implements PartServiceInterface {
     public List<Part> initParts() {
         final List<Part> partList = new ArrayList<>();
 
-        for (int xPos = 0; xPos < 10; xPos++) {
+        for (int xPos = 0; xPos < 20; xPos++) {
             this.createBlocker(5 + xPos, 10);
         }
         for (int yPos = 0; yPos < 40; yPos += 4) {
@@ -65,7 +66,7 @@ public class GeneticPartService implements PartServiceInterface {
     private void createBlocker(final int xPos, final int yPos) {
         final GridNode targetGridNode = this.hexGridService.retrieveGridNode(xPos, yPos);
         if (Objects.isNull(targetGridNode.getOutPart())) {
-            final Part part = new BlockerPart(new double[] { 0.5D, 0.5D, 0.5D });
+            final Part part = new BlockerPart(calcNextPartNr(), new double[] { 0.5D, 0.5D, 0.5D });
             targetGridNode.setOutPart(part);
         }
     }
@@ -83,7 +84,7 @@ public class GeneticPartService implements PartServiceInterface {
                 HexGridService.rnd.nextDouble(0.75D) + 0.25D,
                 HexGridService.rnd.nextDouble(0.75D) + 0.25D
         };
-        final GeneticPart part = new GeneticPart(visibleValueArr);
+        final GeneticPart part = new GeneticPart(calcNextPartNr(), visibleValueArr);
         part.moveDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
         part.size = HexGridService.rnd.nextInt(MIN_SIZE, MAX_SIZE);
         part.energie = HexGridService.rnd.nextInt(part.size / 2, part.size / 1);
@@ -419,7 +420,7 @@ public class GeneticPartService implements PartServiceInterface {
                 sourceVisibleValueArr[1],
                 sourceVisibleValueArr[2]
         };
-        final GeneticPart newPart = new GeneticPart(visibleValueArr);
+        final GeneticPart newPart = new GeneticPart(calcNextPartNr(), visibleValueArr);
         newPart.age = sourcePart.age;
         newPart.moveDir = sourcePart.moveDir;
         newPart.size = sourcePart.size;
@@ -438,7 +439,7 @@ public class GeneticPartService implements PartServiceInterface {
                 this.mutateValue(0.0D, 1.0D, 0.01D, sourceVisibleValueArr[2])
         };
         final float mutationRate = GenNetTrainService.calcMutationRate(minMutationRate, maxMutationRate, HexGridService.rnd);
-        final GeneticPart newPart = new GeneticPart(visibleValueArr);
+        final GeneticPart newPart = new GeneticPart(calcNextPartNr(), visibleValueArr);
         newPart.age = sourcePart.age / 2;
         newPart.moveDir = sourcePart.moveDir;
         newPart.size = this.mutateValue(MIN_SIZE, MAX_SIZE, 1, sourcePart.size);
@@ -538,7 +539,7 @@ public class GeneticPartService implements PartServiceInterface {
                     this.hexGridService.getYGridSize() - HexGridService.rnd.nextInt(this.hexGridService.getYGridSize() / 3));
             final Part targetPart = outGridNode.getOutPart();
             if (Objects.isNull(targetPart)) {
-                final EnergyPart newEnergyPart = new EnergyPart(new double[] { 0.0D, 0.5D, 0.5D });
+                final EnergyPart newEnergyPart = new EnergyPart(calcNextPartNr(), new double[] { 0.0D, 0.5D, 0.5D });
                 newEnergyPart.setEnergie(32*2);
                 outGridNode.setOutPart(newEnergyPart);
             }

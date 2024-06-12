@@ -46,20 +46,20 @@ public class HexGridService {
         this.partList.clear();
 
         if (threadMode) {
-            this.proc.processHexGrid(this);
+            this.partCount = this.proc.processHexGrid(this);
         } else {
-            this.calcGrid(0, 0, this.getXGridSize() - 1, this.getYGridSize() - 1);
+            this.partCount = this.calcGrid(0, 0, this.getXGridSize() - 1, this.getYGridSize() - 1);
         }
 
         this.serviceContext.getPartService().calcParts();
     }
 
-    void calcGrid(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+    int calcGrid(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
         this.calcGridPartNetInput(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridFieldOutToIn(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridFieldInToOut(xStartPos, yStartPos, xEndPos, yEndPos);
         this.calcGridPartOutIn(xStartPos, yStartPos, xEndPos, yEndPos);
-        this.calcGridOut(xStartPos, yStartPos, xEndPos, yEndPos);
+        return this.calcGridOut(xStartPos, yStartPos, xEndPos, yEndPos);
     }
 
     /**
@@ -125,7 +125,8 @@ public class HexGridService {
      *    Part: In -> Out
      *    Part-Field: Out
      */
-    public void calcGridOut(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+    public int calcGridOut(final int xStartPos, final int yStartPos, final int xEndPos, final int yEndPos) {
+        int retPartCount = 0;
         for (int yPos = yStartPos; yPos <= yEndPos; yPos++) {
             for (int xPos = xStartPos; xPos <= xEndPos; xPos++) {
                 final GridNode gridNode = this.retrieveGridNode(xPos, yPos);
@@ -140,13 +141,14 @@ public class HexGridService {
                     gridNode.setInPart(null);
                     gridNode.setOutPart(inPart);
                     inPart.setGridNode(gridNode);
-                    this.partCount++;
+                    retPartCount++;
                     this.partList.add(inPart);
                 }
 
                 this.fieldService.calcGridNodeOutField(gridNode);
             }
         }
+        return retPartCount;
     }
 
     int getYGridSize() {

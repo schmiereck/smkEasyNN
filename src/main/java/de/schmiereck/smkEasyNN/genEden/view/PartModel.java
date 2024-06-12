@@ -6,6 +6,7 @@ public class PartModel {
     public boolean isPart = false;
     public double[] visibleValueArr;
     public HexDir moveDir;
+    public int partNr;
 
     public PartModel() {
     }

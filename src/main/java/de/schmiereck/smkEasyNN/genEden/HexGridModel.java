@@ -1,5 +1,6 @@
 package de.schmiereck.smkEasyNN.genEden;
 
+import de.schmiereck.smkEasyNN.genEden.service.Part;
 import javafx.scene.shape.Circle;
 
 public class HexGridModel {
@@ -24,6 +25,7 @@ public class HexGridModel {
     public int generationCount;
 
     public Circle selectionMarkerShape;
+    public int selectedPartNr = -1;
     public HexCellModel selectedHexCellModel = null;
 
     public HexGridModel(final int xSize, final int ySize, final double size) {

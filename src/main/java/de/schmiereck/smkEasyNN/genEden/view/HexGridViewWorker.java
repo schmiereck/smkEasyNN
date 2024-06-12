@@ -1,8 +1,6 @@
 package de.schmiereck.smkEasyNN.genEden.view;
 
 import de.schmiereck.smkEasyNN.genEden.HexGridModel;
-import de.schmiereck.smkEasyNN.genEden.service.HexGridCalcWorker;
-import de.schmiereck.smkEasyNN.genEden.service.HexGridService;
 
 public class HexGridViewWorker implements Runnable {
     final HexGridViewWorker.WorkInterface workInterface;
