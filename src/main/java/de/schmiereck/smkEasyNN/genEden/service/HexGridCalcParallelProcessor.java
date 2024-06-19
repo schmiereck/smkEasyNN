@@ -7,7 +7,7 @@ import java.util.concurrent.*;
 public class HexGridCalcParallelProcessor {
     private static final int NUM_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
 
-    public int processHexGrid(final HexGridService hexGridService) {
+    public int processHexGrid(final GenEdenHexGridService hexGridService) {
         int retPartCount = 0;
 
         final ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
@@ -16,19 +16,19 @@ public class HexGridCalcParallelProcessor {
         final int yGridSize = hexGridService.getYGridSize();
         final int ySegmentSize = yGridSize / NUM_THREADS;
 
-        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, HexGridService::calcGridPartNetInput);
+        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, GenEdenHexGridService::calcGridPartNetInput);
         //hexGridService.calcGridPartNetInput(0, 0, xGridSize - 1, yGridSize - 1);
 
-        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, HexGridService::calcGridFieldOutToIn);
+        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, GenEdenHexGridService::calcGridFieldOutToIn);
         //hexGridService.calcGridFieldOutToIn(0, 0, xGridSize - 1, yGridSize - 1);
 
-        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, HexGridService::calcGridFieldInToOut);
+        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, GenEdenHexGridService::calcGridFieldInToOut);
         //hexGridService.calcGridFieldInToOut(0, 0, xGridSize - 1, yGridSize - 1);
 
-        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, HexGridService::calcGridPartOutIn);
+        runWorker(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, GenEdenHexGridService::calcGridPartOutIn);
         //hexGridService.calcGridPartOutIn(0, 0, xGridSize - 1, yGridSize - 1);
 
-        retPartCount = runWorkerInteger(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, HexGridService::calcGridOut);
+        retPartCount = runWorkerInteger(executor, hexGridService, ySegmentSize, xGridSize, yGridSize, GenEdenHexGridService::calcGridOut);
         //hexGridService.calcGridOut(0, 0, xGridSize - 1, yGridSize - 1);
 
         executor.shutdown();
@@ -36,7 +36,7 @@ public class HexGridCalcParallelProcessor {
         return retPartCount;
     }
 
-    private static void runWorker(final ExecutorService executor, final HexGridService hexGridService, final int ySegmentSize, final int xGridSize, final int yGridSize, final HexGridCalcRunnable.WorkInterface workInterface) {
+    private static void runWorker(final ExecutorService executor, final GenEdenHexGridService hexGridService, final int ySegmentSize, final int xGridSize, final int yGridSize, final HexGridCalcRunnable.WorkInterface workInterface) {
         final CountDownLatch latch = new CountDownLatch(NUM_THREADS);
 
         for (int threadPos = 0; threadPos < NUM_THREADS; threadPos++) {
@@ -76,7 +76,7 @@ public class HexGridCalcParallelProcessor {
         }
     }
 
-    private static int runWorkerInteger(final ExecutorService executor, final HexGridService hexGridService, final int ySegmentSize, final int xGridSize, final int yGridSize, final HexGridCalcCallable.WorkInterface workInterface) {
+    private static int runWorkerInteger(final ExecutorService executor, final GenEdenHexGridService hexGridService, final int ySegmentSize, final int xGridSize, final int yGridSize, final HexGridCalcCallable.WorkInterface workInterface) {
         final CountDownLatch latch = new CountDownLatch(NUM_THREADS);
         final List<Future<Integer>> futures = new ArrayList<>();
 

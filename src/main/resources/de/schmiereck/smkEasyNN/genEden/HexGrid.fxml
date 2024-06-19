@@ -11,7 +11,7 @@
 <BorderPane
         id="mainBoderPane"
         xmlns:fx="http://javafx.com/fxml"
-        fx:controller="de.schmiereck.smkEasyNN.genEden.HexGridController"
+        fx:controller="de.schmiereck.smkEasyNN.genEden.GenEdenController"
 >
     <top>
         <HBox

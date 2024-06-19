@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 
 public class HexGridCalcCallable implements Callable<Integer> {
     final WorkInterface workInterface;
-    private final HexGridService hexGridService;
+    private final GenEdenHexGridService hexGridService;
     private final int xStartGridPos;
     private final int yStartGridPos;
     private final int xEndGridPos;
@@ -12,10 +12,10 @@ public class HexGridCalcCallable implements Callable<Integer> {
 
     @FunctionalInterface
     public interface WorkInterface {
-        Integer work(final HexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos);
+        Integer work(final GenEdenHexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos);
     }
 
-    public HexGridCalcCallable(final WorkInterface workInterface, final HexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos) {
+    public HexGridCalcCallable(final WorkInterface workInterface, final GenEdenHexGridService hexGridService, final int xStartGridPos, final int yStartGridPos, final int xEndGridPos, final int yEndGridPos) {
         this.workInterface = workInterface;
         this.hexGridService = hexGridService;
         this.xStartGridPos = xStartGridPos;

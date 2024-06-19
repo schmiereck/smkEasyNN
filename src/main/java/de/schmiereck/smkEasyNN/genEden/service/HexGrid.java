@@ -1,8 +1,8 @@
 package de.schmiereck.smkEasyNN.genEden.service;
 
 public class HexGrid {
-    final int xSize;
-    final int ySize;
+    public final int xSize;
+    public final int ySize;
     private final GridNode[][] grid;
     public HexGrid(final int xSize, final int ySize) {
         this.xSize = xSize;

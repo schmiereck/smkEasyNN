@@ -9,9 +9,9 @@ import static de.schmiereck.smkEasyNN.genEden.service.Part.calcNextPartNr;
 public class DemoPartService implements PartServiceInterface {
     private static int MAX_MOVE_CNT = 0;
 
-    private final HexGridService hexGridService;
+    private final GenEdenHexGridService hexGridService;
 
-    public DemoPartService(final HexGridService hexGridService) {
+    public DemoPartService(final GenEdenHexGridService hexGridService) {
         this.hexGridService = hexGridService;
     }
 
@@ -31,8 +31,8 @@ public class DemoPartService implements PartServiceInterface {
 
         final int partCount = (this.hexGridService.getXGridSize() * this.hexGridService.getYGridSize()) / (30);
         for (int pos = 0; pos < partCount; pos++) {
-            final int xPos = HexGridService.rnd.nextInt(this.hexGridService.getXGridSize() / 3);
-            final int yPos = HexGridService.rnd.nextInt(this.hexGridService.getYGridSize());
+            final int xPos = GenEdenHexGridService.rnd.nextInt(this.hexGridService.getXGridSize() / 3);
+            final int yPos = GenEdenHexGridService.rnd.nextInt(this.hexGridService.getYGridSize());
             final GridNode targetGridNode = this.hexGridService.retrieveGridNode(xPos, yPos);
             if (Objects.isNull(targetGridNode.getOutPart())) {
                 final Part part = this.createDemoPart();
@@ -52,7 +52,7 @@ public class DemoPartService implements PartServiceInterface {
                 1.0D
         };
         final DemoPart part = new DemoPart(calcNextPartNr(), visibleValueArr);
-        part.moveCnt = HexGridService.rnd.nextInt(MAX_MOVE_CNT + 1);
+        part.moveCnt = GenEdenHexGridService.rnd.nextInt(MAX_MOVE_CNT + 1);
         return part;
     }
 
@@ -129,7 +129,7 @@ public class DemoPartService implements PartServiceInterface {
         final int startDirOrdinal;
         //final HexDir startOppositeDir;
         if (Objects.isNull(part.moveDir)) {
-            startDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
+            startDir = HexDir.values()[GenEdenHexGridService.rnd.nextInt(HexDir.values().length)];
         } else {
             startDir = part.moveDir;
         }
@@ -157,7 +157,7 @@ public class DemoPartService implements PartServiceInterface {
         //}
         final HexDir moveDir;
         if (Objects.isNull(targetDir)) {
-            moveDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
+            moveDir = HexDir.values()[GenEdenHexGridService.rnd.nextInt(HexDir.values().length)];
         } else {
             moveDir = targetDir;
         }
@@ -174,7 +174,7 @@ public class DemoPartService implements PartServiceInterface {
         final int startDirOrdinal;
         //final HexDir startOppositeDir;
         if (Objects.isNull(part.moveDir)) {
-            startDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
+            startDir = HexDir.values()[GenEdenHexGridService.rnd.nextInt(HexDir.values().length)];
         } else {
             startDir = part.moveDir;
         }
@@ -208,7 +208,7 @@ public class DemoPartService implements PartServiceInterface {
         //}
         final HexDir moveDir;
         if (Objects.isNull(targetDir)) {
-            moveDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
+            moveDir = HexDir.values()[GenEdenHexGridService.rnd.nextInt(HexDir.values().length)];
         } else {
             moveDir = targetDir;
         }
@@ -222,7 +222,7 @@ public class DemoPartService implements PartServiceInterface {
         final HexDir startDir;
         final int startDirOrdinal;
         if (Objects.isNull(part.moveDir)) {
-            startDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
+            startDir = HexDir.values()[GenEdenHexGridService.rnd.nextInt(HexDir.values().length)];
         } else {
             startDir = HexDirUtils.calcOppositeDir(part.moveDir);
         }
@@ -243,7 +243,7 @@ public class DemoPartService implements PartServiceInterface {
         }
         final HexDir moveDir;
         if (Objects.isNull(targetDir)) {
-            moveDir = HexDir.values()[HexGridService.rnd.nextInt(HexDir.values().length)];
+            moveDir = HexDir.values()[GenEdenHexGridService.rnd.nextInt(HexDir.values().length)];
         } else {
             moveDir = targetDir;
         }

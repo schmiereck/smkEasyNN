@@ -10,7 +10,7 @@ public class FieldService {
     /**
      * 1. Field: Out -> In
      */
-    public void calcGridNodeFieldOutToIn(final HexGridService hexGridService, final GridNode gridNode, final int xPos, final int yPos) {
+    public void calcGridNodeFieldOutToIn(final GenEdenHexGridService hexGridService, final GridNode gridNode, final int xPos, final int yPos) {
         //final InDir inDir = InDir.InDir5; {
         for (final HexDir hexDir : HexDir.values()) {
             final Field field = gridNode.getField(hexDir);

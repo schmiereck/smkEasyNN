@@ -1,10 +1,11 @@
 package de.schmiereck.smkEasyNN.genEden;
 
-import de.schmiereck.smkEasyNN.genEden.service.HexGridService;
+import javafx.application.Application;
 
 public class HexGridDemoMain {
     public static void main(String[] args) {
-        HexGridController.demoMode = true;
-        HexGridApp.main(args);
+        GenEdenController.demoMode = true;
+        //HexGridApp.main(args);
+        Application.launch(HexGridApp.class, args);
     }
 }
