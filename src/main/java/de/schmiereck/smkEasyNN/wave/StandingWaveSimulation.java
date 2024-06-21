@@ -98,8 +98,15 @@ public class StandingWaveSimulation extends JPanel {
             }
 
             for (int j = 1; j < PsiArrSize - 1; j++) {
-                // Die Wellenfunktion wird mit dem Laplace-Operator und dem Potential multipliziert.
-                this.psiArr[j] = this.psiArr[j].subtract(laplacian[j].multiply(AlphaComplex));
+                if (withHarmonischenOszillator) {
+                    final double x = j * DX;
+                    double v = potential(x);
+                    Complex potentialTerm = this.psiArr[j].multiply(new Complex(0, DT * v / HBAR));
+                    this.psiArr[j] = this.psiArr[j].subtract(laplacian[j].multiply(AlphaComplex)).subtract(potentialTerm);
+                } else {
+                    // Die Wellenfunktion wird mit dem Laplace-Operator und dem Potential multipliziert.
+                    this.psiArr[j] = this.psiArr[j].subtract(laplacian[j].multiply(AlphaComplex));
+                }
             }
 
             normalize(psiArr);
@@ -121,8 +128,26 @@ public class StandingWaveSimulation extends JPanel {
         System.out.println("END: Simulating.");
     }
 
+    private static final boolean withHarmonischenOszillator = true;
+    // Frequenz des harmonischen Oszillators, Symbol: 𝜔:
+    private static final double OMEGA = 1.0;
+    //private static final double X0 = L / 2; // Zentrum des Oszillators
+    private static final double X0 = L * 0.3D; // Zentrum des Oszillators
+    //private static final double OFAKTOR = 0.5;
+    private static final double OFAKTOR = (0.0001D / DT);
+
+    private double potential(double x) {
+        // Harmonischer Oszillator
+        //return 0.1 * M * OMEGA * OMEGA * x * x;
+        // Harmonischer Oszillator zentriert bei X0
+        //return 0.5 * M * OMEGA * OMEGA * (x - X0) * (x - X0);
+        //return 50000.0 * M * OMEGA * OMEGA * (x - X0) * (x - X0);
+        return OFAKTOR * M * OMEGA * OMEGA * (x - X0) * (x - X0);
+    }
+
     public static final Color IMG_COLOR =  new Color(255, 0, 0, 125);
     public static final Color REAL_COLOR =  new Color(0, 0, 255, 125);
+    public static final Color POT_COLOR =  new Color(0, 255, 0, 125);
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -149,7 +174,15 @@ public class StandingWaveSimulation extends JPanel {
             int y1Imag = (int) (midY - psiArr[j].getImaginary() * VIEW_HEIGHT);
             int y2Imag = (int) (midY - psiArr[j + 1].getImaginary() * VIEW_HEIGHT);
             g.setColor(IMG_COLOR);
-            g.drawLine(x1, y1Imag, (int) ((j + 1) * (VIEW_WIDTH / (double) PsiArrSize)), y2Imag);
+            g.drawLine(x1, y1Imag, x2, y2Imag);
+
+            // Potential
+            final double xPot = j * DX;
+            final double x2Pot = (j + 1) * DX;
+            int y1Pot = (int) (midY - (potential(xPot) / OFAKTOR) * VIEW_HEIGHT);
+            int y2Pot = (int) (midY - (potential(x2Pot) / OFAKTOR) * VIEW_HEIGHT);
+            g.setColor(POT_COLOR);
+            g.drawLine(x1, y1Pot, x2, y2Pot);
         }
     }
 
