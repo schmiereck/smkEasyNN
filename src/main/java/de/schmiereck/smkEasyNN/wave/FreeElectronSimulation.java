@@ -1,4 +1,5 @@
 package de.schmiereck.smkEasyNN.wave;
+
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.FastMath;
 
