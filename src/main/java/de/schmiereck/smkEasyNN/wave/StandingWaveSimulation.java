@@ -129,20 +129,28 @@ public class StandingWaveSimulation extends JPanel {
     }
 
     private static final boolean withHarmonischenOszillator = true;
+    private static final boolean harmonischerOszillator2 = false;
     // Frequenz des harmonischen Oszillators, Symbol: 𝜔:
     private static final double OMEGA = 1.0;
     //private static final double X0 = L / 2; // Zentrum des Oszillators
-    private static final double X0 = L * 0.3D; // Zentrum des Oszillators
+    private static final double X0 = L * 0.25D; // Zentrum des Oszillators
+    private static final double X1 = L * 0.75D; // Zentrum des Oszillators
     //private static final double OFAKTOR = 0.5;
     private static final double OFAKTOR = (0.0001D / DT);
 
     private double potential(double x) {
         // Harmonischer Oszillator
         //return 0.1 * M * OMEGA * OMEGA * x * x;
-        // Harmonischer Oszillator zentriert bei X0
-        //return 0.5 * M * OMEGA * OMEGA * (x - X0) * (x - X0);
-        //return 50000.0 * M * OMEGA * OMEGA * (x - X0) * (x - X0);
-        return OFAKTOR * M * OMEGA * OMEGA * (x - X0) * (x - X0);
+        if (harmonischerOszillator2) {
+            // Harmonischer Oszillator zentriert bei X0 und X1
+            return (OFAKTOR * M * OMEGA * OMEGA * (x - X0) * (x - X0)) *
+                    (OFAKTOR * M * OMEGA * OMEGA * (x - X1) * (x - X1)) / OFAKTOR / 2;
+        } else {
+            // Harmonischer Oszillator zentriert bei X0
+            //return 0.5 * M * OMEGA * OMEGA * (x - X0) * (x - X0);
+            //return 50000.0 * M * OMEGA * OMEGA * (x - X0) * (x - X0);
+            return (OFAKTOR * M * OMEGA * OMEGA * (x - X0) * (x - X0));
+        }
     }
 
     public static final Color IMG_COLOR =  new Color(255, 0, 0, 125);
