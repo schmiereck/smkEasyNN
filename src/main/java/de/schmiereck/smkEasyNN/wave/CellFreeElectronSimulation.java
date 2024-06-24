@@ -75,8 +75,6 @@ public class CellFreeElectronSimulation extends JPanel {
     public void simulate() {
         System.out.println("START: Simulating...");
 
-        Complex[] laplacian = new Complex[PsiArrSize];
-
         for (int t = 0; t < TIMESTEPS * 1000; t++) {
             int nextPsiPos = (this.psiPos + 1) % 2;
 
@@ -96,13 +94,11 @@ public class CellFreeElectronSimulation extends JPanel {
                     if (cell.count > 0) {
                         nextCell.dir = cell.dir == 1 ? -1 : 1;
                         nextCell.count += cell.count;
-                        //nextCell.div = cell.div / 2;
                         nextCell.div = cell.div + 1;
 
                         nextNCell.dir = cell.dir == 1 ? -1 : 1;
                         nextNCell.count += cell.count;
-                        //nextCell.div = cell.div / 2;
-                        nextNCell.div = nextCell.div;
+                        nextNCell.div = cell.div + 1;
                     }
                 }
             }
@@ -128,12 +124,6 @@ public class CellFreeElectronSimulation extends JPanel {
         super.paintComponent(g);
 
         int nextPsiPos = (this.psiPos + 1) % 2;
-
-//        int sum = Arrays.stream(psiArr[nextPsiPos]).mapToInt(cell -> cell.count).map(x -> x * x).sum();
-//        double normFactor = FastMath.sqrt(sum);
-        //int sum = Arrays.stream(psiArr[nextPsiPos]).mapToInt(cell -> cell.count).map(x -> x).sum();
-        //double normFactor = sum;
-        double normFactor = 100000000.0D;
 
         int midY = VIEW_HEIGHT / 2;
         for (int psiArrPos = 0; psiArrPos < PsiArrSize; psiArrPos++) {
