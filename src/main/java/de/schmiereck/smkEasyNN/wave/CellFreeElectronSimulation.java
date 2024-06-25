@@ -14,24 +14,16 @@ public class CellFreeElectronSimulation extends JPanel {
     private static final double DT = 0.00000001;
     private static final int TIMESTEPS = (int) (1.0D / DT);
 
-    private static final double L = 10.0;
-    private static final double K0 = 2.0D * FastMath.PI / L;
     private static final int PsiArrSize = 700;
-    private static final double DX = L / PsiArrSize;
 
-    private static final double HBAR = 1.0D;
-    private static final double M = 1.0D;
-    private static final double ALPHA = HBAR * DT / (2.0D * M * DX * DX);
-    private static final Complex AlphaComplex = new Complex(0, ALPHA);
-
-    private static final double SIGMA = 0.1;
+    final static double MAX_DIV = 128*2*2;
 
     private class Cell {
         int dir;
         double count;
         /**
-         * Count of dividers.
-         * div = div/2, div/4, div/8, div/16, ...
+         * Count of divisions.
+         * div = div/2, div = div/2, div = div/2, ...
          */
         double div = 1;
     }
@@ -54,12 +46,9 @@ public class CellFreeElectronSimulation extends JPanel {
         this.psiArr = new Cell[2][PsiArrSize];
 
         for (int nextArrPos = 0; nextArrPos < PsiArrSize; nextArrPos++) {
-//            final double x = nextArrPos * DX;
-//            double realPart = FastMath.exp(-0.5 * FastMath.pow((x - L / 2) / SIGMA, 2)) * FastMath.cos(K0 * x);
-//            double imaginaryPart = FastMath.exp(-0.5 * FastMath.pow((x - L / 2) / SIGMA, 2)) * FastMath.sin(K0 * x);
-//            this.psiArr[nextArrPos] = new Cell(realPart, imaginaryPart);
             this.psiArr[this.psiPos][nextArrPos] = new Cell();
             this.psiArr[1][nextArrPos] = new Cell();
+
             if (nextArrPos == PsiArrSize / 2) {
                 this.psiArr[this.psiPos][nextArrPos].dir = 1;
                 this.psiArr[this.psiPos][nextArrPos].count = 1;
@@ -68,8 +57,6 @@ public class CellFreeElectronSimulation extends JPanel {
                 this.psiArr[this.psiPos][nextArrPos].count = 0;
             }
         }
-
-        //normalize(psiArr);
     }
 
     public void simulate() {
@@ -92,13 +79,19 @@ public class CellFreeElectronSimulation extends JPanel {
                     Cell nextNCell = this.psiArr[nextPsiPos][(psiArrPos + cell.dir + PsiArrSize) % PsiArrSize];
 
                     if (cell.count > 0) {
-                        nextCell.dir = cell.dir == 1 ? -1 : 1;
-                        nextCell.count += cell.count;
-                        nextCell.div = cell.div + 1;
+                        if (cell.div < MAX_DIV) {
+                            nextCell.dir = cell.dir == 1 ? -1 : 1;
+                            nextCell.count += cell.count;
+                            nextCell.div = cell.div + 1;
 
-                        nextNCell.dir = cell.dir == 1 ? -1 : 1;
-                        nextNCell.count += cell.count;
-                        nextNCell.div = cell.div + 1;
+                            nextNCell.dir = cell.dir == 1 ? -1 : 1;
+                            nextNCell.count += cell.count;
+                            nextNCell.div = cell.div + 1;
+                        } else {
+                            nextCell.dir = cell.dir == 1 ? -1 : 1;
+                            nextCell.count = cell.count;
+                            nextCell.div = cell.div;
+                        }
                     }
                 }
             }
@@ -107,7 +100,7 @@ public class CellFreeElectronSimulation extends JPanel {
             if (t % 1 == 0) {
                 this.repaint();
                 try {
-                    Thread.sleep(250);
+                    Thread.sleep(25);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
