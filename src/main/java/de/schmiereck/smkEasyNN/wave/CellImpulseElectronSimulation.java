@@ -60,7 +60,7 @@ public class CellImpulseElectronSimulation extends JPanel {
                     this.psiArr[this.psiPos][nextArrPos].speedArr[0] = 0;
                     this.psiArr[this.psiPos][nextArrPos].speedArr[1] = 12;
                     this.psiArr[this.psiPos][nextArrPos].speedCntArr[0] = 0;
-                    this.psiArr[this.psiPos][nextArrPos].speedCntArr[1] = 16;
+                    this.psiArr[this.psiPos][nextArrPos].speedCntArr[1] = 0;
                 } else {
                     if (nextArrPos == ((PsiArrSize / 4) * 3)) {
                         this.psiArr[this.psiPos][nextArrPos].dir = 1;
@@ -68,7 +68,7 @@ public class CellImpulseElectronSimulation extends JPanel {
                         this.psiArr[this.psiPos][nextArrPos].div = 1;
                         this.psiArr[this.psiPos][nextArrPos].speedArr[0] = 8;
                         this.psiArr[this.psiPos][nextArrPos].speedArr[1] = 0;
-                        this.psiArr[this.psiPos][nextArrPos].speedCntArr[0] = 8;
+                        this.psiArr[this.psiPos][nextArrPos].speedCntArr[0] = 0;
                         this.psiArr[this.psiPos][nextArrPos].speedCntArr[1] = 0;
                     } else {
                         this.psiArr[this.psiPos][nextArrPos].count = 0;
@@ -105,12 +105,14 @@ public class CellImpulseElectronSimulation extends JPanel {
                             nextSpeedCnt = actSpeedCnt - MAX_SPEED_C;
                             moveDir = actSpeedDirPos == 0 ? -1 : 1;
 
-                            nextCell = this.psiArr[nextPsiPos][(psiArrPos + moveDir + PsiArrSize) % PsiArrSize];
+                            // If reaching MAX_DIV: Use nextCell for the next cell in the direction of the speed.
                             nextNCell = this.psiArr[nextPsiPos][psiArrPos];
+                            nextCell = this.psiArr[nextPsiPos][(psiArrPos + moveDir + PsiArrSize) % PsiArrSize];
                         } else {
                             nextSpeedCnt = actSpeedCnt;
                             moveDir = cell.dir == 0 ? -1 : 1;
 
+                            // If reaching MAX_DIV: Use nextCell for the next cell to stay in position.
                             nextCell = this.psiArr[nextPsiPos][psiArrPos];
                             nextNCell = this.psiArr[nextPsiPos][(psiArrPos + moveDir + PsiArrSize) % PsiArrSize];
                         }
@@ -118,8 +120,8 @@ public class CellImpulseElectronSimulation extends JPanel {
                         final int nextSpeedDirPos = (actSpeedDirPos + 1) % DIR_SIZE;
 
                         if (cell.div <= MAX_DIV) {
-                            calcNextCell(nextCell, nextDir, cell.speedCntArr, cell.speedArr, nextCell.count + cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
-                            calcNextCell(nextNCell, nextDir, cell.speedCntArr, cell.speedArr, nextNCell.count + cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                            calcNextCell(nextCell, nextDir, cell.speedCntArr, cell.speedArr, cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                            calcNextCell(nextNCell, nextDir, cell.speedCntArr, cell.speedArr, cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
                         } else {
                             calcNextCell(nextCell, nextDir, cell.speedCntArr, cell.speedArr, cell.count, cell.div, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
                         }
@@ -130,8 +132,8 @@ public class CellImpulseElectronSimulation extends JPanel {
                 if (t % 1 == 0) {
                     this.repaint();
                     try {
-                        Thread.sleep(25*1);
-                    } catch (InterruptedException e) {
+                        Thread.sleep(25*5);
+                    } catch (final InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -143,7 +145,13 @@ public class CellImpulseElectronSimulation extends JPanel {
                                      long[] speedCntArr, long[] speedArr, long count, long div,
                                      int nextSpeedDirPos, int actSpeedDirPos, long nextSpeedCnt) {
         nextCell.dir = nextDir;
-        nextCell.count = count;
+        //nextCell.count += count;
+        if (Long.MAX_VALUE - count >= nextCell.count) {
+            nextCell.count += count;
+        } else {
+            // Das Hinzufügen von count zu nextCell.count würde den Wertebereich überschreiten
+            throw new RuntimeException("Das Ergebnis von nextCell.count %d + count %d würde den Wertebereich überschreiten".formatted(nextCell.count, count));
+        }
         nextCell.div = div;
         nextCell.speedDirPos = nextSpeedDirPos;
         for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
@@ -191,22 +199,32 @@ public class CellImpulseElectronSimulation extends JPanel {
                 Cell cell2 = psiArr[nextPsiPos][xp2];
                 //int y1 = (int) (midY - VIEW_HEIGHT * (cell1.count  / (normFactor * Math.pow(2, cell1.div))));
                 //int y2 = (int) (midY - VIEW_HEIGHT * (cell2.count / (normFactor * Math.pow(2, cell2.div))));
-                int y1 = (int) (midY - VIEW_HEIGHT * getaDouble(cell1));
-                int y2 = (int) (midY - VIEW_HEIGHT * getaDouble(cell2));
+                int y1 = (int) (midY - VIEW_HEIGHT * calcCellPobability(cell1));
+                int y2 = (int) (midY - VIEW_HEIGHT * calcCellPobability(cell2));
                 g.setColor(Color.BLACK);
                 g.drawLine(x1, y1, x2, y2);
             }
         }
 
-        private static double getaDouble(Cell cell1) {
-            final double ret;
-            if (cell1.count == 0) {
-                ret = 0.0D;
+        private static double calcCellPobability(final Cell cell) {
+            final double retPobability;
+            if (cell.count == 0) {
+                retPobability = 0.0D;
             } else {
-                //ret = 1.0D / (cell1.count * (Math.pow(2, cell1.div)));
-                ret = cell1.count * (1.0D / (Math.pow(2, cell1.div)));
+                //retPobability = cell.count * (1.0D / (Math.pow(2.0D, cell.div)));
+                retPobability = cell.count * (1.0D / (mathPowChecked(2.0D, cell.div)));
+            }
+            return retPobability;
+        }
+
+        private static double mathPowChecked(double base, double exponent) {
+            final double ret;
+            if (exponent > Math.log(Double.MAX_VALUE) / Math.log(base)) {
+                // Das Ergebnis von Math.pow(base, exponent) würde den Wertebereich überschreiten
+                throw new RuntimeException("Das Ergebnis würde den Wertebereich überschreiten");
+            } else {
+                ret = Math.pow(base, exponent);
             }
             return ret;
         }
-
     }
