@@ -52,7 +52,7 @@ public class CellImpulseElectronSimulation extends JPanel {
 
             for (int nextArrPos = 0; nextArrPos < PsiArrSize; nextArrPos++) {
                 this.psiArr[this.psiPos][nextArrPos] = new Cell();
-                this.psiArr[1][nextArrPos] = new Cell();
+                this.psiArr[this.psiPos + 1][nextArrPos] = new Cell();
 
                 if (nextArrPos == ((PsiArrSize / 4) * 1)) {
                     this.psiArr[this.psiPos][nextArrPos].count = 1;
