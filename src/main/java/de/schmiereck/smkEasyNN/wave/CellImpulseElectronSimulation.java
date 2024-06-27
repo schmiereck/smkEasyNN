@@ -2,6 +2,7 @@ package de.schmiereck.smkEasyNN.wave;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class CellImpulseElectronSimulation extends JPanel {
         private static final int VIEW_WIDTH = 1400;
@@ -17,7 +18,7 @@ public class CellImpulseElectronSimulation extends JPanel {
         private final static long MAX_SPEED_C = 16;
 
         private class Cell {
-            int dir;
+            int dirPos = 1;
             long count;
             /**
              * Count of divisions.
@@ -54,19 +55,17 @@ public class CellImpulseElectronSimulation extends JPanel {
                 this.psiArr[1][nextArrPos] = new Cell();
 
                 if (nextArrPos == ((PsiArrSize / 4) * 1)) {
-                    this.psiArr[this.psiPos][nextArrPos].dir = 1;
                     this.psiArr[this.psiPos][nextArrPos].count = 1;
                     this.psiArr[this.psiPos][nextArrPos].div = 1;
                     this.psiArr[this.psiPos][nextArrPos].speedArr[0] = 0;
-                    this.psiArr[this.psiPos][nextArrPos].speedArr[1] = 12;
+                    this.psiArr[this.psiPos][nextArrPos].speedArr[1] = 8;
                     this.psiArr[this.psiPos][nextArrPos].speedCntArr[0] = 0;
                     this.psiArr[this.psiPos][nextArrPos].speedCntArr[1] = 0;
                 } else {
                     if (nextArrPos == ((PsiArrSize / 4) * 3)) {
-                        this.psiArr[this.psiPos][nextArrPos].dir = 1;
                         this.psiArr[this.psiPos][nextArrPos].count = 1;
                         this.psiArr[this.psiPos][nextArrPos].div = 1;
-                        this.psiArr[this.psiPos][nextArrPos].speedArr[0] = 8;
+                        this.psiArr[this.psiPos][nextArrPos].speedArr[0] = 6;
                         this.psiArr[this.psiPos][nextArrPos].speedArr[1] = 0;
                         this.psiArr[this.psiPos][nextArrPos].speedCntArr[0] = 0;
                         this.psiArr[this.psiPos][nextArrPos].speedCntArr[1] = 0;
@@ -85,7 +84,7 @@ public class CellImpulseElectronSimulation extends JPanel {
 
                 for (int psiArrPos = 0; psiArrPos < PsiArrSize; psiArrPos++) {
                     final Cell nextCell = this.psiArr[nextPsiPos][psiArrPos];
-                    nextCell.dir = 0;
+                    nextCell.dirPos = 0;
                     nextCell.count = 0;
                     nextCell.div = 1;
                 }
@@ -96,34 +95,36 @@ public class CellImpulseElectronSimulation extends JPanel {
                         final Cell nextNCell;
                         final Cell nextCell;
 
-                        final int moveDir;
                         final int actSpeedDirPos = cell.speedDirPos;
                         final long actSpeedCnt = cell.speedCntArr[actSpeedDirPos] + cell.speedArr[actSpeedDirPos];
                         final long nextSpeedCnt;
-                        final int nextDir;
                         if (actSpeedCnt >= MAX_SPEED_C) {
                             nextSpeedCnt = actSpeedCnt - MAX_SPEED_C;
-                            moveDir = actSpeedDirPos == 0 ? -1 : 1;
+                            final int moveDir = actSpeedDirPos == 0 ? -1 : 1;
 
                             // If reaching MAX_DIV: Use nextCell for the next cell in the direction of the speed.
                             nextNCell = this.psiArr[nextPsiPos][psiArrPos];
                             nextCell = this.psiArr[nextPsiPos][(psiArrPos + moveDir + PsiArrSize) % PsiArrSize];
                         } else {
                             nextSpeedCnt = actSpeedCnt;
-                            moveDir = cell.dir == 0 ? -1 : 1;
+                            final int moveDir = cell.dirPos == 0 ? -1 : 1;
 
                             // If reaching MAX_DIV: Use nextCell for the next cell to stay in position.
                             nextCell = this.psiArr[nextPsiPos][psiArrPos];
                             nextNCell = this.psiArr[nextPsiPos][(psiArrPos + moveDir + PsiArrSize) % PsiArrSize];
                         }
-                        nextDir = cell.dir == 0 ? 1 : 0;
+                        final int nextDirPos = (cell.dirPos + 1) % DIR_SIZE;
                         final int nextSpeedDirPos = (actSpeedDirPos + 1) % DIR_SIZE;
 
                         if (cell.div <= MAX_DIV) {
-                            calcNextCell(nextCell, nextDir, cell.speedCntArr, cell.speedArr, cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
-                            calcNextCell(nextNCell, nextDir, cell.speedCntArr, cell.speedArr, cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                            if (Objects.nonNull(nextNCell)) {
+                                calcNextCell(nextCell, nextDirPos, cell.speedCntArr, cell.speedArr, cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                                calcNextCell(nextNCell, nextDirPos, cell.speedCntArr, cell.speedArr, cell.count, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                            } else {
+                                calcNextCell(nextCell, nextDirPos, cell.speedCntArr, cell.speedArr, cell.count * 2, cell.div + 1, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                            }
                         } else {
-                            calcNextCell(nextCell, nextDir, cell.speedCntArr, cell.speedArr, cell.count, cell.div, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
+                            calcNextCell(nextCell, nextDirPos, cell.speedCntArr, cell.speedArr, cell.count, cell.div, nextSpeedDirPos, actSpeedDirPos, nextSpeedCnt);
                         }
                     }
                 }
@@ -132,7 +133,7 @@ public class CellImpulseElectronSimulation extends JPanel {
                 if (t % 1 == 0) {
                     this.repaint();
                     try {
-                        Thread.sleep(25*5);
+                        Thread.sleep(25*9);
                     } catch (final InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -141,10 +142,10 @@ public class CellImpulseElectronSimulation extends JPanel {
             System.out.println("END: Simulating.");
         }
 
-    private static void calcNextCell(Cell nextCell, int nextDir,
+    private static void calcNextCell(Cell nextCell, int nextDirPos,
                                      long[] speedCntArr, long[] speedArr, long count, long div,
                                      int nextSpeedDirPos, int actSpeedDirPos, long nextSpeedCnt) {
-        nextCell.dir = nextDir;
+        nextCell.dirPos = nextDirPos;
         //nextCell.count += count;
         if (Long.MAX_VALUE - count >= nextCell.count) {
             nextCell.count += count;
