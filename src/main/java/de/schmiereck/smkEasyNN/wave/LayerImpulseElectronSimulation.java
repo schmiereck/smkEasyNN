@@ -3,6 +3,9 @@ package de.schmiereck.smkEasyNN.wave;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * https://chatgpt.com/c/20509527-0f81-4457-b7a7-d869fc25e129
+ */
 public class LayerImpulseElectronSimulation extends JPanel {
     private static final int VIEW_WIDTH = 1400;
     private static final int VIEW_HEIGHT = 600;
@@ -135,8 +138,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
         {
             // to right, verry fast:
             final int nextArrPos = ((PsiArrSize / 4) * 1);
-            final Cell cell = retrieveCell(this.psiLayerArr, this.psiPos, nextArrPos, 3, 0, 0, 0, 1, MAX_SPEED_C - (MAX_SPEED_C / 4));
-            cell.count = 0;//1;
+            final Cell cell = retrieveCell(this.psiLayerArr, this.psiPos, nextArrPos, 1, 0, 0, 0, 1, MAX_SPEED_C - ((MAX_SPEED_C / 4)));
+            cell.count = 1;
             //cell.div = 1;
             //cell.speedArr[0] = 0;
             //cell.speedArr[1] = 16;
@@ -148,7 +151,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
         {
             // stay in middle:
             final int nextArrPos = ((PsiArrSize / 4) * 2);
-            final Cell cell = retrieveCell(this.psiLayerArr, this.psiPos, nextArrPos, 1, 0, 0, 0, 1, 0);
+            final Cell cell = retrieveCell(this.psiLayerArr, this.psiPos, nextArrPos, 3, 0, 0, 0, 1, 0);
             cell.count = 1;
             cell.speedCntArr[0] = 0;
             cell.speedCntArr[1] = 0;
@@ -156,8 +159,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
         {
             // to left, slowly:
             final int nextArrPos = ((PsiArrSize / 4) * 3);
-            final Cell cell = retrieveCell(this.psiLayerArr, this.psiPos, nextArrPos,  5, 0, 1, 0, 0, MAX_SPEED_C - (MAX_SPEED_C / 2));
-            cell.count = 0;//1;
+            final Cell cell = retrieveCell(this.psiLayerArr, this.psiPos, nextArrPos,  1, 0, 1, 0, 0, MAX_SPEED_C - ((MAX_SPEED_C / 4) * 2));
+            cell.count = 1;
             //cell.div = 1;
             //cell.speedArr[0] = 6;
             //cell.speedArr[1] = 0;
@@ -231,63 +234,71 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                         final Cell cell = divNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
 
                                         if (cell.count > 0) {
-                                            final int actCalcDirPos = speedDirPos;
-                                            final int nextSpinDirPos = (spinDirPos + 1) % DIR_SIZE;
+                                            final int actSpinDirPos = spinDirPos;
+                                            final int nextSpinDirPos;
                                             final int actSpinCntPos = spinCntPos;//cell.spinCnt;
                                             final int nextSpinCntPos = (actSpinCntPos + 1) % spinPos;//cell.spin;
 
                                             final int actSpeedDirPos = speedDirPos;
-                                            final int nextSpeedDirPos = (speedDirPos + 1) % DIR_SIZE;
-                                            //final long actSpeedCnt = cell.speedCntArr[speedDirPos] + speedPos;
-                                            final long actSpeedCnt = cell.speedCntArr[spinDirPos] + speedPos;
+                                            final int nextSpeedDirPos = actSpeedDirPos;
+                                            final int actSpeedPos = speedPos;
+                                            final int nextSpeedPos = actSpeedPos;
+                                            final long actSpeedCnt = cell.speedCntArr[actSpinDirPos];
                                             final long nextSpeedCnt;
-                                            if (actSpeedCnt >= MAX_SPEED_C) {
-                                                nextSpeedCnt = actSpeedCnt - MAX_SPEED_C;
-                                                final int moveDir = speedDirPos == 0 ? -1 : 1;
 
-                                                // Use nextCell for the next cell in the direction of the speed.
-                                                final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                                calcNextCell(this.psiLayerArr, nextPsiArrPos, cell,
-                                                        nextPsiPos, divPos,
-                                                        spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                        speedDirPos, speedPos,
-                                                        speedDirPos, nextSpeedCnt);//, nextSpinCnt);
-                                            } else {
-                                                nextSpeedCnt = actSpeedCnt;
-                                                if (nextSpinCntPos == 0) {
+                                            if (actSpinCntPos == 0) {
+                                                nextSpinDirPos = (actSpinDirPos + 1) % DIR_SIZE;
+
+                                                final long calcSpeedCnt = actSpeedCnt + actSpeedPos;
+
+                                                if (calcSpeedCnt >= MAX_SPEED_C) {
+                                                    nextSpeedCnt = calcSpeedCnt - MAX_SPEED_C;
                                                     final int moveDir = speedDirPos == 0 ? -1 : 1;
+
+                                                    // Use nextCell for the next cell in the direction of the speed.
+                                                    final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
+                                                    calcNextCell(this.psiLayerArr, nextPsiArrPos, cell,
+                                                            nextPsiPos, divPos,
+                                                            spinPos, nextSpinCntPos, nextSpinDirPos,
+                                                            nextSpeedDirPos, nextSpeedPos,
+                                                            actSpeedDirPos, nextSpeedCnt);
+                                                } else {
+                                                    nextSpeedCnt = calcSpeedCnt;
+                                                    final int moveDir = actSpinDirPos == 0 ? -1 : 1;
 
                                                     // If reaching MAX_DIV: Use nextCell for the next cell to stay in position.
                                                     final int nextDivPos = divPos + 1;
                                                     if (nextDivPos < MAX_DIV) {
                                                         calcNextCell(this.psiLayerArr, psiArrPos, cell,
                                                                 nextPsiPos, nextDivPos,
-                                                                //spinPos, actSpinCntPos,//nextSpinCntPos,
                                                                 spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                speedDirPos, speedPos,
-                                                                speedDirPos, nextSpeedCnt);//, nextSpinCnt);
-                                                                //nextSpeedCnt, actSpinCnt);
+                                                                nextSpeedDirPos, nextSpeedPos,
+                                                                actSpeedDirPos, nextSpeedCnt);
 
                                                         final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
                                                         calcNextCell(this.psiLayerArr, nextPsiArrPos, cell,
                                                                 nextPsiPos, nextDivPos,
                                                                 spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                speedDirPos, speedPos,
-                                                                speedDirPos, nextSpeedCnt);//, nextSpinCnt);
+                                                                //spinPos, actSpinCntPos, nextSpinDirPos,
+                                                                nextSpeedDirPos, nextSpeedPos,
+                                                                actSpeedDirPos, nextSpeedCnt);
                                                     } else {
                                                         calcNextCell(this.psiLayerArr, psiArrPos, cell,
                                                                 nextPsiPos, divPos,
                                                                 spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                speedDirPos, speedPos,
-                                                                speedDirPos, nextSpeedCnt);//, nextSpinCnt);
+                                                                nextSpeedDirPos, nextSpeedPos,
+                                                                actSpeedDirPos, nextSpeedCnt);
                                                     }
-                                                } else {
-                                                    calcNextCell(this.psiLayerArr, psiArrPos, cell,
-                                                            nextPsiPos, divPos,
-                                                            spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                            speedDirPos, speedPos,
-                                                            speedDirPos, nextSpeedCnt);//, nextSpinCnt);
                                                 }
+                                            } else {
+                                                nextSpinDirPos = actSpinDirPos;
+                                                nextSpeedCnt = actSpeedCnt;
+
+                                                calcNextCell(this.psiLayerArr, psiArrPos, cell,
+                                                        nextPsiPos, divPos,
+                                                        spinPos, nextSpinCntPos, nextSpinDirPos,
+                                                        nextSpeedDirPos, nextSpeedPos,
+                                                        actSpeedDirPos, nextSpeedCnt);
                                             }
                                         }
                                     }
