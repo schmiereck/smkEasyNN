@@ -23,6 +23,9 @@ public class LayerImpulseElectronSimulation extends JPanel {
         //long[] speedArr = new long[DIR_SIZE];
         //long speed = 0;
         long[] speedCntArr = new long[DIR_SIZE];
+
+        int spin;
+        int spinCnt = 0;
     }
 
     private class SpeedNode {
@@ -40,12 +43,9 @@ public class LayerImpulseElectronSimulation extends JPanel {
     }
 
     private class SpinDirNode {
-        /**
-         * Count of divisions.
-         * div = div/2, div = div/2, div = div/2, ...
-         * Position 0 is div = 1.
-         */
         final SpeedNode[] divCellArr = new SpeedNode[MAX_DIV];
+        //int spin;
+        //int spinCnt = 0;
 
         public SpinDirNode() {
             for (int divPos = 0; divPos < MAX_DIV; divPos++) {
@@ -68,6 +68,11 @@ public class LayerImpulseElectronSimulation extends JPanel {
     }
 
     private class Layer {
+        /**
+         * Count of divisions.
+         * div = div/2, div = div/2, div = div/2, ...
+         * Position 0 is div = 1.
+         */
         final DivNode[] dirNodeArr = new DivNode[PsiArrSize];
 
         public Layer() {
@@ -109,6 +114,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
             //cell.speed = 16;
             cell.speedCntArr[0] = 0;
             cell.speedCntArr[1] = 0;
+            cell.spin = 3;
         }
         {
             final int nextArrPos = ((PsiArrSize / 4) * 3);
@@ -120,6 +126,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
             //cell.speed = 6;
             cell.speedCntArr[0] = 0;
             cell.speedCntArr[1] = 0;
+            cell.spin = 6;
         }
     }
 
@@ -175,6 +182,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                 if (cell.count > 0) {
                                     final int actCalcDirPos = speedDirPos;
                                     final int nextSpinDirPos = (spinDirPos + 1) % DIR_SIZE;
+                                    final int actSpinCnt = cell.spinCnt;
+                                    final int nextSpinCnt = (actSpinCnt + 1) % cell.spin;
 
                                     //final long actSpeedCnt = cell.speedCntArr[speedDirPos] + speedPos;
                                     final long actSpeedCnt = cell.speedCntArr[spinDirPos] + speedPos;
@@ -185,20 +194,30 @@ public class LayerImpulseElectronSimulation extends JPanel {
 
                                         // Use nextCell for the next cell in the direction of the speed.
                                         final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                        calcNextCell(this.psiLayerArr, nextPsiArrPos, cell, nextPsiPos, divPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos, nextSpeedCnt);
+                                        calcNextCell(this.psiLayerArr, nextPsiArrPos, cell, nextPsiPos, divPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos,
+                                                nextSpeedCnt, nextSpinCnt);
                                     } else {
                                         nextSpeedCnt = actSpeedCnt;
-                                        final int moveDir = speedDirPos == 0 ? -1 : 1;
+                                        if (nextSpinCnt == 0) {
+                                            final int moveDir = speedDirPos == 0 ? -1 : 1;
 
-                                        // If reaching MAX_DIV: Use nextCell for the next cell to stay in position.
-                                        final int nextDivPos = divPos + 1;
-                                        if (nextDivPos < MAX_DIV) {
-                                            calcNextCell(this.psiLayerArr, psiArrPos, cell, nextPsiPos, nextDivPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos, nextSpeedCnt);
+                                            // If reaching MAX_DIV: Use nextCell for the next cell to stay in position.
+                                            final int nextDivPos = divPos + 1;
+                                            if (nextDivPos < MAX_DIV) {
+                                                calcNextCell(this.psiLayerArr, psiArrPos, cell, nextPsiPos, nextDivPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos,
+                                                        //nextSpeedCnt, actSpinCnt);
+                                                        nextSpeedCnt, nextSpinCnt);
 
-                                            final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                            calcNextCell(this.psiLayerArr, nextPsiArrPos, cell, nextPsiPos, nextDivPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos, nextSpeedCnt);
+                                                final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
+                                                calcNextCell(this.psiLayerArr, nextPsiArrPos, cell, nextPsiPos, nextDivPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos,
+                                                        nextSpeedCnt, nextSpinCnt);
+                                            } else {
+                                                calcNextCell(this.psiLayerArr, psiArrPos, cell, nextPsiPos, divPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos,
+                                                        nextSpeedCnt, nextSpinCnt);
+                                            }
                                         } else {
-                                            calcNextCell(this.psiLayerArr, psiArrPos, cell, nextPsiPos, divPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos, nextSpeedCnt);
+                                            calcNextCell(this.psiLayerArr, psiArrPos, cell, nextPsiPos, divPos, nextSpinDirPos, speedDirPos, speedPos, speedDirPos,
+                                                    nextSpeedCnt, nextSpinCnt);
                                         }
                                     }
                                 }
@@ -221,67 +240,65 @@ public class LayerImpulseElectronSimulation extends JPanel {
         System.out.println("END: Simulating.");
     }
 
-    private static void calcNextCell(Layer[] psiLayerArr, int nextPsiArrPos, Cell cell, int nextPsiPos, int divPos, int spinDirPos, int speedDirPos, int speedPos, int actDirPos, long nextSpeedCnt) {
-        final Cell nextCell = retrieveCell(psiLayerArr, nextPsiPos, nextPsiArrPos, divPos, spinDirPos, speedDirPos, speedPos);
+    private static void calcNextCell(Layer[] psiLayerArr, int nextPsiArrPos, Cell sourceCell,
+                                     int nextPsiPos, int nextDivPos, int nextSpinDirPos, int nextSpeedDirPos, int nextSpeedPos,
+                                     int actDirPos, long nextSpeedCnt, int nextSpinCnt) {
+        final Cell nextCell = retrieveCell(psiLayerArr, nextPsiPos, nextPsiArrPos, nextDivPos, nextSpinDirPos, nextSpeedDirPos, nextSpeedPos);
 
-        calcNextCell(nextCell, cell.speedCntArr,
-                //cell.speed,
-                cell.count, actDirPos, nextSpeedCnt);
+        calcNextCellState(nextCell, sourceCell.speedCntArr,
+                sourceCell.count, actDirPos, nextSpeedCnt, sourceCell.spin, nextSpinCnt);
     }
 
-    private static void calcNextCell2(Layer[] psiLayerArr, int nextPsiArrPos, Cell cell, int nextPsiPos, int divPos, int spinDirPos, int speedDirPos, int speedPos, long nextCellCount) {
-        final Cell nextCell = retrieveCell(psiLayerArr, nextPsiPos, nextPsiArrPos, divPos, spinDirPos, speedDirPos, speedPos);
+    private static void calcNextCell2(Layer[] psiLayerArr, int nextPsiArrPos, Cell sourceCell,
+                                      int nextPsiPos, int nextDivPos, int nextSpinDirPos, int nextSpeedDirPos, int nextSpeedPos,
+                                      long nextCellCount) {
+        final Cell nextCell = retrieveCell(psiLayerArr, nextPsiPos, nextPsiArrPos, nextDivPos, nextSpinDirPos, nextSpeedDirPos, nextSpeedPos);
 
-        calcNextCell2(nextCell, cell.speedCntArr,
-                //cell.speed,
-                nextCellCount);
+        calcNextCellState2(nextCell, sourceCell.speedCntArr,
+                nextCellCount, sourceCell.spin, sourceCell.spinCnt);
     }
 
-    private static Cell retrieveCell(Layer[] psiLayerArr, int nextPsiPos, int nextPsiArrPos, int divPos, int spinDirPos, int speedDirPos, int speedPos) {
-        return psiLayerArr[nextPsiPos].dirNodeArr[nextPsiArrPos].spinDirCellArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
+    private static Cell retrieveCell(Layer[] psiLayerArr, int psiPos, int psiArrPos, int divPos, int spinDirPos, int speedDirPos, int speedPos) {
+        return psiLayerArr[psiPos].dirNodeArr[psiArrPos].spinDirCellArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
     }
 
-    private static void calcNextCell(Cell nextCell,
-                                     long[] speedCntArr,
-                                     //long speed,
-                                     long count,
-                                     int actSpeedDirPos, long nextSpeedCnt) {
+    private static void calcNextCellState(final Cell nextCell,
+                                          final long[] sourceSpeedCntArr,
+                                          final long count,
+                                          final int actSpeedDirPos, final long nextSpeedCnt,
+                                          final int nextSpin, int nextSpinCnt) {
         //nextCell.count += count;
-        if (Long.MAX_VALUE - count >= nextCell.count) {
+        if ((Long.MAX_VALUE - count) >= nextCell.count) {
             nextCell.count += count;
         } else {
-            // Das Hinzufügen von count zu nextCell.count würde den Wertebereich überschreiten
             throw new RuntimeException("Das Ergebnis von nextCell.count %d + count %d würde den Wertebereich überschreiten".formatted(nextCell.count, count));
         }
-        //nextCell.div = div;
         for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
             if (speedDirPos == actSpeedDirPos) {
                 nextCell.speedCntArr[speedDirPos] = nextSpeedCnt;
             } else {
-                nextCell.speedCntArr[speedDirPos] = speedCntArr[speedDirPos];
+                nextCell.speedCntArr[speedDirPos] = sourceSpeedCntArr[speedDirPos];
             }
-            //nextCell.speedArr[speedDirPos] = speedArr[speedDirPos];
         }
-        //nextCell.speed = speed;
+        nextCell.spin = nextSpin;
+        nextCell.spinCnt = nextSpinCnt;
     }
 
-    private static void calcNextCell2(Cell nextCell,
-                                     long[] speedCntArr,
-                                      //long speed,
-                                      long count) {
+    private static void calcNextCellState2(Cell nextCell,
+                                           long[] speedCntArr,
+                                           long count,
+                                           final int nextSpin, int nextSpinCnt) {
         //nextCell.count += count;
         if (Long.MAX_VALUE - count >= nextCell.count) {
             nextCell.count += count;
         } else {
-            // Das Hinzufügen von count zu nextCell.count würde den Wertebereich überschreiten
             throw new RuntimeException("Das Ergebnis von nextCell.count %d + count %d würde den Wertebereich überschreiten".formatted(nextCell.count, count));
         }
-        //nextCell.div = div;
         for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
             nextCell.speedCntArr[speedDirPos] = speedCntArr[speedDirPos];
-            //nextCell.speedArr[speedDirPos] = speedArr[speedDirPos];
         }
-        //nextCell.speed = speed;
+        nextCell.spin = nextSpin;
+        nextCell.spinCnt = nextSpinCnt;
     }
 
     public static final Color IMG_COLOR = new Color(255, 0, 0, 125);
@@ -319,6 +336,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
 //            g.setColor(IMG_COLOR);
 //            g.drawLine(x1, y1Imag, x2, y2Imag);
 
+            long ys1 = 0;
             long yc1 = 0;
             long yc2 = 0;
             double yp1 = 0.0D;
@@ -327,8 +345,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
                 for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
                     for (int spinDirPos = 0; spinDirPos < DIR_SIZE; spinDirPos++) {
                         for (int speedPos = 0; speedPos <= MAX_SPEED_C; speedPos++) {
-                            Cell cell1 = psiLayerArr[nextPsiPos].dirNodeArr[xp1].spinDirCellArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
-                            Cell cell2 = psiLayerArr[nextPsiPos].dirNodeArr[xp2].spinDirCellArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
+                            final Cell cell1 = psiLayerArr[nextPsiPos].dirNodeArr[xp1].spinDirCellArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
+                            final Cell cell2 = psiLayerArr[nextPsiPos].dirNodeArr[xp2].spinDirCellArr[spinDirPos].divCellArr[divPos].speedCellArr[speedDirPos][speedPos];
                             //int y1 = (int) (midY - VIEW_HEIGHT * (cell1.count  / (normFactor * Math.pow(2, cell1.div))));
                             //int y2 = (int) (midY - VIEW_HEIGHT * (cell2.count / (normFactor * Math.pow(2, cell2.div))));
                             yp1 += calcCellPobability(cell1, divPos + 1);
@@ -342,6 +360,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                 int y2 = (int) (midY + VIEW_HEIGHT * yd2);
                                 g.setColor(Color.RED);
                                 g.drawLine(x1, y2, x2, y2);
+
+                                ys1 += cell1.spinCnt;
                             }
                             if (cell2.count > 0) {
                                 yc2 += cell2.count;
@@ -361,6 +381,11 @@ public class LayerImpulseElectronSimulation extends JPanel {
                 int y2 = (int) (midY - VIEW_HEIGHT * (yc2 / 300.0D));
                 g.setColor(Color.BLUE);
                 g.drawLine(x1, y1 - 125, x2, y2 - 125);
+            }
+            {
+                int y1 = (int) (midY - VIEW_HEIGHT * (ys1 / 600.0D));
+                g.setColor(Color.ORANGE);
+                g.drawLine(x1, y1 - 125, x2, y1 - 125);
             }
         }
     }

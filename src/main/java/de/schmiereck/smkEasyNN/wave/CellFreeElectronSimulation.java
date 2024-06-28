@@ -119,6 +119,10 @@ public class CellFreeElectronSimulation extends JPanel {
         int nextPsiPos = (this.psiPos + 1) % 2;
 
         int midY = VIEW_HEIGHT / 2;
+
+        g.setColor(Color.GRAY);
+        g.drawLine(0, midY, VIEW_WIDTH, midY);
+
         for (int psiArrPos = 0; psiArrPos < PsiArrSize - 1; psiArrPos++) {
             int xp1 = (psiArrPos + PsiArrSize) % PsiArrSize;
             int xp2 = (psiArrPos + 1 + PsiArrSize) % PsiArrSize;
@@ -140,8 +144,8 @@ public class CellFreeElectronSimulation extends JPanel {
 //            g.setColor(IMG_COLOR);
 //            g.drawLine(x1, y1Imag, x2, y2Imag);
 
-            Cell cell1 = psiArr[nextPsiPos][xp1];
-            Cell cell2 = psiArr[nextPsiPos][xp2];
+            final Cell cell1 = psiArr[nextPsiPos][xp1];
+            final Cell cell2 = psiArr[nextPsiPos][xp2];
             //int y1 = (int) (midY - VIEW_HEIGHT * (cell1.count  / (normFactor * Math.pow(2, cell1.div))));
             //int y2 = (int) (midY - VIEW_HEIGHT * (cell2.count / (normFactor * Math.pow(2, cell2.div))));
             int y1 = (int) (midY - VIEW_HEIGHT * getaDouble(cell1));

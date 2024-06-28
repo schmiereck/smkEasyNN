@@ -175,6 +175,10 @@ public class CellImpulseElectronSimulation extends JPanel {
             int nextPsiPos = (this.psiPos + 1) % 2;
 
             int midY = VIEW_HEIGHT / 2;
+
+            g.setColor(Color.GRAY);
+            g.drawLine(0, midY, VIEW_WIDTH, midY);
+
             for (int psiArrPos = 0; psiArrPos < PsiArrSize - 1; psiArrPos++) {
                 int xp1 = (psiArrPos + PsiArrSize) % PsiArrSize;
                 int xp2 = (psiArrPos + 1 + PsiArrSize) % PsiArrSize;
