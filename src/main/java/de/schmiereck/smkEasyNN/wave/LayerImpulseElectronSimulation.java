@@ -2,6 +2,7 @@ package de.schmiereck.smkEasyNN.wave;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * https://chatgpt.com/c/20509527-0f81-4457-b7a7-d869fc25e129
@@ -20,9 +21,19 @@ public class LayerImpulseElectronSimulation extends JPanel {
     private final static int MAX_SPEED_C = 8;//12;
     private final static int PSI_LAYER_SIZE = 2;
     private final static int MAX_SPIN = 6;
+    private final static int TYPE_SIZE = 2;
+
+    private static class SourceEvent {
+        SourceEvent parentSourceEvent = null;
+    }
+
+    // TODO Field als Typ hinzufügen mit eigenem Count.
+    // Die Speed wird als Impuls interpretiert.
+    // Felder haben auch einen Spin.
 
     private static class Node {
         long count = 0;
+        SourceEvent sourceEvent = null;
 
         //long[] speedArr = new long[DIR_SIZE];
         //long speed = 0;
@@ -86,7 +97,6 @@ public class LayerImpulseElectronSimulation extends JPanel {
     }
 
     private static class SpinDirNode {
-        // TODO Div nach oben unter Node schieben
         final DivNode[] divNodeArr = DivNode.createDivNodeArr();
 
         public static SpinDirNode[] createSpinDirNodeArr() {
@@ -179,9 +189,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
                     1, 0, 0,
                     0,
                     0, 0, 1, MAX_SPEED_C - ((MAX_SPEED_C / 4)));
-            node.count = 0;
-            //node.speedCntArr[0] = 0;
-            //node.speedCntArr[1] = 0;
+            node.count = 1;
+            node.sourceEvent = new SourceEvent();
         }
         {
             // stay in middle:
@@ -190,9 +199,8 @@ public class LayerImpulseElectronSimulation extends JPanel {
                     3, 0, 0,
                     0,
                     0, 0, 1, 0);
-            node.count = 0;
-            //node.speedCntArr[0] = 0;
-            //node.speedCntArr[1] = 0;
+            node.count = 1;
+            node.sourceEvent = new SourceEvent();
         }
         {
             // to left, slowly:
@@ -202,8 +210,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
                     0,
                     0, 0, 0, MAX_SPEED_C - ((MAX_SPEED_C / 4) * 3));
             node.count = 1;
-            //node.speedCntArr[0] = 0;
-            //node.speedCntArr[1] = 0;
+            node.sourceEvent = new SourceEvent();
         }
     }
 
@@ -232,9 +239,9 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                                     final long upperNodeCount = node.count / 2;
                                                     final long letNodeCount = node.count % 2;
 
-                                                    calcNextNode2(this.psiLayerArr, psiArrPos, node,
-                                                            actPsiPos, divPos - 1,
+                                                    calcNextNode2(node, this.psiLayerArr, actPsiPos, psiArrPos,
                                                             spinPos, spinCntPos, spinDirPos,
+                                                            divPos - 1,
                                                             spinSpeedDirPos, speedCntPos, speedDirPos, speedPos,
                                                             upperNodeCount);
                                                     node.count = letNodeCount;
@@ -261,6 +268,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                                 final Node node = psiNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
                                                         divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
                                                 node.count = 0;
+                                                node.sourceEvent = null;
                                             }
                                         }
                                     }
@@ -295,7 +303,6 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                                     final int nextSpeedDirPos = actSpeedDirPos;
                                                     final int actSpeedPos = speedPos;
                                                     final int nextSpeedPos = actSpeedPos;
-                                                    //final long actSpeedCnt = node.speedCntArr[actSpinDirPos];
                                                     final int actSpeedCntPos = speedCntPos;
                                                     final int nextSpeedCntPos;
 
@@ -305,7 +312,6 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                                         nextSpinDirPos = actSpinDirPos;
                                                     }
 
-                                                    //final long calcSpeedCnt = actSpeedCnt + actSpeedPos;
                                                     final int calcSpeedCntPos = actSpeedCntPos + actSpeedPos;
 
                                                     if (calcSpeedCntPos >= MAX_SPEED_C) {
@@ -314,55 +320,38 @@ public class LayerImpulseElectronSimulation extends JPanel {
 
                                                         // Use nextNode for the next node in the direction of the speed.
                                                         final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                                        calcNextNode(this.psiLayerArr, nextPsiArrPos, node,
-                                                                nextPsiPos, divPos,
+                                                        calcNextNode(node, this.psiLayerArr, nextPsiPos, nextPsiArrPos,
                                                                 spinPos, nextSpinCntPos, nextSpinDirPos,
+                                                                divPos,
                                                                 nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
                                                                 actSpeedDirPos, nextSpeedCntPos);
                                                     } else {
-                                                        //nextSpeedCnt = calcSpeedCnt;
                                                         nextSpeedCntPos = calcSpeedCntPos;
                                                         final int moveDir = actSpinDirPos == 0 ? -1 : 1;
 
                                                         // If reaching MAX_DIV: Use nextNode for the next node to stay in position.
                                                         final int nextDivPos = divPos + 1;
                                                         if (nextDivPos < MAX_DIV) {
-                                                            calcNextNode(this.psiLayerArr, psiArrPos, node,
-                                                                    nextPsiPos, nextDivPos,
+                                                            calcNextNode(node, this.psiLayerArr, nextPsiPos, psiArrPos,
                                                                     spinPos, nextSpinCntPos, nextSpinDirPos,
+                                                                    nextDivPos,
                                                                     nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
                                                                     actSpeedDirPos, nextSpeedCntPos);
 
                                                             final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                                            calcNextNode(this.psiLayerArr, nextPsiArrPos, node,
-                                                                    nextPsiPos, nextDivPos,
+                                                            calcNextNode(node, this.psiLayerArr, nextPsiPos, nextPsiArrPos,
                                                                     spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                    //spinPos, actSpinCntPos, nextSpinDirPos,
+                                                                    nextDivPos,
                                                                     nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
                                                                     actSpeedDirPos, nextSpeedCntPos);
                                                         } else {
-                                                            calcNextNode(this.psiLayerArr, psiArrPos, node,
-                                                                    nextPsiPos, divPos,
+                                                            calcNextNode(node, this.psiLayerArr, nextPsiPos, psiArrPos,
                                                                     spinPos, nextSpinCntPos, nextSpinDirPos,
+                                                                    divPos,
                                                                     nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
                                                                     actSpeedDirPos, nextSpeedCntPos);
                                                         }
                                                     }
-                                                    //                                                } else {
-                                                    //                                                    if (actSpinCntPos == 0) {
-                                                    //
-                                                    //                                                    } else {
-                                                    //
-                                                    //                                                    }
-                                                    //                                                    nextSpinDirPos = actSpinDirPos;
-                                                    //                                                    nextSpeedCnt = actSpeedCnt;
-                                                    //
-                                                    //                                                    calcNextNode(this.psiLayerArr, psiArrPos, node,
-                                                    //                                                            nextPsiPos, divPos,
-                                                    //                                                            spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                    //                                                            nextSpinSpeedDirPos, nextSpeedDirPos, nextSpeedPos,
-                                                    //                                                            actSpeedDirPos, nextSpeedCnt);
-                                                    //                                                }
                                                 }
                                             }
                                         }
@@ -378,7 +367,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
             if (t % 1 == 0) {
                 this.repaint();
                 try {
-                    Thread.sleep(25*5);
+                    Thread.sleep(25*6);
                 } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -387,9 +376,9 @@ public class LayerImpulseElectronSimulation extends JPanel {
         System.out.println("END: Simulating.");
     }
 
-    private static void calcNextNode(Layer[] psiLayerArr, int nextPsiArrPos, Node sourceNode,
-                                     int nextPsiPos, int nextDivPos,
+    private static void calcNextNode(Node sourceNode, Layer[] psiLayerArr, int nextPsiPos, int nextPsiArrPos,
                                      int nextSpinPos, int nextSpinCntPos, int nextSpinDirPos,
+                                     int nextDivPos,
                                      int nextSpinSpeedDirPos, int nextSpeedCntPos, int nextSpeedDirPos, int nextSpeedPos,
                                      int actSpeedDirPos, long nextSpeedCntPos2) {
         final Node nextNode = retrieveNode(psiLayerArr, nextPsiPos, nextPsiArrPos,
@@ -398,14 +387,15 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                            nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos);
 
         calcNextNodeState(nextNode, //sourceNode.speedCntArr,
-                sourceNode.count
+                sourceNode.count,
+                sourceNode.sourceEvent
                 //actSpeedDirPos, nextSpeedCnt
         );
     }
 
-    private static void calcNextNode2(Layer[] psiLayerArr, int nextPsiArrPos, Node sourceNode,
-                                      int nextPsiPos, int nextDivPos,
+    private static void calcNextNode2(Node sourceNode, Layer[] psiLayerArr, int nextPsiPos, int nextPsiArrPos,
                                       int nextSpinPos, int nextSpinCntPos, int nextSpinDirPos,
+                                      int nextDivPos,
                                       int nextSpinSpeedDirPos, int nextSpeedCntPos, int nextSpeedDirPos, int nextSpeedPos,
                                       long nextNodeCount) {
         final Node nextNode = retrieveNode(psiLayerArr, nextPsiPos, nextPsiArrPos,
@@ -414,7 +404,7 @@ public class LayerImpulseElectronSimulation extends JPanel {
                                            nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos);
 
         calcNextNodeState2(nextNode, //sourceNode.speedCntArr,
-                nextNodeCount);
+                nextNodeCount, sourceNode.sourceEvent);
     }
 
     private static Node retrieveNode(Layer[] psiLayerArr, int psiPos, int psiArrPos,
@@ -427,38 +417,35 @@ public class LayerImpulseElectronSimulation extends JPanel {
 
     private static void calcNextNodeState(final Node nextNode,
                                           //final long[] sourceSpeedCntArr,
-                                          final long count
+                                          final long count,
+                                          final SourceEvent sourceEvent
                                           //final int actSpeedDirPos, final long nextSpeedCnt
     ) {
-        if ((Long.MAX_VALUE - count) >= nextNode.count) {
+        if ((Integer.MAX_VALUE - count) >= nextNode.count) {
             nextNode.count += count;
         } else {
             throw new RuntimeException("Das Ergebnis von nextNode.count %d + count %d würde den Wertebereich überschreiten".formatted(nextNode.count, count));
         }
-        //for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
-        //    if (speedDirPos == actSpeedDirPos) {
-        //        nextNode.speedCntArr[speedDirPos] = nextSpeedCnt;
-        //    } else {
-        //        nextNode.speedCntArr[speedDirPos] = sourceSpeedCntArr[speedDirPos];
-        //    }
-        //}
+        if (Objects.nonNull(nextNode.sourceEvent) && (nextNode.sourceEvent != sourceEvent)) {
+            throw new RuntimeException("nextNode.sourceEvent != sourceEvent");
+        }
+        nextNode.sourceEvent = sourceEvent;
     }
 
     private static void calcNextNodeState2(Node nextNode,
                                            //long[] speedCntArr,
-                                           long count) {
-        if (Long.MAX_VALUE - count >= nextNode.count) {
+                                           long count,
+                                           SourceEvent sourceEvent) {
+        if (Integer.MAX_VALUE - count >= nextNode.count) {
             nextNode.count += count;
         } else {
             throw new RuntimeException("Das Ergebnis von nextNode.count %d + count %d würde den Wertebereich überschreiten".formatted(nextNode.count, count));
         }
-        //for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
-        //    nextNode.speedCntArr[speedDirPos] = speedCntArr[speedDirPos];
-        //}
+        if (Objects.nonNull(nextNode.sourceEvent) && (nextNode.sourceEvent != sourceEvent)) {
+            throw new RuntimeException("nextNode.sourceEvent != sourceEvent");
+        }
+        nextNode.sourceEvent = sourceEvent;
     }
-
-    public static final Color IMG_COLOR = new Color(255, 0, 0, 125);
-    public static final Color REAL_COLOR = new Color(0, 0, 255, 125);
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -480,21 +467,6 @@ public class LayerImpulseElectronSimulation extends JPanel {
             int xp2 = (psiArrPos + 1 + PsiArrSize) % PsiArrSize;
             int x1 = (int) (xp1 * (VIEW_WIDTH / (double) PsiArrSize));
             int x2 = (int) ((xp2) * (VIEW_WIDTH / (double) PsiArrSize));
-
-//            int y1 = (int) (midY - psiArr[psiArrPos].abs() * VIEW_HEIGHT);
-//            int y2 = (int) (midY - psiArr[psiArrPos + 1].abs() * VIEW_HEIGHT);
-//            g.setColor(Color.BLACK);
-//            g.drawLine(x1, y1, x2, y2);
-//
-//            int y1Real = (int) (midY - psiArr[psiArrPos].getReal() * VIEW_HEIGHT);
-//            int y2Real = (int) (midY - psiArr[psiArrPos + 1].getReal() * VIEW_HEIGHT);
-//            g.setColor(REAL_COLOR);
-//            g.drawLine(x1, y1Real, x2, y2Real);
-//
-//            int y1Imag = (int) (midY - psiArr[psiArrPos].getImaginary() * VIEW_HEIGHT);
-//            int y2Imag = (int) (midY - psiArr[psiArrPos + 1].getImaginary() * VIEW_HEIGHT);
-//            g.setColor(IMG_COLOR);
-//            g.drawLine(x1, y1Imag, x2, y2Imag);
 
             long ys1 = 0;
             long ys2 = 0;
