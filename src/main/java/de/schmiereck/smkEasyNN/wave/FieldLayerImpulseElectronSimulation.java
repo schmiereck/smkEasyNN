@@ -36,7 +36,6 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
 
     private static class Node {
         long count = 0;
-        long eFieldCount;
         SourceEvent sourceEvent = null;
 
         //long[] speedArr = new long[DIR_SIZE];
@@ -87,21 +86,23 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
         }
     }
 
-    private static class DivNode {
-        final SpinSpeedDirNode[] spinSpeedDirNodeArr = SpinSpeedDirNode.createSpinSpeedDirNodeArr();
-
-        public static DivNode[] createDivNodeArr() {
-            final DivNode[] divNodeArr = new DivNode[MAX_DIV];
-
-            for (int divPos = 0; divPos < MAX_DIV; divPos++) {
-                divNodeArr[divPos] = new DivNode();
-            }
-            return divNodeArr;
-        }
-    }
+//    private static class DivNode {
+//        final SpinSpeedDirNode[] spinSpeedDirNodeArr = SpinSpeedDirNode.createSpinSpeedDirNodeArr();
+//
+//        public static DivNode[] createDivNodeArr() {
+//            final DivNode[] divNodeArr = new DivNode[MAX_DIV];
+//
+//            for (int divPos = 0; divPos < MAX_DIV; divPos++) {
+//                divNodeArr[divPos] = new DivNode();
+//            }
+//            return divNodeArr;
+//        }
+//    }
 
     private static class SpinDirNode {
-        final DivNode[] divNodeArr = DivNode.createDivNodeArr();
+        //final DivNode[] divNodeArr = DivNode.createDivNodeArr();
+        final SpinSpeedDirNode[] spinSpeedDirNodeArr = SpinSpeedDirNode.createSpinSpeedDirNodeArr();
+        long eFieldCount;
 
         public static SpinDirNode[] createSpinDirNodeArr() {
             final SpinDirNode[] spinDirNodeArr = new SpinDirNode[DIR_SIZE];
@@ -204,9 +205,9 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
             final int nextArrPos = ((PsiArrSize / 4) * 1);
             final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
                     1, 0, 0,
-                    0,
+                    //MAX_DIV - 1,
                     0, 0, 1, MAX_SPEED_C - ((MAX_SPEED_C / 4)));
-            node.count = 0;
+            node.count = intPow2(MAX_DIV);
             node.sourceEvent = new SourceEvent();
         }
         {
@@ -214,9 +215,9 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
             final int nextArrPos = ((PsiArrSize / 4) * 2);
             final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
                     3, 0, 0,
-                    0,
+                    //MAX_DIV - 1,
                     0, 0, 1, 0);
-            node.count = 1;
+            node.count = intPow2(MAX_DIV);
             node.sourceEvent = new SourceEvent();
         }
         {
@@ -224,9 +225,9 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
             final int nextArrPos = ((PsiArrSize / 4) * 3);
             final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
                     1, 0, 1,
-                    0,
+                    //MAX_DIV - 1,
                     0, 0, 0, MAX_SPEED_C - ((MAX_SPEED_C / 4) * 3));
-            node.count = 0;
+            node.count = intPow2(MAX_DIV);
             node.sourceEvent = new SourceEvent();
         }
     }
@@ -246,96 +247,103 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
                 for (int spinPos = 0; spinPos < MAX_SPIN; spinPos++) {
                     for (int spinCntPos = 0; spinCntPos < MAX_SPIN; spinCntPos++) {
                         for (int spinDirPos = 0; spinDirPos < DIR_SIZE; spinDirPos++) {
-                            for (int divPos = MAX_DIV - 1; divPos >= 0; divPos--) {
+                            //for (int divPos = MAX_DIV - 1; divPos >= 0; divPos--) {
                                 for (int spinSpeedDirPos = 0; spinSpeedDirPos < DIR_SIZE; spinSpeedDirPos++) {
                                     for (int speedCntPos = 0; speedCntPos <= MAX_SPEED_C; speedCntPos++) {
                                         for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
                                             for (int speedPos = 0; speedPos <= MAX_SPEED_C; speedPos++) {
                                                 final Node node = psiNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
-                                                        divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+                                                        //divNodeArr[divPos].
+                                                        spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
 
                                                 // Renorm div counts to lower divisions.
-                                                if ((node.count > 1) && (divPos > 0)) {
-                                                    final long upperNodeCount = node.count / 2;
-                                                    final long letNodeCount = node.count % 2;
-
-                                                    calcNextNode2(node, this.psiLayerArr, actPsiPos, psiArrPos,
-                                                            spinPos, spinCntPos, spinDirPos,
-                                                            divPos - 1,
-                                                            spinSpeedDirPos, speedCntPos, speedDirPos, speedPos,
-                                                            upperNodeCount);
-                                                    node.count = letNodeCount;
-                                                    this.realityNodeArr[psiArrPos].eQuant += letNodeCount;
+                                                if ((node.count > 1)) { // && (divPos > 0)) {
+                                                //    final long upperNodeCount = node.count / 2;
+                                                //    final long letNodeCount = node.count % 2;
+//
+                                                //    calcNextNode2(node, this.psiLayerArr, actPsiPos, psiArrPos,
+                                                //            spinPos, spinCntPos, spinDirPos,
+                                                //            divPos - 1,
+                                                //            spinSpeedDirPos, speedCntPos, speedDirPos, speedPos,
+                                                //            upperNodeCount);
+                                                //    node.count = letNodeCount;
+                                                //    this.realityNodeArr[psiArrPos].eQuant += letNodeCount;
+                                                    this.realityNodeArr[psiArrPos].eQuant += node.count;
                                                 }
-                                                if (node.eFieldCount > 1) {
-                                                    final long upperNodeCount = node.eFieldCount / 2;
-                                                    final long letNodeCount = node.eFieldCount % 2;
-
-                                                    final Node upperNode = retrieveNode(this.psiLayerArr, actPsiPos, psiArrPos,
-                                                            spinPos, spinCntPos, spinDirPos,
-                                                            divPos,
-                                                            spinSpeedDirPos, speedCntPos, speedDirPos, speedPos);
-
-                                                    upperNode.eFieldCount += upperNodeCount;
-                                                    node.eFieldCount = letNodeCount;
-                                                }
-                                                if (node.eFieldCount > 0) {
-                                                    final double eField = (node.eFieldCount * (1.0D / (Math.pow(2.0D, divPos + 1))));
-                                                    this.realityNodeArr[psiArrPos].eFieldArray[speedDirPos] += eField;
-                                                }
+                                                //if (node.eFieldCount > 1) {
+                                                //    final long upperNodeCount = node.eFieldCount / 2;
+                                                //    final long letNodeCount = node.eFieldCount % 2;
+//
+                                                //    final Node upperNode = retrieveNode(this.psiLayerArr, actPsiPos, psiArrPos,
+                                                //            spinPos, spinCntPos, spinDirPos,
+                                                //            divPos,
+                                                //            spinSpeedDirPos, speedCntPos, speedDirPos, speedPos);
+//
+                                                //    upperNode.eFieldCount += upperNodeCount;
+                                                //    node.eFieldCount = letNodeCount;
+                                                //}
+                                                //if (node.eFieldCount > 0) {
+                                                //    final double eField = node.eFieldCount;//(node.eFieldCount * (1.0D / (Math.pow(2.0D, divPos + 1))));
+                                                //    this.realityNodeArr[psiArrPos].eFieldArray[speedDirPos] += eField;
+                                                //}
                                             }
                                         }
                                     }
-                                }
+                                //}
                             }
                         }
                     }
                 }
             }
             for (int psiArrPos = 0; psiArrPos < PsiArrSize; psiArrPos++) {
-                final PsiNode psiNode = this.psiLayerArr[nextPsiPos].psiNodeArr[psiArrPos];
+                final PsiNode nextPsiNode = this.psiLayerArr[nextPsiPos].psiNodeArr[psiArrPos];
                 for (int spinPos = 0; spinPos < MAX_SPIN; spinPos++) {
                     for (int spinCntPos = 0; spinCntPos < MAX_SPIN; spinCntPos++) {
                         for (int spinDirPos = 0; spinDirPos < DIR_SIZE; spinDirPos++) {
-                            for (int divPos = 0; divPos < MAX_DIV; divPos++) {
+                            final SpinDirNode nextSpinDirNode = nextPsiNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos];
+                            //for (int divPos = 0; divPos < MAX_DIV; divPos++) {
                                 for (int spinSpeedDirPos = 0; spinSpeedDirPos < DIR_SIZE; spinSpeedDirPos++) {
                                     for (int speedCntPos = 0; speedCntPos <= MAX_SPEED_C; speedCntPos++) {
                                         for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
                                             for (int speedPos = 0; speedPos <= MAX_SPEED_C; speedPos++) {
-                                                final Node node = psiNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
-                                                        divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+                                                final Node node = nextSpinDirNode.
+                                                        //divNodeArr[divPos].
+                                                        spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
                                                 node.count = 0;
-                                                node.eFieldCount = 0;
                                                 node.sourceEvent = null;
                                             }
                                         }
                                     }
                                 }
-                            }
+                            //}
+                            nextSpinDirNode.eFieldCount = 0;
                         }
                     }
                 }
             }
             for (int psiArrPos = 0; psiArrPos < PsiArrSize; psiArrPos++) {
-                final PsiNode psiNode = this.psiLayerArr[this.psiPos].psiNodeArr[psiArrPos];
+                final PsiNode actPsiNode = this.psiLayerArr[this.psiPos].psiNodeArr[psiArrPos];
                 for (int spinPos = 0; spinPos < MAX_SPIN; spinPos++) {
                     for (int spinCntPos = 0; spinCntPos < MAX_SPIN; spinCntPos++) {
                         for (int spinDirPos = 0; spinDirPos < DIR_SIZE; spinDirPos++) {
-                            for (int divPos = 0; divPos < MAX_DIV; divPos++) {
+                            final SpinDirNode actSpinDirNode = actPsiNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos];
+                            long nodeCount = 0;
+                            //for (int divPos = 0; divPos < MAX_DIV; divPos++) {
                                 for (int spinSpeedDirPos = 0; spinSpeedDirPos < DIR_SIZE; spinSpeedDirPos++) {
                                     for (int speedCntPos = 0; speedCntPos <= MAX_SPEED_C; speedCntPos++) {
                                         for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
                                             for (int speedPos = 0; speedPos <= MAX_SPEED_C; speedPos++) {
-                                                final Node node = psiNode.spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
-                                                        divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+                                                final Node actNode = actSpinDirNode.
+                                                        //divNodeArr[divPos].
+                                                        spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
 
-                                                final int actDivPos = divPos;
+                                                //final int actDivPos = divPos;
                                                 final int actSpinSpeedDirPos = spinSpeedDirPos;
                                                 final int actSpeedDirPos = speedDirPos;
                                                 final int actSpeedCntPos = speedCntPos;
                                                 final int actSpeedPos = speedPos;
 
-                                                if (node.count > 0) {
+                                                if (actNode.count > 0) {
                                                     final int actSpinDirPos = spinDirPos;
                                                     final int nextSpinDirPos;
                                                     final int actSpinCntPos = spinCntPos;
@@ -358,102 +366,120 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
                                                         nextSpeedCntPos = calcSpeedCntPos - MAX_SPEED_C;
                                                         final int moveDir = actSpeedDirPos == 0 ? -1 : 1;
 
-                                                        // Use nextNode for the next node in the direction of the speed.
+                                                        // Use nextNode for the next actNode in the direction of the speed.
                                                         final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                                        calcNextNode(node, this.psiLayerArr, nextPsiPos, nextPsiArrPos,
+                                                        calcNextNode(actNode, this.psiLayerArr, nextPsiPos, nextPsiArrPos,
                                                                 spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                divPos,
-                                                                nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
-                                                                actSpeedDirPos, nextSpeedCntPos);
+                                                                //divPos,
+                                                                nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos);
                                                     } else {
                                                         nextSpeedCntPos = calcSpeedCntPos;
                                                         final int moveDir = actSpinDirPos == 0 ? -1 : 1;
 
-                                                        // If reaching MAX_DIV: Use nextNode for the next node to stay in position.
-                                                        final int nextDivPos = divPos + 1;
-                                                        if (nextDivPos < MAX_DIV) {
-                                                            calcNextNode(node, this.psiLayerArr, nextPsiPos, psiArrPos,
+                                                        final long hNodeCount = actNode.count / 2;
+                                                        final long lhNodeCount = actNode.count % 2;
+
+                                                        // If reaching MAX_DIV: Use nextNode for the next actNode to stay in position.
+                                                        //final int nextDivPos = divPos + 1;
+                                                        //if (nextDivPos < MAX_DIV) {
+                                                        if (hNodeCount > 0) {
+                                                            calcNextNode2(actNode, this.psiLayerArr, nextPsiPos, psiArrPos,
                                                                     spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                    nextDivPos,
+                                                                    //actDivPos,
                                                                     nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
-                                                                    actSpeedDirPos, nextSpeedCntPos);
+                                                                    hNodeCount + lhNodeCount);
 
                                                             final int nextPsiArrPos = (psiArrPos + moveDir + PsiArrSize) % PsiArrSize;
-                                                            calcNextNode(node, this.psiLayerArr, nextPsiPos, nextPsiArrPos,
+                                                            calcNextNode2(actNode, this.psiLayerArr, nextPsiPos, nextPsiArrPos,
                                                                     spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                    nextDivPos,
+                                                                    //actDivPos,
                                                                     nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
-                                                                    actSpeedDirPos, nextSpeedCntPos);
+                                                                    hNodeCount);
                                                         } else {
-                                                            calcNextNode(node, this.psiLayerArr, nextPsiPos, psiArrPos,
+                                                            calcNextNode(actNode, this.psiLayerArr, nextPsiPos, psiArrPos,
                                                                     spinPos, nextSpinCntPos, nextSpinDirPos,
-                                                                    divPos,
-                                                                    nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos,
-                                                                    actSpeedDirPos, nextSpeedCntPos);
+                                                                    //actDivPos,
+                                                                    nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos);
                                                         }
                                                     }
-                                                    {
-                                                        // Wenn das Feld-Potential an dieser Stelle niedriger als 1 ist, dann hochsetzen (in beide Richtungen).
-                                                        for (int dirPos = 0; dirPos < DIR_SIZE; dirPos++) {
-                                                            final double eField = Math.min(1.0D, this.realityNodeArr[psiArrPos].eFieldArray[dirPos]);
-                                                            final double eFieldDiff = 1.0D - eField;
-                                                            if (eFieldDiff > 0.0D) {
-                                                                int fieldDivPos = (int) (MAX_DIV - (Math.sqrt(eFieldDiff) * (MAX_DIV - 1)));
-                                                                int nextFieldDivPos = fieldDivPos;//(fieldDivPos * divPos) / MAX_DIV;
-                                                                int fieldSpinSpeedDirPos = dirPos;
-                                                                int fieldSpeedCntPos = 0;
-                                                                int fieldSpeedDirPos = dirPos;
-                                                                int fieldSpeedPos = MAX_SPEED_C - 1;
-                                                                final Node fieldNode = retrieveNode(this.psiLayerArr, nextPsiPos, psiArrPos,
-                                                                        spinPos, spinCntPos, spinDirPos,
-                                                                        nextFieldDivPos,
-                                                                        fieldSpinSpeedDirPos, fieldSpeedCntPos, fieldSpeedDirPos, fieldSpeedPos);
-                                                                fieldNode.eFieldCount += 1;
-                                                            } else {
-                                                                final Node fieldNode = retrieveNode(this.psiLayerArr, nextPsiPos, psiArrPos,
-                                                                        spinPos, spinCntPos, spinDirPos,
-                                                                        actDivPos,
-                                                                        actSpinSpeedDirPos, actSpeedCntPos, actSpeedDirPos, actSpeedPos);
-                                                                fieldNode.eFieldCount += node.eFieldCount;
-                                                            }
-                                                        }
-                                                    }
+                                                    nodeCount += actNode.count;
                                                 } else {
-                                                    // Wenn das Feld in Richtung des Feldes niedriger höher als 1/2 des eigenes Feldes,
-                                                    // dann Node in Richtung des Feldes auf 1/2 hochsetzen (und im anderen Node abziehen).
-                                                    for (int dirPos = 0; dirPos < DIR_SIZE; dirPos++) {
-                                                        final int fieldDir = dirPos == 0 ? -1 : 1;
-                                                        final double eField = Math.min(1.0D, this.realityNodeArr[psiArrPos].eFieldArray[dirPos]);
-                                                        final int nPos = (psiArrPos + fieldDir + PsiArrSize) % PsiArrSize;
-                                                        final double neField = Math.min(1.0D, this.realityNodeArr[nPos].eFieldArray[dirPos]);
-                                                        final double eFieldDiff = neField - eField;
-                                                        if (eFieldDiff > 0.0D) {
-                                                            final double nextEFieldDiff = eFieldDiff / 2.0D;
-                                                            int fieldDivPos = (int) (MAX_DIV - (Math.sqrt(eField + nextEFieldDiff) * (MAX_DIV - 1)));
-                                                            int nextFieldDivPos = fieldDivPos;//(fieldDivPos * divPos) / MAX_DIV;
-                                                            int fieldSpinSpeedDirPos = dirPos;
-                                                            int fieldSpeedCntPos = 0;
-                                                            int fieldSpeedDirPos = dirPos;
-                                                            int fieldSpeedPos = MAX_SPEED_C - 1;
-                                                            final Node fieldNode = retrieveNode(this.psiLayerArr, nextPsiPos, psiArrPos,
-                                                                    spinPos, spinCntPos, spinDirPos,
-                                                                    nextFieldDivPos,
-                                                                    fieldSpinSpeedDirPos, fieldSpeedCntPos, fieldSpeedDirPos, fieldSpeedPos);
-                                                            fieldNode.eFieldCount += 1;
-                                                        } else {
-                                                            final Node fieldNode = retrieveNode(this.psiLayerArr, nextPsiPos, psiArrPos,
-                                                                    spinPos, spinCntPos, spinDirPos,
-                                                                    actDivPos,
-                                                                    actSpinSpeedDirPos, actSpeedCntPos, actSpeedDirPos, actSpeedPos);
-                                                            fieldNode.eFieldCount += node.eFieldCount;
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                             }
                                         }
                                     }
                                 }
-                            }
+                            //}
+                                    if (nodeCount > 0) {
+                                        // Wenn das Feld-Potential an dieser Stelle niedriger als 1 ist, dann hochsetzen (in beide Richtungen).
+                                        //for (int dirPos = 0; dirPos < DIR_SIZE; dirPos++)
+                                        {
+                                            final int dirPos = spinDirPos;
+                                            final int fieldDir = dirPos == 0 ? -1 : 1;
+                                            //final double eField = Math.min(MAX_DIV, this.realityNodeArr[psiArrPos].eFieldArray[dirPos]);
+                                            final double eFieldDiff = nodeCount - actSpinDirNode.eFieldCount;
+                                            if (eFieldDiff > 0.0D) {
+                                                //int fieldDivPos = (int) (MAX_DIV - (Math.sqrt(eFieldDiff) * (MAX_DIV - 1)));
+                                                //int nextFieldDivPos = fieldDivPos;//(fieldDivPos * divPos) / MAX_DIV;
+                                                //int nextFieldDivPos = (fieldDivPos * divPos) / MAX_DIV;
+                                                //int fieldSpinSpeedDirPos = actSpinSpeedDirPos;
+                                                //int fieldSpeedCntPos = nextSpeedCntPos;//0;
+                                                //int fieldSpeedDirPos = dirPos;
+                                                //int fieldSpeedPos = MAX_SPEED_C - 1;
+                                                //final Node fieldNode = retrieveNode(this.psiLayerArr, nextPsiPos, psiArrPos + fieldDir,
+                                                //        spinPos, spinCntPos, spinDirPos,
+                                                //        //nextFieldDivPos,
+                                                //        fieldSpinSpeedDirPos, fieldSpeedCntPos, fieldSpeedDirPos, fieldSpeedPos);
+                                                //fieldNode.eFieldCount += eFieldDiff;
+                                                final SpinDirNode fieldNode = retrieveSpinDirNode(this.psiLayerArr, nextPsiPos, psiArrPos,
+                                                        spinPos, spinCntPos, spinDirPos);
+                                                        //nextFieldDivPos,
+                                                        //actSpinSpeedDirPos, actSpeedCntPos, actSpeedDirPos, actSpeedPos);
+                                                        //fieldSpinSpeedDirPos, fieldSpeedCntPos, fieldSpeedDirPos, fieldSpeedPos);
+                                                fieldNode.eFieldCount += eFieldDiff;
+                                            } else {
+                                                //final Node fieldNode = retrieveNode(this.psiLayerArr, nextPsiPos, psiArrPos,
+                                                //        spinPos, spinCntPos, spinDirPos,
+                                                //        //actDivPos,
+                                                //        actSpinSpeedDirPos, actSpeedCntPos, actSpeedDirPos, actSpeedPos);
+                                                //fieldNode.eFieldCount += actNode.eFieldCount;
+                                            }
+                                        }
+                                    }
+
+                                    // Wenn das Nachbar-Feld in Richtung des Feldes niedriger als 1/2 des eigenes Feldes,
+                                    // dann Node in Richtung des Feldes um Differenz auf 1/2 hochsetzen (und im anderen Node abziehen).
+                                    //for (int dirPos = 0; dirPos < DIR_SIZE; dirPos++)
+                                    {
+                                        final int dirPos = spinDirPos;
+                                        final int nFieldDir = (dirPos == 0 ? -1 : 1) * -1;
+                                        final long actEField = actSpinDirNode.eFieldCount;//Math.min(MAX_DIV, this.realityNodeArr[psiArrPos].eFieldArray[dirPos]);
+                                        final int nPos = (psiArrPos + nFieldDir + PsiArrSize) % PsiArrSize;
+                                        //int fieldSpinSpeedDirPos = actSpinSpeedDirPos;
+                                        //int fieldSpeedCntPos = actSpeedCntPos;//0;
+                                        //int fieldSpeedDirPos = dirPos;
+                                        //int fieldSpeedPos = MAX_SPEED_C - 1;
+                                        final SpinDirNode nextFieldNode = retrieveSpinDirNode(this.psiLayerArr, nextPsiPos, psiArrPos,
+                                                spinPos, spinCntPos, spinDirPos);
+                                                //nextFieldDivPos,
+                                                //actSpinSpeedDirPos, actSpeedCntPos, actSpeedDirPos, actSpeedPos);
+                                                //fieldSpinSpeedDirPos, fieldSpeedCntPos, fieldSpeedDirPos, fieldSpeedPos);
+                                        final SpinDirNode actNFieldNode = retrieveSpinDirNode(this.psiLayerArr, actPsiPos, nPos,
+                                                spinPos, spinCntPos, spinDirPos);
+                                                //nextFieldDivPos,
+                                                //actSpinSpeedDirPos, actSpeedCntPos, actSpeedDirPos, actSpeedPos);
+                                                //fieldSpinSpeedDirPos, fieldSpeedCntPos, fieldSpeedDirPos, fieldSpeedPos);
+                                        final long neField = actNFieldNode.eFieldCount;//Math.min(MAX_DIV, this.realityNodeArr[nPos].eFieldArray[dirPos]);
+                                        final long targetEField = neField / 2;
+                                        final long eFieldDiff = targetEField - actEField;
+                                        if (eFieldDiff > 0) {
+                                            //final double nextEFieldDiff = eFieldDiff / 2.0D;
+                                            //nextFieldNode.eFieldCount += actEField + eFieldDiff;
+                                        } else {
+                                            nextFieldNode.eFieldCount += actEField;
+                                        }
+                                    }
+                                }
+
                         }
                     }
                 }
@@ -475,41 +501,45 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
 
     private static void calcNextNode(Node sourceNode, Layer[] psiLayerArr, int nextPsiPos, int nextPsiArrPos,
                                      int nextSpinPos, int nextSpinCntPos, int nextSpinDirPos,
-                                     int nextDivPos,
-                                     int nextSpinSpeedDirPos, int nextSpeedCntPos, int nextSpeedDirPos, int nextSpeedPos,
-                                     int actSpeedDirPos, long nextSpeedCntPos2) {
+                                     //int nextDivPos,
+                                     int nextSpinSpeedDirPos, int nextSpeedCntPos, int nextSpeedDirPos, int nextSpeedPos) {
         final Node nextNode = retrieveNode(psiLayerArr, nextPsiPos, nextPsiArrPos,
                 nextSpinPos, nextSpinCntPos, nextSpinDirPos,
-                nextDivPos,
+                //nextDivPos,
                 nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos);
 
-        calcNextNodeState(nextNode, //sourceNode.speedCntArr,
+        calcNextNodeState(nextNode,
                 sourceNode.count,
-                sourceNode.sourceEvent
-                //actSpeedDirPos, nextSpeedCnt
-        );
+                sourceNode.sourceEvent);
     }
 
     private static void calcNextNode2(Node sourceNode, Layer[] psiLayerArr, int nextPsiPos, int nextPsiArrPos,
                                       int nextSpinPos, int nextSpinCntPos, int nextSpinDirPos,
-                                      int nextDivPos,
+                                      //int nextDivPos,
                                       int nextSpinSpeedDirPos, int nextSpeedCntPos, int nextSpeedDirPos, int nextSpeedPos,
                                       long nextNodeCount) {
         final Node nextNode = retrieveNode(psiLayerArr, nextPsiPos, nextPsiArrPos,
                 nextSpinPos, nextSpinCntPos, nextSpinDirPos,
-                nextDivPos,
+                //nextDivPos,
                 nextSpinSpeedDirPos, nextSpeedCntPos, nextSpeedDirPos, nextSpeedPos);
 
-        calcNextNodeState2(nextNode, //sourceNode.speedCntArr,
-                nextNodeCount, sourceNode.sourceEvent);
+        calcNextNodeState2(nextNode,
+                nextNodeCount,
+                sourceNode.sourceEvent);
     }
 
     private static Node retrieveNode(Layer[] psiLayerArr, int psiPos, int psiArrPos,
                                                                     int spinPos, int spinCntPos, int spinDirPos,
-                                                                    int divPos,
+                                     //int divPos,
                                                                     int spinSpeedDirPos, int speedCntPos, int speedDirPos, int speedPos) {
         return psiLayerArr[psiPos].psiNodeArr[psiArrPos].spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
-                divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+                //divNodeArr[divPos].
+                spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+    }
+
+    private static SpinDirNode retrieveSpinDirNode(Layer[] psiLayerArr, int psiPos, int psiArrPos,
+                                            int spinPos, int spinCntPos, int spinDirPos) {
+        return psiLayerArr[psiPos].psiNodeArr[psiArrPos].spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos];
     }
 
     private static void calcNextNodeState(final Node nextNode,
@@ -564,6 +594,8 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
             int x1 = (int) (xp1 * (VIEW_WIDTH / (double) PsiArrSize));
             int x2 = (int) ((xp2) * (VIEW_WIDTH / (double) PsiArrSize));
 
+            double[] ye1 = new double[DIR_SIZE];
+            double[] ye2 = new double[DIR_SIZE];
             long ys1 = 0;
             long ys2 = 0;
             long yc1 = 0;
@@ -573,16 +605,21 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
             for (int spinPos = 0; spinPos < MAX_SPIN; spinPos++) {
                 for (int spinCntPos = 0; spinCntPos < MAX_SPIN; spinCntPos++) {
                     for (int spinDirPos = 0; spinDirPos < DIR_SIZE; spinDirPos++) {
-                        for (int divPos = 0; divPos < MAX_DIV; divPos++) {
+                        final SpinDirNode spinDirNode1 = psiLayerArr[nextPsiPos].psiNodeArr[xp1].spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos];
+                        final SpinDirNode spinDirNode2 = psiLayerArr[nextPsiPos].psiNodeArr[xp2].spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos];
+                        //for (int divPos = 0; divPos < MAX_DIV; divPos++) {
                             for (int spinSpeedDirPos = 0; spinSpeedDirPos < DIR_SIZE; spinSpeedDirPos++) {
                                 for (int speedCntPos = 0; speedCntPos <= MAX_SPEED_C; speedCntPos++) {
                                     for (int speedDirPos = 0; speedDirPos < DIR_SIZE; speedDirPos++) {
                                         for (int speedPos = 0; speedPos <= MAX_SPEED_C; speedPos++) {
-                                            final Node node1 = psiLayerArr[nextPsiPos].psiNodeArr[xp1].spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
-                                                    divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
-                                            final Node node2 = psiLayerArr[nextPsiPos].psiNodeArr[xp2].spinNodeArr[spinPos].spinCntNodeArr[spinCntPos].spinDirNodeArr[spinDirPos].
-                                                    divNodeArr[divPos].spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+                                            final Node node1 = spinDirNode1.
+                                                    //divNodeArr[divPos].
+                                                    spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
+                                            final Node node2 = spinDirNode2.
+                                                    //divNodeArr[divPos].
+                                                    spinSpeedDirNodeArr[spinSpeedDirPos].speedCntNodeArr[speedCntPos].dirSpeedNodeArr[speedDirPos][speedPos];
 
+                                            final int divPos = MAX_DIV - 1;
                                             yp1 += calcNodePobability(node1, divPos + 1);
                                             yp2 += calcNodePobability(node2, divPos + 1);
                                             if (node1.count > 0) {
@@ -615,7 +652,9 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
                                     }
                                 }
                             }
-                        }
+                        //}
+                        ye1[spinDirPos] += spinDirNode1.eFieldCount;
+                        ye2[spinDirPos] += spinDirNode2.eFieldCount;
                     }
                 }
             }
@@ -637,11 +676,15 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
                 g.setColor(Color.ORANGE);
                 g.drawLine(x1, VIEW_EXTRA_HEIGHT * 2 - y1, x2, VIEW_EXTRA_HEIGHT * 2 - y2);
             }
+            double lastYe1 = 0.0D;
+            double lastYe2 = 0.0D;
             for (int dirPos = 0; dirPos < DIR_SIZE; dirPos++) {
-                double ye1 = this.realityNodeArr[xp1].eFieldArray[dirPos];
-                double ye2 = this.realityNodeArr[xp2].eFieldArray[dirPos];
-                int y1 = (int) (VIEW_EXTRA_HEIGHT * (ye1)) + dirPos;
-                int y2 = (int) (VIEW_EXTRA_HEIGHT * (ye2)) + dirPos;
+                //double ye1 = this.realityNodeArr[xp1].eFieldArray[dirPos] + lastYe1;
+                //double ye2 = this.realityNodeArr[xp2].eFieldArray[dirPos] + lastYe2;
+                lastYe1 = ye1[dirPos] + lastYe1;
+                lastYe2 = ye2[dirPos] + lastYe2;
+                int y1 = (int) (VIEW_EXTRA_HEIGHT * (ye1[dirPos])) / intPow2(MAX_DIV - 1) + dirPos;
+                int y2 = (int) (VIEW_EXTRA_HEIGHT * (ye2[dirPos])) / intPow2(MAX_DIV - 1) + dirPos;
                 g.setColor(Color.BLUE);
                 g.drawLine(x1, VIEW_EXTRA_HEIGHT * 6 - y1, x2, VIEW_EXTRA_HEIGHT * 6 - y2);
             }
@@ -667,5 +710,9 @@ public class FieldLayerImpulseElectronSimulation extends JPanel {
             ret = Math.pow(base, exponent);
         }
         return ret;
+    }
+
+    private static int intPow2(final int exponent) {
+        return 1 << exponent;
     }
 }
