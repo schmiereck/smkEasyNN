@@ -27,8 +27,8 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
     private final static int MAX_SPIN = 6;
     private final static int TYPE_SIZE = 2;
 
-    //private final static boolean UseProbability = true;
-    private final static boolean UseProbability = false;
+    //private static boolean UseProbability = true;
+    private static boolean UseProbability = false;
 
     private static long eventIdCounter = 0;
 
@@ -182,6 +182,11 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
             this.psiLayerArr[layerPos] = new Layer();
         }
 
+        //init1();
+        init2();
+    }
+
+    private void init1() {
         {
             // to right, very fast:
             final int nextArrPos = ((PsiArrSize / 4) * 1);
@@ -214,6 +219,72 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
             //node.count = 0;//intPow2(MAX_DIV);
             final SourceEvent otherSourceEvent = new SourceEvent();
             node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(otherSourceEvent);
+        }
+    }
+
+    private void init2() {
+        UseProbability = false;
+        final SourceEvent aOtherSourceEvent = new SourceEvent();
+        final SourceEvent bOtherSourceEvent = new SourceEvent();
+        {
+            // to right, very fast:
+            final int nextArrPos = ((PsiArrSize / 4) * 1) - 1;
+            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                    1, 0, 0,
+                    0, 0, 1, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
+            node.count = intPow2(MAX_DIV) / 4;
+            //node.count = 0;//intPow2(MAX_DIV);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+        }
+        {
+            // to right, very fast:
+            final int nextArrPos = ((PsiArrSize / 4) * 1);
+            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                    1, 0, 0,
+                    0, 0, 1, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
+            node.count = intPow2(MAX_DIV) / 2;
+            //node.count = 0;//intPow2(MAX_DIV);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+        }
+        {
+            // to right, very fast:
+            final int nextArrPos = ((PsiArrSize / 4) * 1) + 1;
+            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                    1, 0, 0,
+                    0, 0, 1, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
+            node.count = intPow2(MAX_DIV) / 4;
+            //node.count = 0;//intPow2(MAX_DIV);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+        }
+        {
+            // to left, very fast:
+            final int nextArrPos = ((PsiArrSize / 4) * 3) - 1;
+            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                    1, 0, 1,
+                    0, 0, 0, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
+            node.count = intPow2(MAX_DIV) / 4;
+            //node.count = 0;//intPow2(MAX_DIV);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+        }
+        {
+            // to left, very fast:
+            final int nextArrPos = ((PsiArrSize / 4) * 3);
+            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                    1, 0, 1,
+                    0, 0, 0, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
+            node.count = intPow2(MAX_DIV) / 2;
+            //node.count = 0;//intPow2(MAX_DIV);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+        }
+        {
+            // to left, very fast:
+            final int nextArrPos = ((PsiArrSize / 4) * 3) + 1;
+            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                    1, 0, 1,
+                    0, 0, 0, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
+            node.count = intPow2(MAX_DIV) / 4;
+            //node.count = 0;//intPow2(MAX_DIV);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
         }
     }
 
