@@ -389,15 +389,17 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                                     final SourceEvent eFieldSourceEvent = eFieldNode.eFieldSourceEvent;
 
                                     if (Objects.nonNull(eFieldSourceEvent) && (eFieldSourceEvent != nextSourceEvent) &&
-                                            //(nextSpeedDirPos != speedDirPos) &&
+                                            //((nextSpeedDirPos != speedDirPos) && (nextSpeedPos != speedPos)) &&
                                             (eFieldCount > 0)) {
-                                        System.out.println("Reflection: " + eFieldCount);
 
                                         final Node sourceNode = retrieveNode(psiLayerArr, nextPsiPos, actPsiArrPos,
                                                 nextSpinPos, nextSpinCntPos, nextSpinDirPos,
                                                 spinSpeedDirPos, speedCntPos, speedDirPos, speedPos);
 
                                         final SourceEvent newSourceEvent = nextSourceEvent.retrieveChildSourceEvent(eFieldSourceEvent);
+                                        System.out.println("Reflection: cnt:" + eFieldCount + ", newSourceEvent:" + newSourceEvent.eventId +
+                                                " <- (nextSourceEvent:" + nextSourceEvent.eventId + ", eFieldSourceEvent:" + eFieldSourceEvent.eventId +") " +
+                                                "nextSpeedDirPos:" + nextSpeedDirPos + ", speedDirPos:" + speedDirPos + ", nextSpeedPos:" + nextSpeedPos + ", speedPos:" + speedPos);
 
                                         eFieldNode.eFieldCount -= eFieldCount;
                                         //eFieldNode.eFieldSourceEvent = null;
@@ -472,7 +474,8 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
 
         nextEFieldNode.eFieldCount += fieldCount;
         if (Objects.nonNull(nextEFieldNode.eFieldSourceEvent) && (nextEFieldNode.eFieldSourceEvent != nextEFieldSourceEvent)) {
-            throw new RuntimeException("nextEFieldNode.eFieldSourceEvent(%d) != nextEFieldSourceEvent(%d)".formatted(nextEFieldNode.eFieldSourceEvent.eventId, nextEFieldSourceEvent.eventId));
+            throw new RuntimeException("nextEFieldNode.eFieldSourceEvent(%d) != nextEFieldSourceEvent(%d)".
+                    formatted(nextEFieldNode.eFieldSourceEvent.eventId, nextEFieldSourceEvent.eventId));
         }
         nextEFieldNode.eFieldSourceEvent = nextEFieldSourceEvent;
     }
