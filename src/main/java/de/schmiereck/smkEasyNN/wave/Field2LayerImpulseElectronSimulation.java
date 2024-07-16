@@ -27,7 +27,8 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
     private final static int MAX_SPIN = 6;
     private final static int TYPE_SIZE = 2;
 
-    private final static boolean UseProbability = true;
+    //private final static boolean UseProbability = true;
+    private final static boolean UseProbability = false;
 
     private static long eventIdCounter = 0;
 
@@ -388,11 +389,12 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                                     final SourceEvent eFieldSourceEvent = eFieldNode.eFieldSourceEvent;
 
                                     if (Objects.nonNull(eFieldSourceEvent) && (eFieldSourceEvent != nextSourceEvent) &&
+                                            //(nextSpeedDirPos != speedDirPos) &&
                                             (eFieldCount > 0)) {
                                         System.out.println("Reflection: " + eFieldCount);
 
                                         final Node sourceNode = retrieveNode(psiLayerArr, nextPsiPos, actPsiArrPos,
-                                                spinPos, spinCntPos, spinDirPos,
+                                                nextSpinPos, nextSpinCntPos, nextSpinDirPos,
                                                 spinSpeedDirPos, speedCntPos, speedDirPos, speedPos);
 
                                         final SourceEvent newSourceEvent = nextSourceEvent.retrieveChildSourceEvent(eFieldSourceEvent);
@@ -400,14 +402,10 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                                         eFieldNode.eFieldCount -= eFieldCount;
                                         //eFieldNode.eFieldSourceEvent = null;
 
-                                        //calcNextNodeState(sourceNode,
-                                        //        eFieldNode.eFieldCount,
-                                        //        newSourceEvent);
-
                                         calcNextState(psiLayerArr, nextPsiPos, actPsiArrPos,
                                                 spinSpeedDirPos, speedCntPos, speedDirPos, speedPos,
                                                 newSourceEvent,
-                                                nextNode, eFieldCount);
+                                                sourceNode, eFieldCount);
 
                                         usedNextNodeCount -= eFieldCount;
                                     }
@@ -558,7 +556,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                                                 int y2 = (int) Math.round((VIEW_HEIGHT * yd2 / 10.0D) + 0.5D);
                                                 g.setColor(createColorById(node1.sourceEvent.eventId));
                                                 lastY2 += y2;
-                                                g.fillRect(x1, VIEW_EXTRA_HEIGHT * 3 - lastY2, (int) xSampleSize, y2);
+                                                g.fillRect(x1, VIEW_EXTRA_HEIGHT * 7 - lastY2, (int) xSampleSize, y2);
                                                 g.setColor(Color.RED);
                                                 g.drawLine(x1, VIEW_EXTRA_HEIGHT * 2 - y2, x2, VIEW_EXTRA_HEIGHT * 2 - y2);
                                             }
