@@ -208,9 +208,30 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
 
     private void init1(final boolean useProbability) {
         UseProbability = useProbability;
-        final SourceEvent aOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent bOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent cOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
+
+        //--------------------------------------------------------------------------------------------------------------
+        final SourceEvent aSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, aSourceSourceEvent);
+
+        final SourceEvent bSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, bSourceSourceEvent);
+
+        final SourceEvent cSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, cSourceSourceEvent);
+
+        //--------------------------------------------------------------------------------------------------------------
+        //final SourceEvent aOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
+        final SourceEvent aOtherSourceEvent = new SourceEvent(aSourceSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(aSourceSourceEvent, aOtherSourceEvent);
+
+        //final SourceEvent bOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
+        final SourceEvent bOtherSourceEvent = new SourceEvent(bSourceSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(bSourceSourceEvent, bOtherSourceEvent);
+
+        //final SourceEvent cOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
+        final SourceEvent cOtherSourceEvent = new SourceEvent(cSourceSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(cSourceSourceEvent, cOtherSourceEvent);
+        //--------------------------------------------------------------------------------------------------------------
         {
             // to right, very fast:
             final int nextArrPos = ((PsiArrSize / 4) * 1);
@@ -246,19 +267,22 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
     private void init2() {
         UseProbability = false;
 
+        //--------------------------------------------------------------------------------------------------------------
         final SourceEvent aSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
         BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, aSourceSourceEvent);
 
         final SourceEvent bSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
         BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, bSourceSourceEvent);
 
+        //--------------------------------------------------------------------------------------------------------------
         //final SourceEvent aOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
         final SourceEvent aOtherSourceEvent = new SourceEvent(aSourceSourceEvent);
-        aSourceSourceEvent.childSourceEventMap.put(aSourceSourceEvent, aOtherSourceEvent);
+        BigBangSourceEvent.childSourceEventMap.put(aSourceSourceEvent, aOtherSourceEvent);
 
         //final SourceEvent bOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
         final SourceEvent bOtherSourceEvent = new SourceEvent(bSourceSourceEvent);
         BigBangSourceEvent.childSourceEventMap.put(bSourceSourceEvent, bOtherSourceEvent);
+        //--------------------------------------------------------------------------------------------------------------
         {
             // to right, very fast:
             final int nextArrPos = ((PsiArrSize / 4) * 1) - 1;
