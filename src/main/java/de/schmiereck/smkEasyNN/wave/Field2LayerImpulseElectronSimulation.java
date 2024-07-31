@@ -42,22 +42,25 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
             this.eventId = eventIdCounter++;
         }
 
-        public SourceEvent retrieveChildSourceEvent(final SourceEvent otherSourceEvent) {
+        public SourceEvent retrieveChildSourceEvent(final SourceEvent otherSourceEvent, final boolean useParentChain) {
             return Objects.requireNonNullElseGet(this.childSourceEventMap.get(otherSourceEvent),
                 () -> {
-                    final SourceEvent sourceEvent = retrieveChildSourceEvent(this, otherSourceEvent);
+                    final SourceEvent sourceEvent = retrieveChildSourceEvent(this, otherSourceEvent, useParentChain);
                     return Objects.requireNonNullElseGet(sourceEvent,
                         () -> {
-                            final SourceEvent newSourceEvent = new SourceEvent(this);
-                            this.childSourceEventMap.put(otherSourceEvent, newSourceEvent);
-                            return newSourceEvent;
+                            //final SourceEvent newSourceEvent = new SourceEvent(this);
+                            //this.childSourceEventMap.put(otherSourceEvent, newSourceEvent);
+                            //return newSourceEvent;
+                            return createSourceEvent(this, otherSourceEvent);
                         });
                 });
         }
 
-        private static SourceEvent retrieveChildSourceEvent(final SourceEvent thisSourceEvent, final SourceEvent otherSourceEvent) {
+        private static SourceEvent retrieveChildSourceEvent(final SourceEvent thisSourceEvent, final SourceEvent otherSourceEvent,
+                                                            final boolean useParentChain) {
             final SourceEvent retSourceEvent;
             if ((thisSourceEvent == otherSourceEvent.parentSourceEvent)) {
+                //TODO in Paranet-Chain größere Source-ID heraussuchen
                 if (thisSourceEvent.eventId > otherSourceEvent.eventId) {
                     //if (thisSourceEvent.parentSourceEvent.eventId > otherSourceEvent.eventId) {
                     retSourceEvent = thisSourceEvent;
@@ -67,7 +70,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                 //retSourceEvent = otherSourceEvent;
             } else {
                 if ((thisSourceEvent.parentSourceEvent == otherSourceEvent)) {
-                    //TODO größere Source-ID heraussuchen
+                    //TODO in Paranet-Chain größere Source-ID heraussuchen
                     if (thisSourceEvent.eventId > otherSourceEvent.eventId) {
                     //if (thisSourceEvent.parentSourceEvent.eventId > otherSourceEvent.eventId) {
                         retSourceEvent = thisSourceEvent;
@@ -77,15 +80,30 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     //retSourceEvent = thisSourceEvent;
                     //retSourceEvent = otherSourceEvent;
                 } else {
-                    //if (Objects.nonNull(thisSourceEvent.parentSourceEvent)) {
-                    //    retSourceEvent = thisSourceEvent.parentSourceEvent.retrieveChildSourceEvent(otherSourceEvent);
-                    //} else {
-                    retSourceEvent = null;
-                    //}
+                    if (useParentChain && Objects.nonNull(otherSourceEvent.parentSourceEvent)) {
+                        retSourceEvent = retrieveChildSourceEvent(thisSourceEvent, otherSourceEvent.parentSourceEvent, useParentChain);
+                    } else {
+                        retSourceEvent = null;
+                    }
                 }
             }
             return retSourceEvent;
         }
+    }
+
+    private static SourceEvent createSourceEvent(final SourceEvent aSourceSourceEvent) {
+        return createSourceEvent(BigBangSourceEvent, aSourceSourceEvent);
+    }
+
+    private static SourceEvent createSourceEvent(final SourceEvent thisSourceEvent, final SourceEvent otherSourceEvent) {
+        final SourceEvent aOtherSourceEvent = new SourceEvent(otherSourceEvent);
+        thisSourceEvent.childSourceEventMap.put(otherSourceEvent, aOtherSourceEvent);
+
+        System.out.println("createSourceEvent - newSourceEvent:%d <- (this(%d, parrent:%d), other(%d, parrent:%d))".formatted(
+                aOtherSourceEvent.eventId,
+                thisSourceEvent.eventId, Objects.nonNull(thisSourceEvent.parentSourceEvent) ? thisSourceEvent.parentSourceEvent.eventId : -1,
+                otherSourceEvent.eventId, Objects.nonNull(otherSourceEvent.parentSourceEvent) ? otherSourceEvent.parentSourceEvent.eventId : -1));
+        return aOtherSourceEvent;
     }
 
     private static final SourceEvent BigBangSourceEvent = new SourceEvent(null);
@@ -219,7 +237,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
         }
 
         //initTest1();
-        initTest2(false);
+        initTest2(false, false);
         //initTestMain(true);
         //initTestMain(false);
     }
@@ -228,20 +246,16 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
         UseProbability = false;
 
         //--------------------------------------------------------------------------------------------------------------
-        final SourceEvent aSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, aSourceSourceEvent);
+        final SourceEvent aSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
-        final SourceEvent bSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, bSourceSourceEvent);
+        final SourceEvent bSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
         //--------------------------------------------------------------------------------------------------------------
         //final SourceEvent aOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent aOtherSourceEvent = new SourceEvent(aSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(aSourceSourceEvent, aOtherSourceEvent);
+        final SourceEvent aOtherSourceEvent = createSourceEvent(aSourceSourceEvent);
 
         //final SourceEvent bOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent bOtherSourceEvent = new SourceEvent(bSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(bSourceSourceEvent, bOtherSourceEvent);
+        final SourceEvent bOtherSourceEvent = createSourceEvent(bSourceSourceEvent);
         //--------------------------------------------------------------------------------------------------------------
         {
             // to right, very fast (1/4):
@@ -251,7 +265,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 1, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV) / 4;
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         {
             // to right, very fast (1/2):
@@ -261,7 +275,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 1, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV) / 2;
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         {
             // to right, very fast (1/3):
@@ -271,7 +285,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 1, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV) / 3;
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         //--------------------------------------------------------------------------------------------------------------
         {
@@ -282,7 +296,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 0, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV) / 3;
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         {
             // to left, very fast (1/2):
@@ -292,7 +306,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 0, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV) / 2;
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         {
             // to left, very fast (1/4):
@@ -302,33 +316,38 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 0, MAX_SPEED_C);// - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV) / 4;
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         //--------------------------------------------------------------------------------------------------------------
     }
 
-    private void initTest2(final boolean useProbability) {
+    private void initTest2(final boolean useProbability, final boolean use3) {
         UseProbability = useProbability;
 
         //--------------------------------------------------------------------------------------------------------------
-        final SourceEvent aSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, aSourceSourceEvent);
+        final SourceEvent aSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
-        final SourceEvent bSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, bSourceSourceEvent);
+        final SourceEvent bSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
-        final SourceEvent cSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, cSourceSourceEvent);
-
+        final SourceEvent cSourceSourceEvent;
+        if (use3) {
+            cSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
+            BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, cSourceSourceEvent);
+        } else {
+            cSourceSourceEvent = null;
+        }
         //--------------------------------------------------------------------------------------------------------------
-        final SourceEvent aOtherSourceEvent = new SourceEvent(aSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(aSourceSourceEvent, aOtherSourceEvent);
+        final SourceEvent aOtherSourceEvent = createSourceEvent(aSourceSourceEvent);
 
-        final SourceEvent bOtherSourceEvent = new SourceEvent(bSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(bSourceSourceEvent, bOtherSourceEvent);
+        final SourceEvent bOtherSourceEvent = createSourceEvent(bSourceSourceEvent);
 
-        final SourceEvent cOtherSourceEvent = new SourceEvent(cSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(cSourceSourceEvent, cOtherSourceEvent);
+        final SourceEvent cOtherSourceEvent;
+        if (use3) {
+            cOtherSourceEvent = new SourceEvent(cSourceSourceEvent);
+            BigBangSourceEvent.childSourceEventMap.put(cSourceSourceEvent, cOtherSourceEvent);
+        } else {
+            cOtherSourceEvent = null;
+        }
         //--------------------------------------------------------------------------------------------------------------
         // P1: Left -> to right, Fast:
         final int p1NextArrPos = ((PsiArrSize / 4) * 1);
@@ -343,7 +362,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     p1SpinPos, 0, p1SpinDirPos,
                     0, 0, p1SpeedDirPos, p1Speed);
             node.count = intPow2(MAX_DIV) / 4;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         {
             // to right, very fast (1/2):
@@ -352,7 +371,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     p1SpinPos, 0, p1SpinDirPos,
                     0, 0, p1SpeedDirPos, p1Speed);
             node.count = intPow2(MAX_DIV) / 2;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         {
             // to right, very fast (1/3):
@@ -361,7 +380,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     p1SpinPos, 0, p1SpinDirPos,
                     0, 0, p1SpeedDirPos, p1Speed);
             node.count = intPow2(MAX_DIV) / 3;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         //--------------------------------------------------------------------------------------------------------------
         // P2: Middle, Stay:
@@ -377,7 +396,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     p2SpinPos, 0, p2SpinDirPos,
                     0, 0, p2SpeedDirPos, p2Speed);
             node.count = intPow2(MAX_DIV) / 4;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         {
             // to right, very fast (1/2):
@@ -386,7 +405,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     p2SpinPos, 0, p2SpinDirPos,
                     0, 0, p2SpeedDirPos, p2Speed);
             node.count = intPow2(MAX_DIV) / 2;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         {
             // to right, very fast (1/3):
@@ -395,41 +414,43 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     p2SpinPos, 0, p2SpinDirPos,
                     0, 0, p2SpeedDirPos, p2Speed);
             node.count = intPow2(MAX_DIV) / 4;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         //--------------------------------------------------------------------------------------------------------------
         // P3: Right -> to left, Slowly:
-        final int p3NextArrPos = ((PsiArrSize / 4) * 3);
-        final int p3SpeedDirPos = 0;
-        final int p3Speed = MAX_SPEED_C - ((MAX_SPEED_C / 4) * 3);
-        final int p3SpinPos = 1;
-        final int p3SpinDirPos = 1;
-        {
-            // to right, very fast (1/4):
-            final int nextArrPos = p3NextArrPos + 1;
-            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
-                    p3SpinPos, 0, p3SpinDirPos,
-                    0, 0, p3SpeedDirPos, p3Speed);
-            node.count = intPow2(MAX_DIV) / 4;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent);
-        }
-        {
-            // to right, very fast (1/2):
-            final int nextArrPos = p3NextArrPos;
-            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
-                    p3SpinPos, 0, p3SpinDirPos,
-                    0, 0, p3SpeedDirPos, p3Speed);
-            node.count = intPow2(MAX_DIV) / 2;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent);
-        }
-        {
-            // to right, very fast (1/3):
-            final int nextArrPos = p3NextArrPos - 1;
-            final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
-                    p3SpinPos, 0, p3SpinDirPos,
-                    0, 0, p3SpeedDirPos, p3Speed);
-            node.count = intPow2(MAX_DIV) / 3;
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent);
+        if (use3) {
+            final int p3NextArrPos = ((PsiArrSize / 4) * 3);
+            final int p3SpeedDirPos = 0;
+            final int p3Speed = MAX_SPEED_C - ((MAX_SPEED_C / 4) * 3);
+            final int p3SpinPos = 1;
+            final int p3SpinDirPos = 1;
+            {
+                // to right, very fast (1/4):
+                final int nextArrPos = p3NextArrPos + 1;
+                final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                        p3SpinPos, 0, p3SpinDirPos,
+                        0, 0, p3SpeedDirPos, p3Speed);
+                node.count = intPow2(MAX_DIV) / 4;
+                node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent, false);
+            }
+            {
+                // to right, very fast (1/2):
+                final int nextArrPos = p3NextArrPos;
+                final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                        p3SpinPos, 0, p3SpinDirPos,
+                        0, 0, p3SpeedDirPos, p3Speed);
+                node.count = intPow2(MAX_DIV) / 2;
+                node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent, false);
+            }
+            {
+                // to right, very fast (1/3):
+                final int nextArrPos = p3NextArrPos - 1;
+                final Node node = retrieveNode(this.psiLayerArr, this.psiPos, nextArrPos,
+                        p3SpinPos, 0, p3SpinDirPos,
+                        0, 0, p3SpeedDirPos, p3Speed);
+                node.count = intPow2(MAX_DIV) / 3;
+                node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent, false);
+            }
         }
     }
 
@@ -437,27 +458,21 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
         UseProbability = useProbability;
 
         //--------------------------------------------------------------------------------------------------------------
-        final SourceEvent aSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, aSourceSourceEvent);
+        final SourceEvent aSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
-        final SourceEvent bSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, bSourceSourceEvent);
+        final SourceEvent bSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
-        final SourceEvent cSourceSourceEvent = new SourceEvent(BigBangSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(BigBangSourceEvent, cSourceSourceEvent);
+        final SourceEvent cSourceSourceEvent = createSourceEvent(BigBangSourceEvent);
 
         //--------------------------------------------------------------------------------------------------------------
         //final SourceEvent aOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent aOtherSourceEvent = new SourceEvent(aSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(aSourceSourceEvent, aOtherSourceEvent);
+        final SourceEvent aOtherSourceEvent = createSourceEvent(aSourceSourceEvent);
 
         //final SourceEvent bOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent bOtherSourceEvent = new SourceEvent(bSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(bSourceSourceEvent, bOtherSourceEvent);
+        final SourceEvent bOtherSourceEvent = createSourceEvent(bSourceSourceEvent);
 
         //final SourceEvent cOtherSourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(new SourceEvent(BigBangSourceEvent));
-        final SourceEvent cOtherSourceEvent = new SourceEvent(cSourceSourceEvent);
-        BigBangSourceEvent.childSourceEventMap.put(cSourceSourceEvent, cOtherSourceEvent);
+        final SourceEvent cOtherSourceEvent = createSourceEvent(cSourceSourceEvent);
         //--------------------------------------------------------------------------------------------------------------
         {
             // to right, very fast:
@@ -467,7 +482,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 1, MAX_SPEED_C - ((MAX_SPEED_C / 4)));
             node.count = intPow2(MAX_DIV);
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(aOtherSourceEvent, false);
         }
         {
             // stay in middle:
@@ -477,7 +492,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 1, 0);
             node.count = intPow2(MAX_DIV);
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(bOtherSourceEvent, false);
         }
         {
             // to left, slowly:
@@ -487,7 +502,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                     0, 0, 0, MAX_SPEED_C - ((MAX_SPEED_C / 4) * 3));
             node.count = intPow2(MAX_DIV);
             //node.count = 0;//intPow2(MAX_DIV);
-            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent);
+            node.sourceEvent = BigBangSourceEvent.retrieveChildSourceEvent(cOtherSourceEvent, false);
         }
     }
 
@@ -670,7 +685,7 @@ public class Field2LayerImpulseElectronSimulation extends JPanel {
                                                 nextSpinPos, nextSpinCntPos, nextSpinDirPos,
                                                 spinSpeedDirPos, speedCntPos, speedDirPos, speedPos);
 
-                                        final SourceEvent newSourceEvent = nextSourceEvent.retrieveChildSourceEvent(eFieldSourceEvent);
+                                        final SourceEvent newSourceEvent = nextSourceEvent.retrieveChildSourceEvent(eFieldSourceEvent, true);
                                         System.out.println("Reflection: cnt:" + eFieldCount + ", newSourceEvent:" + newSourceEvent.eventId +
                                                 " <- (nextSourceEvent:(" + nextSourceEvent.eventId + ",parent:" + (Objects.nonNull(nextSourceEvent.parentSourceEvent) ? nextSourceEvent.parentSourceEvent.eventId : -1) + "), " +
                                                 "eFieldSourceEvent:(" + eFieldSourceEvent.eventId +",parent:" + (Objects.nonNull(eFieldSourceEvent.parentSourceEvent) ? eFieldSourceEvent.parentSourceEvent.eventId : -1) + ")) " +
