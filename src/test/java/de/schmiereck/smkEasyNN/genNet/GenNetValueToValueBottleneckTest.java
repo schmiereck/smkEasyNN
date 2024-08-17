@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 
-public class MlpNetValueToValueBottleneckTest {
+public class GenNetValueToValueBottleneckTest {
 
     record GenNetConfig(GenNet genNet, float minMutationRate, int populationSize, float copyPercent, float maxMutationRate) {
     }
@@ -39,8 +39,8 @@ public class MlpNetValueToValueBottleneckTest {
                         new float[]{ 0, 1, 0, 0, 0, 0, 0 },
                         new float[]{ 1, 0, 0, 0, 0, 0, 0 },
                 };
-        //final int[] layerSizeArr = new int[]{ 7, 7, 7, 3, 7, 7, 7 };
-        final int[] layerSizeArr = new int[]{ 7, 7, 3, 7, 7 };
+        final int[] layerSizeArr = new int[]{ 7, 7, 7, 3, 7, 7, 7 };
+        //final int[] layerSizeArr = new int[]{ 7, 7, 3, 7, 7 };
 
         final Random rnd = new Random(123456);
         //final Random rnd = new Random();
@@ -80,9 +80,13 @@ public class MlpNetValueToValueBottleneckTest {
                         minMutationRate, maxMutationRateValue, populationSize, epocheSize, copyPercent,
                         GenNetTrainService.DefaultGenNetMutateConfig,
                         expectedOutputArrArr, trainInputArrArr,
-                        (epochPos) -> {},
+                        //(epochPos, geniNetList) -> {},
+                        //(epochePos, geniNetList) -> System.out.printf("Epoch %8d:", epochePos),
+                        (epochePos, geniNetList) -> System.out.printf("Epoch %8d for maxMutationRateValue %.3f: mse:%.3f\n", epochePos, maxMutationRateValue, geniNetList.get(0).error),
                         (error) -> {},
-                        () -> {},
+                        //(error) -> System.out.printf(" %3d", error),
+                        () -> { },
+                        //() -> { System.out.println(); },
                         rnd);
                 final GenNetConfig genNetConfig = new GenNetConfig(trainedGenNet, minMutationRate, populationSize, copyPercent, maxMutationRateValue);
                 return genNetConfig; // Beispiel: Quadrat des Werts berechnen

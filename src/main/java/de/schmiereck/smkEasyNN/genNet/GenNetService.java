@@ -161,7 +161,23 @@ public class GenNetService {
         switch (neuronType) {
             case Input -> value;
             case Hidden, Output -> hyperbolicTension(value);
+            //case Hidden, Output -> calcReLU(value);
+            //case Hidden, Output -> calcLeakyReLU(value);
         };
+    }
+
+    /**
+     * ReLU (Rectified Linear Unit)
+     */
+    private static float calcReLU(final float value) {
+        return Math.max(0, value);
+    }
+
+    /**
+     * Leaky ReLU (Rectified Linear Unit)
+     */
+    private static float calcLeakyReLU(final float value) {
+        return Math.max(0.01F * value, value);
     }
 
     private static float hyperbolicTension(final float value) {

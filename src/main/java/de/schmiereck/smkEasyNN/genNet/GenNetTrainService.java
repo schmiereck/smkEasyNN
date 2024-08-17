@@ -1,9 +1,12 @@
 package de.schmiereck.smkEasyNN.genNet;
 
+import de.schmiereck.smkEasyNN.geniNet.GeniNet;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static de.schmiereck.smkEasyNN.genNet.GenNetService.createGenNetSynapse;
@@ -54,7 +57,7 @@ public class GenNetTrainService {
                               final Random rnd) {
         return runTrainNet(genNet, minMutationRate, maxMutationRate, populationSize, epocheSize, copyPercent, config,
                 expectedOutputArrArr, trainInputArrArr,
-                (epochePos) -> System.out.printf("Epoch %8d:", epochePos),
+                (epochePos, genNetList) -> System.out.printf("Epoch %8d:", epochePos),
                 (error) -> System.out.printf(" %5.3f", error),
                 () -> System.out.println(),
                 rnd);
@@ -64,7 +67,7 @@ public class GenNetTrainService {
                               final int epocheSize, final float copyPercent,
                               final GenNetMutateConfig config,
                               final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
-                              final Consumer<Integer> printEpoch,
+                              final BiConsumer<Integer, List<GenNet>> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
                               final Random rnd) {
@@ -78,7 +81,7 @@ public class GenNetTrainService {
                               final int epocheSize, final float copyPercent,
                               final GenNetMutateConfig config,
                               final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
-                              final Consumer<Integer> printEpoch,
+                              final BiConsumer<Integer, List<GenNet>> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
                               final Random rnd) {
@@ -99,7 +102,7 @@ public class GenNetTrainService {
                               final int epocheSize, final float copyPercent,
                               final GenNetMutateConfig config,
                               final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
-                              final Consumer<Integer> printEpoch,
+                              final BiConsumer<Integer, List<GenNet>> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
                               final Random rnd) {
@@ -108,7 +111,7 @@ public class GenNetTrainService {
         for (int netPos = 0; netPos < populationSize; netPos++) {
             //final GenNet mutatedGenNet = createNet(rnd);
             final float mutationRate = calcMutationRate(minMutationRate, maxMutationRate, rnd);
-            final GenNet mutatedGenNet = createMutatedNet(genNet, mutationRate, rnd);
+            final GenNet mutatedGenNet = createMutatedNet(genNet, mutationRate, config, rnd);
             genNetList.add(mutatedGenNet);
         }
 
@@ -122,12 +125,12 @@ public class GenNetTrainService {
                               final int epocheSize, final float copyPercent,
                               final GenNetMutateConfig config,
                               final float[][] expectedOutputArrArr, final float[][] trainInputArrArr,
-                              final Consumer<Integer> printEpoch,
+                              final BiConsumer<Integer, List<GenNet>> printEpoch,
                               final Consumer<Float> printError,
                               final Runnable printEndline,
                               final Random rnd) {
         for (int epochePos = 0; epochePos < epocheSize; epochePos++) {
-            printEpoch.accept(epochePos);
+            printEpoch.accept(epochePos, genNetList);
 
             calcErrorAndSort(genNetList, expectedOutputArrArr, trainInputArrArr);
 
