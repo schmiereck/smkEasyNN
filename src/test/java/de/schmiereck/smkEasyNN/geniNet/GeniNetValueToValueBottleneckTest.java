@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 
-import static de.schmiereck.smkEasyNN.geniNet.GeniNetTestUtils.calcToMaxValue;
+import static de.schmiereck.smkEasyNN.geniNet.GeniNetTestUtils.calcToValueMax2;
 
 public class GeniNetValueToValueBottleneckTest {
 
@@ -23,7 +23,7 @@ public class GeniNetValueToValueBottleneckTest {
         //GeniNetService.initValueRange(24);
         //GeniNetService.initValueRange(8);
 
-        final int[][] trainInputArrArr = calcToMaxValue(new int[][]
+        final int[][] trainInputArrArr = calcToValueMax2(new int[][]
                 {
                         new int[]{ 0, 0, 0, 0, 0, 0, 0 },
                         new int[]{ 0, 0, 0, 0, 0, 0, 1 },
@@ -35,7 +35,7 @@ public class GeniNetValueToValueBottleneckTest {
                         new int[]{ 0, 1, 0, 0, 0, 0, 0 },
                         new int[]{ 1, 0, 0, 0, 0, 0, 0 },
                 });
-        final int[][] expectedOutputArrArr = calcToMaxValue(new int[][]
+        final int[][] expectedOutputArrArr = calcToValueMax2(new int[][]
                 {
                         new int[]{ 0, 0, 0, 0, 0, 0, 0 },
                         new int[]{ 0, 0, 0, 0, 0, 0, 1 },
@@ -66,7 +66,7 @@ public class GeniNetValueToValueBottleneckTest {
         //final float maxMutationRateArr[] = { 0.4F };
         //final float maxMutationRateArr[] = { 0.02F, 0.1F, 0.18F, 0.2F, 0.3F, 0.4F , 0.4F };
         //final float maxMutationRateArr[] = { 0.1F,  0.12F,  0.18F, 0.25F };
-        final float maxMutationRateArr[] = { 0.15F, 0.25F, 0.35F, 0.45F, 0.55F };
+        final float maxMutationRateArr[] = { 0.15F, 0.25F, 0.35F, 0.45F, 0.55F }; // 0.45F best!
         final int populationSize = 3_600;
         final int populationSizeArr[] = { 400, 800, 1_200, 1_600, 1_800, 1_900 };
         final int epocheSize = 32_000;//1_000;//16_000;

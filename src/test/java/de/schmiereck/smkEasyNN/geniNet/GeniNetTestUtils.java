@@ -92,13 +92,26 @@ public class GeniNetTestUtils {
         }
     }
 
-    public static int[][] calcToMaxValue(int[][] arrArr) {
+    public static int[][] calcToValueMax2(int[][] arrArr) {
         final int[][] toMaxValueArrArr = new int[arrArr.length][];
         for (int arrPos = 0; arrPos < arrArr.length; arrPos++) {
             final int[] toMaxValueArr = new int[arrArr[arrPos].length];
             for (int pos = 0; pos < arrArr[arrPos].length; pos++) {
                 //toMaxValueArr[pos] = arrArr[arrPos][pos] == 1 ? GeniNetService.VALUE_MAX2 : 0;
                 toMaxValueArr[pos] = arrArr[arrPos][pos] * GeniNetService.VALUE_MAX2;
+            }
+            toMaxValueArrArr[arrPos] = toMaxValueArr;
+        }
+        return toMaxValueArrArr;
+    }
+
+    public static int[][] calcToValueMax(int[][] arrArr) {
+        final int[][] toMaxValueArrArr = new int[arrArr.length][];
+        for (int arrPos = 0; arrPos < arrArr.length; arrPos++) {
+            final int[] toMaxValueArr = new int[arrArr[arrPos].length];
+            for (int pos = 0; pos < arrArr[arrPos].length; pos++) {
+                //toMaxValueArr[pos] = arrArr[arrPos][pos] == 1 ? GeniNetService.VALUE_MAX2 : 0;
+                toMaxValueArr[pos] = arrArr[arrPos][pos] * GeniNetService.VALUE_MAX;
             }
             toMaxValueArrArr[arrPos] = toMaxValueArr;
         }
