@@ -1,32 +1,26 @@
 package de.schmiereck.smkEasyNN.engineWorld;
 
-public class RuleEngine {
-    int inputTypePos;
-    int outputTypePos;
+import de.schmiereck.smkEasyNN.engineWorld.EngineWorldService.PositionType;
 
-    public RuleEngine(final int inputTypePos, final int outputTypePos) {
+public abstract class RuleEngine {
+    PositionType inputPositionType;
+    int inputTypePos;
+    int inputEnergyPos;
+    int inputImpulsePos;
+
+    public RuleEngine(final PositionType inputPositionType, final int inputTypePos, final int inputEnergyPos, final int inputImpulsePos) {
+        this.inputPositionType = inputPositionType;
         this.inputTypePos = inputTypePos;
-        this.outputTypePos = outputTypePos;
+        this.inputEnergyPos = inputEnergyPos;
+        this.inputImpulsePos = inputImpulsePos;
     }
 
-    record RuleState(int positionTypePos,
+    record RuleState(PositionType positionType,
                      int typePos,
                      int energyPos,
                      int impulsePos,
                      int count) {
     }
 
-    RuleState calc(final RuleState positionRuleState, final EwState positionEwState) {
-        final EwState inputTypeEwState = positionEwState.ewStateArr[this.inputTypePos];
-        final EwState outputTypeEwState = positionEwState.ewStateArr[this.outputTypePos];
-
-        final RuleState retPositionRuleState = new RuleState(
-                2, //positionRuleState.positionTypePos,
-                positionRuleState.typePos,
-                positionRuleState.energyPos,
-                positionRuleState.impulsePos,
-                positionRuleState.count);
-
-        return retPositionRuleState;
-    }
+    abstract RuleState calc(final RuleState positionRuleState, final EwState positionEwState);
 }

@@ -10,26 +10,18 @@ public class EngineWorldPanel extends JPanel {
         this.engineWorldService = engineWorldService;
     }
 
-    public void simulate() {
-        System.out.println("START: Simulating...");
+    public void view() {
+        System.out.println("START: View...");
 
-        for (int t = 0; t < 3000; t++) {
+        while (true) {
+            this.repaint();
 
-            this.engineWorldService.run();
-
-            //if (t % 1 == 0)
-            {
-                this.repaint();
-                try {
-                    //Thread.sleep(25*1);
-                    Thread.sleep(5*1);
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                Thread.sleep(25*1);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
             }
         }
-
-        System.out.println("END: Simulating.");
     }
 
     @Override
