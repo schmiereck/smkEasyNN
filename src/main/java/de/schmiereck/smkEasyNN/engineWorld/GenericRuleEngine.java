@@ -49,7 +49,7 @@ public class GenericRuleEngine extends RuleEngine {
 //                    this.outputTypePos,
 //                    this.outputEnergyPos,
 //                    this.outputImpulsePos,
-//                    positionRuleState.count() / 2);
+//                    positionRuleState.countSum() / 2);
 //        } else {
             retPositionRuleState = new RuleState(
                     positionRuleState.positionType(),

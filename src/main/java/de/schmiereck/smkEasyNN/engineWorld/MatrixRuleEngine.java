@@ -1,11 +1,16 @@
 package de.schmiereck.smkEasyNN.engineWorld;
 
 import java.util.List;
+import java.util.Objects;
+
+import static de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngineService.calcCountResult;
+import static de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngineService.removeOutputState;
 
 public class MatrixRuleEngine extends RuleEngine {
     record OutputState(EngineWorldService.PositionType positionType, int typePos, int energyPos, int impulsePos) {
 
         public int calcCount(final RuleState positionRuleState) {
+            //final int retCount = calcCountResult(positionRuleState, 0) / 2;
             final int retCount = positionRuleState.count() / 2;
             return retCount;
         }
@@ -32,16 +37,40 @@ public class MatrixRuleEngine extends RuleEngine {
         final OutputStateList outputStateList =
             MatrixRuleEngineService.searchMatchingOutputStateList(this.outputStateListArr, stateCountMatrixArr);
 
-        if (!outputStateList.outputStateList.isEmpty()) {
-            final OutputState outputState =
-                    outputStateList.outputStateList.get(engineWorldService.rnd.nextInt(outputStateList.outputStateList.size()));
+        RuleState foundPositionRuleState = null;
+        while (!outputStateList.outputStateList.isEmpty()) {
+            final int outputStatePos = engineWorldService.rnd.nextInt(outputStateList.outputStateList.size());
 
-            retPositionRuleState = new RuleState(
+            final OutputState outputState =
+                    outputStateList.outputStateList.get(outputStatePos);
+
+            final int calcedCount = outputState.calcCount(positionRuleState);
+
+            final int inputResult =
+                    calcCountResult(positionRuleState);
+
+            final int newInputResult =
+                    calcCountResult(positionRuleState, calcedCount);
+
+            final int newOutputResult =
+                    calcCountResult(outputState, calcedCount);
+
+            if (inputResult == (newInputResult + newOutputResult)) {
+                foundPositionRuleState = new RuleState(
                     outputState.positionType(),
                     outputState.typePos(),
                     outputState.energyPos(),
                     outputState.impulsePos(),
-                    outputState.calcCount(positionRuleState));
+                    calcedCount);
+                break;
+            } else {
+                outputStateList.outputStateList.remove(outputStatePos);
+                removeOutputState(engineWorldService, this, outputState);
+            }
+        }
+
+        if (Objects.nonNull(foundPositionRuleState)) {
+            retPositionRuleState = foundPositionRuleState;
         } else {
             retPositionRuleState = new RuleState(
                     positionRuleState.positionType(),
@@ -53,4 +82,5 @@ public class MatrixRuleEngine extends RuleEngine {
 
         return retPositionRuleState;
     }
+
 }

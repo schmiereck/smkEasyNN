@@ -11,11 +11,12 @@ public class EngineWorldService {
     }
 
     final int stateMaxCount = 64;
-    final int typeCount = 2;//4;
-    final int energyCount = 2;//3;
-    final int impulseCount = 2;//3;
 
     final int locationCount;
+
+    final int typeCount;//4;
+    final int energyCount;//3;
+    final int impulseCount;//3;
 
     int engineLocationPos = 0;
     int engineTypePos = 0;
@@ -29,8 +30,12 @@ public class EngineWorldService {
 
     final Random rnd = new Random();
 
-    public EngineWorldService(int locationCount) {
+    public EngineWorldService(final int locationCount, final int typeCount, final int energyCount, final int impulseCount) {
         this.locationCount = locationCount;
+
+        this.typeCount = typeCount;
+        this.energyCount = energyCount;
+        this.impulseCount = impulseCount;
 
         this.locationEwStateArr = new EwState[this.locationCount];
 
@@ -225,5 +230,9 @@ public class EngineWorldService {
         }
 
         usedEngineTypeRuleEngineMap3.put(ruleEngine.inputTypePos, ruleEngine);
+    }
+
+    int calcStateCountPercentFromMax(final int percent) {
+        return (this.stateMaxCount * percent) / 100;
     }
 }
