@@ -11,9 +11,9 @@ public class EngineWorldService {
     }
 
     final int stateMaxCount = 64;
-    final int typeCount = 4;
-    final int energyCount = 3;
-    final int impulseCount = 3;
+    final int typeCount = 2;//4;
+    final int energyCount = 2;//3;
+    final int impulseCount = 2;//3;
 
     final int locationCount;
 
@@ -100,7 +100,7 @@ public class EngineWorldService {
                                     new RuleEngine.RuleState(inputPositionType, this.engineTypePos, this.engineEnergyPos, this.engineImpulsePos, inputEwState.count);
 
                             final RuleEngine.RuleState outputRuleState =
-                                    ruleEngine.calc(locationRuleState, this.locationEwStateArr[this.engineLocationPos]);
+                                    ruleEngine.calc(this, locationRuleState, this.locationEwStateArr[this.engineLocationPos]);
 
                             final int nextLocationPos =
                                     calcNextLocationPos(this.engineLocationPos, inputPositionType, outputRuleState.positionType());

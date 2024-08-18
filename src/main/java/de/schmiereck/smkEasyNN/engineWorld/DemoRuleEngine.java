@@ -9,7 +9,7 @@ public class DemoRuleEngine extends RuleEngine {
     }
 
     @Override
-    RuleState calc(final RuleState positionRuleState, final EwState positionEwState) {
+    RuleState calc(EngineWorldService engineWorldService, final RuleState positionRuleState, final EwState positionEwState) {
         final PositionType nextPositionType =
             switch (positionRuleState.positionType()) {
                 case R -> PositionType.G;

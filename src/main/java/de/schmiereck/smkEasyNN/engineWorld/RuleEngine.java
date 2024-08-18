@@ -22,5 +22,5 @@ public abstract class RuleEngine {
                      int count) {
     }
 
-    abstract RuleState calc(final RuleState positionRuleState, final EwState positionEwState);
+    abstract RuleState calc(final EngineWorldService engineWorldService, final RuleState positionRuleState, final EwState positionEwState);
 }
