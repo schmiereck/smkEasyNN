@@ -23,8 +23,10 @@ public class EngineWorldPanel extends JPanel {
         }
     }
 
+    final FPSCounter fpsCounter = new FPSCounter();
+
     final Deque<HistoryEntry> historyDeque = new ArrayDeque<>();
-    final int historyMaxSize = 200;
+    final int historyMaxSize = 900;
 
     public EngineWorldPanel(final EngineWorldService engineWorldService) {
         this.engineWorldService = engineWorldService;
@@ -35,6 +37,7 @@ public class EngineWorldPanel extends JPanel {
 
         while (true) {
             this.repaint();
+            this.fpsCounter.frameRendered();
 
             try {
                 Thread.sleep(25*1);
@@ -89,25 +92,25 @@ public class EngineWorldPanel extends JPanel {
 
         final int count = this.engineWorldService.locationCount * this.engineWorldService.typeCount * this.engineWorldService.energyCount * this.engineWorldService.impulseCount;
 
-        final int stateViewWidth = (viewWidth / count);
+        final float stateViewWidth = (viewWidth / count);
 
-        final int stateHeight = topHeight / 5;
+        final float stateHeight = topHeight / 5;
         //final int stateHeight = stateViewWidth;
 
         //final int worldWidth = viewWidth - ((viewWidth) % (countSum));
-        final int worldWidth = viewWidth - (stateViewWidth % (count));
+        final float worldWidth = viewWidth - (stateViewWidth % (count));
 
-        final int locationWidth = worldWidth / this.engineWorldService.locationCount;
-        final int yLocation = 1;
+        final float locationWidth = worldWidth / this.engineWorldService.locationCount;
+        final float yLocation = 1;
 
-        final int typeWidth = (locationWidth - 2) / this.engineWorldService.typeCount;
-        final int yType = yLocation + stateHeight + 1;
+        final float typeWidth = (locationWidth - 2) / this.engineWorldService.typeCount;
+        final float yType = yLocation + stateHeight + 1;
 
-        final int energyWidth = (typeWidth - 2) / this.engineWorldService.energyCount;
-        final int yEnergy = yType + stateHeight + 1;
+        final float energyWidth = (typeWidth - 2) / this.engineWorldService.energyCount;
+        final float yEnergy = yType + stateHeight + 1;
 
-        final int impulseWidth = (energyWidth - 2) / this.engineWorldService.impulseCount;
-        final int yImpulse = yEnergy + stateHeight + 1;
+        final float impulseWidth = (energyWidth - 2) / this.engineWorldService.impulseCount;
+        final float yImpulse = yEnergy + stateHeight + 1;
 
         int sumCount = 0;
         int sumEnergyCount = 0;
@@ -122,24 +125,24 @@ public class EngineWorldPanel extends JPanel {
             int historyEnergySum = 0;
             int historyImpulseSum = 0;
 
-            final int xLocation = (locationPos * locationWidth);
+            final float xLocation = (locationPos * locationWidth);
 
             for (int typePos = 0; typePos < this.engineWorldService.typeCount; typePos++) {
                 final EwState typeEwState = locationEwState.ewStateArr[typePos];
 
-                final int xType = xLocation + 1 + typePos * typeWidth;
+                final float xType = xLocation + 1 + typePos * typeWidth;
                 int typeCountSum = 0;
 
                 for (int energyPos = 0; energyPos < this.engineWorldService.energyCount; energyPos++) {
                     final EwState energyEwState = typeEwState.ewStateArr[energyPos];
 
-                    final int xEnergy = xType + energyPos * energyWidth + 1;
+                    final float xEnergy = xType + energyPos * energyWidth + 1;
                     int energyCountSum = 0;
 
                     for (int impulsePos = 0; impulsePos < this.engineWorldService.impulseCount; impulsePos++) {
                         final EwState impulseEwState = energyEwState.ewStateArr[impulsePos];
 
-                        final int xImpulse = xEnergy + impulsePos * impulseWidth + 1;
+                        final float xImpulse = xEnergy + impulsePos * impulseWidth + 1;
                         int impulseCountSum = 0;
 
                         if (impulseEwState.count > 0) {
@@ -149,7 +152,7 @@ public class EngineWorldPanel extends JPanel {
 
                             historyCountSum += impulseEwState.count;
                             //historyTypeSum |= (typePos + 1) * (energyPos + 1) * (impulsePos + 1);
-                            historyTypeSum |= ((typePos + 1) * 17);
+                            historyTypeSum |= ((typePos + 1) * 32);
                             historyEnergySum |= ((energyPos + 1) * 49);
                             historyImpulseSum |= ((impulsePos + 1) * 67);
 
@@ -158,25 +161,31 @@ public class EngineWorldPanel extends JPanel {
                             impulseCountSum += impulseEwState.count;
                         }
                         g2d.setColor(ImpulseColorArr[impulsePos]);
-                        g2d.drawRect(xImpulse, yImpulse, impulseWidth, stateHeight);
-                        final int impulseCountHeight = (impulseCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
+                        if (impulseWidth > 4) {
+                            g2d.draw(new Rectangle2D.Float(xImpulse, yImpulse, impulseWidth, stateHeight));
+                        }
+                        final float impulseCountHeight = (impulseCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
                         g2d.fill(new Rectangle2D.Float(xImpulse, yImpulse, impulseWidth, impulseCountHeight));
                     }
                     g2d.setColor(EnergyColorArr[energyPos]);
-                    g2d.drawRect(xEnergy, yEnergy, energyWidth, stateHeight);
-                    final int energyCountHeight = (energyCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
+                    if (energyWidth > 4) {
+                        g2d.draw(new Rectangle2D.Float(xEnergy, yEnergy, energyWidth, stateHeight));
+                    }
+                    final float energyCountHeight = (energyCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
                     g2d.fill(new Rectangle2D.Float(xEnergy, yEnergy, energyWidth, energyCountHeight));
                 }
                 g2d.setColor(TypeColorArr[typePos]);
-                g2d.drawRect(xType, yType, typeWidth, stateHeight);
-                final int typeCountHeight = (typeCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
+                if (typeWidth > 4) {
+                    g2d.draw(new Rectangle2D.Float(xType, yType, typeWidth, stateHeight));
+                }
+                final float typeCountHeight = (typeCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
                 g2d.fill(new Rectangle2D.Float(xType, yType, typeWidth, typeCountHeight));
             }
 
             g2d.setColor(Color.ORANGE);
-            g2d.drawRect(xLocation, yLocation, locationWidth, stateHeight);
-            final int locationCountHeight = (historyCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
-            g2d.fillRect(xLocation, yLocation, locationWidth, locationCountHeight);
+            g2d.draw(new Rectangle2D.Float(xLocation, yLocation, locationWidth, stateHeight));
+            final float locationCountHeight = (historyCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
+            g2d.fill(new Rectangle2D.Float(xLocation, yLocation, locationWidth, locationCountHeight));
 
             historyEntry.locationHistoryEntryArr[locationPos] =
                     new HistoryEntry.LocationHistoryEntry(historyCountSum, historyTypeSum, historyEnergySum, historyImpulseSum);
@@ -193,6 +202,9 @@ public class EngineWorldPanel extends JPanel {
         g.drawString("Sum Count: " + sumCount, 10, -topHeight + 16);
         g.drawString("Sum Energy Count: " + sumEnergyCount, 10, -topHeight + 16 * 2);
 
+        g.drawString("Calc FPS: %d".formatted(this.engineWorldService.fpsCounter.getFPS()), 10 + 180, -topHeight + 16);
+        g.drawString("View FPS: %d".formatted(this.fpsCounter.getFPS()), 10 + 180, -topHeight + 16 * 2);
+
         // History:
         final float historyEntryHeight = downHeight / (float)this.historyMaxSize;
         for (int historyPos = 0; historyPos < this.historyDeque.size(); historyPos++) {
@@ -207,7 +219,7 @@ public class EngineWorldPanel extends JPanel {
                     final float countPercent = ((float) locationHistoryEntry.countSum) / this.engineWorldService.stateMaxCount;
                     final int countAlpha = Math.min(255, (int) (countPercent * 255));
 
-                    final int xHistoryLocation = (locationPos * locationWidth);
+                    final float xHistoryLocation = (locationPos * locationWidth);
                     //g2d.setColor(new Color(255, 200, 0, countAlpha));
                     g2d.setColor(createColorById(locationHistoryEntry.typeSum, locationHistoryEntry.energySum, locationHistoryEntry.impulseSum, countAlpha));
                     //g2d.drawRect(xHistoryLocation, yHistoryLocation, locationWidth, historyEntryHeight);
@@ -229,9 +241,9 @@ public class EngineWorldPanel extends JPanel {
 
     private static Color createColorById(final int id1, final int id2, final int id3, final int countAlpha) {
         return new Color(
-                (int) (id1 * 64) % 255,
-                (int) ((id2 + 64) * 32) % 255,
-                (int) ((id3 + 128) * 16) % 255,
+                (int) (id2 * 64) % 255,
+                (int) ((id3 + 64) * 32) % 255,
+                (int) ((id1 + 128) * 16) % 255,
                 countAlpha);
     }
 

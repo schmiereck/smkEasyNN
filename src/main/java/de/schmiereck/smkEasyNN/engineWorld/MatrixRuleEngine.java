@@ -2,6 +2,7 @@ package de.schmiereck.smkEasyNN.engineWorld;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 
 import static de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngineService.calcCountResult;
 import static de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngineService.removeOutputState;
@@ -12,11 +13,18 @@ public class MatrixRuleEngine extends RuleEngine {
         public int calcCount(final RuleState positionRuleState) {
             //final int retCount = calcCountResult(positionRuleState, 0) / 2;
             final int retCount = positionRuleState.count() / 2;
+            //final int retCount = positionRuleState.count() / 3;
+            //final int retCount = positionRuleState.count() / 4;
+            //final int retCount = positionRuleState.count() / 8;
+            //final int retCount = (positionRuleState.count() * 75) / 100;
+            //final int retCount = positionRuleState.count() / 10;
+            //final int retCount = positionRuleState.count();
             return retCount;
         }
     }
     static class OutputStateList {
         List<MatrixRuleEngine.OutputState> outputStateList;
+        //Queue<OutputState> outputStateList;
     }
     OutputStateList[][][][] outputStateListArr;
 
@@ -43,6 +51,7 @@ public class MatrixRuleEngine extends RuleEngine {
 
             final OutputState outputState =
                     outputStateList.outputStateList.get(outputStatePos);
+                    //outputStateList.outputStateList.peek();
 
             final int calcedCount = outputState.calcCount(positionRuleState);
 
@@ -62,10 +71,12 @@ public class MatrixRuleEngine extends RuleEngine {
                     outputState.energyPos(),
                     outputState.impulsePos(),
                     calcedCount);
+                removeOutputState(engineWorldService, this, outputState, false);
+                //removeOutputState(engineWorldService, this, outputState, true);
                 break;
             } else {
-                outputStateList.outputStateList.remove(outputStatePos);
-                removeOutputState(engineWorldService, this, outputState);
+                //outputStateList.outputStateList.remove(outputStatePos);
+                removeOutputState(engineWorldService, this, outputState, false);
             }
         }
 

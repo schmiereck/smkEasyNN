@@ -27,7 +27,7 @@ public class EngineWorldService {
 
     final Map<PositionType, Map<Integer, Map<Integer, Map<Integer, RuleEngine>>>> ruleEngineMap = new HashMap<>();
     //final Map<RuleEngineKey, RuleEngine> ruleEngineMap = new HashMap<>();
-
+    final FPSCounter fpsCounter = new FPSCounter();
     final Random rnd = new Random();
 
     public EngineWorldService(final int locationCount, final int typeCount, final int energyCount, final int impulseCount) {
@@ -71,12 +71,18 @@ public class EngineWorldService {
 
         while (true) {
             this.run();
+            this.fpsCounter.frameRendered();
 
-            try {
-                Thread.sleep(1);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
+            // Optional: Reset FPS counter periodically
+            //if (this.fpsCounter.getFPS() > 60) {
+            //    this.fpsCounter.reset();
+            //}
+
+            //try {
+            //    Thread.sleep(1);
+            //} catch (final InterruptedException e) {
+            //    e.printStackTrace();
+            //}
         }
     }
 

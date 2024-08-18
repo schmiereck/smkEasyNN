@@ -3,15 +3,17 @@ package de.schmiereck.smkEasyNN.engineWorld;
 import de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngine.OutputStateList;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 public class MatrixRuleEngineService {
 
-    final static boolean UseStateCountvalues = true;
+    final static boolean UseStateCountvalues = false;
 
     static EngineWorldService initMatrixWorld() {
-        final var engineWorldService  = new EngineWorldService(3 * 3 * 3,
+        //final var engineWorldService  = new EngineWorldService(3 * 3 * 3,
+        final var engineWorldService  = new EngineWorldService(3 * 3 * 3 * 3,
                 3, 2, 3);
 
         engineWorldService.
@@ -39,6 +41,70 @@ public class MatrixRuleEngineService {
                 locationEwStateArr[7].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
                 ewStateArr[2].          // 1 type
                 ewStateArr[1].          // 2 energy
+                ewStateArr[2].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        //------------------------------------------
+        engineWorldService.
+                locationEwStateArr[16].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[0].          // 2 energy
+                ewStateArr[0].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[18].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[1].          // 2 energy
+                ewStateArr[0].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[20].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[0].          // 2 energy
+                ewStateArr[1].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[22].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[1].          // 2 energy
+                ewStateArr[1].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[24].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[1].          // 2 energy
+                ewStateArr[2].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[26].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[1].          // 2 energy
+                ewStateArr[0].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[42].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[1].          // 2 energy
+                ewStateArr[1].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[52].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[1].          // 2 energy
+                ewStateArr[2].          // 1 impulse
+                count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
+
+        engineWorldService.
+                locationEwStateArr[62].  // location (0:R, 1:G, 2:B, 3:R, 4:G, 5:B, 6:R, 7:G, 8:B)
+                ewStateArr[2].          // 1 type
+                ewStateArr[0].          // 2 energy
                 ewStateArr[2].          // 1 impulse
                 count = engineWorldService.calcStateCountPercentFromMax(100); // 100%
 
@@ -78,6 +144,7 @@ public class MatrixRuleEngineService {
 
                         final OutputStateList outputStateList = new OutputStateList();
                         outputStateList.outputStateList = new ArrayList<>();
+                        //outputStateList.outputStateList = new LinkedList<>();
 
                         outputStateListArr
                                 [inputPositionType.ordinal()]
@@ -195,6 +262,7 @@ public class MatrixRuleEngineService {
                                 foundFirst = false;
                                 final OutputStateList newOutputStateList = new OutputStateList();
                                 newOutputStateList.outputStateList = new ArrayList<>();
+                                //newOutputStateList.outputStateList = new LinkedList<>();
                                 newOutputStateList.outputStateList.addAll(retOutputStateList.outputStateList);
                                 retOutputStateList = newOutputStateList;
                             }
@@ -210,7 +278,8 @@ public class MatrixRuleEngineService {
     }
 
     static void removeOutputState(final EngineWorldService engineWorldService,
-                                  final MatrixRuleEngine matrixRuleEngine, final MatrixRuleEngine.OutputState outputState) {
+                                  final MatrixRuleEngine matrixRuleEngine, final MatrixRuleEngine.OutputState outputState,
+                                  final boolean readd) {
         returnAll:
         for (final EngineWorldService.PositionType inputPositionType : EngineWorldService.PositionType.values()) {
             for (int inputTypePos = 0; inputTypePos < engineWorldService.typeCount; inputTypePos++) {
@@ -223,8 +292,16 @@ public class MatrixRuleEngineService {
                                         [inputEnergyPos]
                                         [inputImpulsePos];
 
-                        if (outputStateList.outputStateList.remove(outputState)) {
-                            break returnAll;
+                        if (!readd) {
+                            if (outputStateList.outputStateList.remove(outputState)) {
+                                System.out.printf("MatrixRuleEngine(%s %d %d %d): removeOutputState: %s %d %d %d (from %d)\n",
+                                        matrixRuleEngine.inputPositionType, matrixRuleEngine.inputTypePos, matrixRuleEngine.inputEnergyPos, matrixRuleEngine.inputImpulsePos,
+                                        inputPositionType, inputTypePos, inputEnergyPos, inputImpulsePos, outputStateList.outputStateList.size());
+                                break returnAll;
+                            }
+                        } else {
+                            outputStateList.outputStateList.remove(outputState);
+                            outputStateList.outputStateList.add(outputState);
                         }
 
                         //outputStateList.outputStateList.removeIf(outputState1 ->
