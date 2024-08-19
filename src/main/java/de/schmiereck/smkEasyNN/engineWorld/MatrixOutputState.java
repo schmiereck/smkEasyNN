@@ -47,15 +47,26 @@ class MatrixOutputState {
                         final MatrixOperation matrixOperation = this.matrixOperationArr[positionType.ordinal()][inputTypePos][inputEnergyPos][inputImpulsePos];
                         final int matrixValue = matrixOperation.value;
 
-                        result +=
+                        final int matrixResult =
                                 switch (matrixOperation.op) {
                                     case Mul -> (positionCount * stateCount * count) * matrixValue;
                                     case Mul1 -> (positionCount *  count) * matrixValue;
                                     case Mul2 -> (stateCount *  count) * matrixValue;
                                     case Mul3 -> (count) * matrixValue;
                                     case Div -> matrixValue > 0 ? (positionCount * stateCount * count) / matrixValue : 0;
+                                    case Div1 -> matrixValue > 0 ? (stateCount * count) / matrixValue : 0;
                                     //case Div -> matrixValue > 0 ? (positionCount * count) / matrixValue : 0;
                                 };
+
+                        switch (matrixOperation.resultOp) {
+                            case Mul -> result *= matrixResult;
+                            case Mul1 -> result += (result * matrixResult);
+                            case Mul2 -> result += (count);
+                            case Mul3 -> result *= (count);
+                            case Div -> result /= matrixResult > 0 ? matrixResult : 1;
+                            case Div1 -> result += matrixResult;
+                            //case Div -> matrixValue > 0 ? (positionCount * count) / matrixValue : 0;
+                        }
                     }
                 }
             }
@@ -64,6 +75,7 @@ class MatrixOutputState {
         //final int retCount = Math.max(0, Math.min(result / maxCount, positionRuleState.count() - 30));
         //final int retCount = Math.min(result / maxCount, positionRuleState.count() / 2);
         //final int retCount = Math.min(result / (maxCount), positionRuleState.count());
+        //final int retCount = Math.min(result, positionRuleState.count() / 4);
         final int retCount = Math.min(result, positionRuleState.count() / 2);
         //final int retCount = Math.min(result, positionRuleState.count());
 

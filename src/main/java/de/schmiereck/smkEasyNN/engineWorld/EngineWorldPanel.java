@@ -48,9 +48,11 @@ public class EngineWorldPanel extends JPanel {
     }
 
     public static final Color[] TypeColorArr = new Color[] {
-            new Color(110, 180, 110),
+            new Color(110, 200, 110),
             new Color(80, 120, 230),
-            new Color(230, 200, 10)
+            new Color(230, 200, 10),
+            new Color(170, 60, 110),
+            new Color(250, 60, 110),
     };
 
     public static final Color[] EnergyColorArr = new Color[] {
@@ -64,6 +66,7 @@ public class EngineWorldPanel extends JPanel {
             new Color(180, 180, 70),
             new Color(220, 10, 130),
             new Color(250, 90, 90),
+            new Color(50, 90, 250),
     };
 
     @Override

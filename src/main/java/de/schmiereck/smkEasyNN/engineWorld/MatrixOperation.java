@@ -9,9 +9,11 @@ public class MatrixOperation {
         Mul1,
         Mul2,
         Mul3,
-        Div
+        Div,
+        Div1
     }
 
     int value;
     Op op;
+    Op resultOp;
 }

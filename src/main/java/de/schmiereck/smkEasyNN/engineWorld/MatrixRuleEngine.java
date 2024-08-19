@@ -34,7 +34,8 @@ public class MatrixRuleEngine extends RuleEngine {
         // Noch viel mehr mit allen denkbaren OutputStates aufgrund aller möglichen Matrix-Operationen hinzufügen.
         // Fordere Einträge aus sortierter Liste öfter holen: nextInt(nextInt(outputStateList.outputStateList.size()) + 1)
         final int outputStateSelectSize = engineWorldService.rnd.nextInt(this.outputStateList.size());
-        final int outputStateSelectPos = engineWorldService.rnd.nextInt(outputStateSelectSize + 1);
+        final int outputStateSelectSize2 = engineWorldService.rnd.nextInt(outputStateSelectSize + 1);
+        final int outputStateSelectPos = engineWorldService.rnd.nextInt(outputStateSelectSize2 + 1);
 
         // Legt fest, wo der calcedCount-Wert landet.
         final MatrixOutputState selectedOutputState =
@@ -85,12 +86,19 @@ public class MatrixRuleEngine extends RuleEngine {
             //removeOutputState(engineWorldService, this, selectedOutputState, true);
 
             selectedOutputState.calcCount++;
-            selectedOutputState.sumCount += calcedCount;
 
-            this.outputStateList.sort((aOutputState, bOutputState) -> (int) (
-                            (aOutputState.sumCount / aOutputState.calcCount) -
-                            (bOutputState.sumCount / bOutputState.calcCount)));
-            //this.outputStateList.sort((aOutputState, bOutputState) -> (int) (bOutputState.sumCount - aOutputState.sumCount));
+            // Not really a transfer.
+            if ((positionRuleState.positionType() != selectedOutputState.positionType) ||
+                (positionRuleState.typePos() != selectedOutputState.typePos) ||
+                (positionRuleState.energyPos() != selectedOutputState.energyPos) ||
+                (positionRuleState.impulsePos() != selectedOutputState.impulsePos)) {
+                selectedOutputState.sumCount += calcedCount;
+
+                // Sort for most transfer per call.
+                this.outputStateList.sort((aOutputState, bOutputState) -> (int) ((aOutputState.sumCount / aOutputState.calcCount) - (bOutputState.sumCount / bOutputState.calcCount)));
+                // Sort for most transfer over all.
+                //this.outputStateList.sort((aOutputState, bOutputState) -> (int) (bOutputState.sumCount - aOutputState.sumCount));
+            }
         } else {
         //    //outputStateList.outputStateList.remove(outputStatePos);
         //    removeOutputState(engineWorldService, this, selectedOutputState, false);
