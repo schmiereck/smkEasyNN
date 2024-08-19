@@ -1,93 +1,108 @@
 package de.schmiereck.smkEasyNN.engineWorld;
 
+import de.schmiereck.smkEasyNN.engineWorld.EngineWorldService.PositionType;
+
 import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
 
 import static de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngineService.calcCountResult;
-import static de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngineService.removeOutputState;
 
 public class MatrixRuleEngine extends RuleEngine {
-    record OutputState(EngineWorldService.PositionType positionType, int typePos, int energyPos, int impulsePos) {
 
-        public int calcCount(final RuleState positionRuleState) {
-            //final int retCount = calcCountResult(positionRuleState, 0) / 2;
-            final int retCount = positionRuleState.count() / 2;
-            //final int retCount = positionRuleState.count() / 3;
-            //final int retCount = positionRuleState.count() / 4;
-            //final int retCount = positionRuleState.count() / 8;
-            //final int retCount = (positionRuleState.count() * 75) / 100;
-            //final int retCount = positionRuleState.count() / 10;
-            //final int retCount = positionRuleState.count();
-            return retCount;
-        }
-    }
-    static class OutputStateList {
-        List<MatrixRuleEngine.OutputState> outputStateList;
-        //Queue<OutputState> outputStateList;
-    }
-    OutputStateList[][][][] outputStateListArr;
+    final List<MatrixOutputState> outputStateList;
 
-    public MatrixRuleEngine(final EngineWorldService.PositionType inputPositionType, final int inputTypePos, final int inputEnergyPos, final int inputImpulsePos,
-                            final OutputStateList[][][][] outputStateListArr) {
+    public MatrixRuleEngine(final PositionType inputPositionType, final int inputTypePos, final int inputEnergyPos, final int inputImpulsePos,
+                            final List<MatrixOutputState> outputStateList) {
         super(inputPositionType, inputTypePos, inputEnergyPos, inputImpulsePos);
 
-        this.outputStateListArr = outputStateListArr;
+        this.outputStateList = outputStateList;
     }
 
     @Override
     RuleState calc(final EngineWorldService engineWorldService, final RuleState positionRuleState, final EwState positionEwState) {
         final RuleState retPositionRuleState;
 
+        // TODO Idee: positionEwState gleich in der World in Chuncs mit L&R Nachbarn in kleinen [3] Arrays speichen.
+        //    könnte nützlich für die Operationen werden.
+
+        // Idee 1: Ergebnis als flaches Array mit den counts als Werte zurückgeben. (Unnötig?)
+        // TODO Idee 2: positionEwState ist ja schon die mehrdimensionals Matrix mit den Count-Werten, kann direkt für die Matrix-Berechnung verwendet werden
+        //     (Evtl eben mit den Nachbar-Positionen zusammen?)
         final int[][][][] stateCountMatrixArr =
             MatrixRuleEngineService.createStateCountMatrix(engineWorldService, positionRuleState.positionType(), positionEwState);
 
-        final OutputStateList outputStateList =
-            MatrixRuleEngineService.searchMatchingOutputStateList(this.outputStateListArr, stateCountMatrixArr);
+        // Statt Suche, irgendeine OutputStateList zufällig auswählen.
+        // Noch viel mehr mit allen denkbaren OutputStates aufgrund aller möglichen Matrix-Operationen hinzufügen.
+        // Fordere Einträge aus sortierter Liste öfter holen: nextInt(nextInt(outputStateList.outputStateList.size()) + 1)
+        final int outputStateSelectSize = engineWorldService.rnd.nextInt(this.outputStateList.size());
+        final int outputStateSelectPos = engineWorldService.rnd.nextInt(outputStateSelectSize + 1);
 
-        RuleState foundPositionRuleState = null;
-        while (!outputStateList.outputStateList.isEmpty()) {
-            final int outputStatePos = engineWorldService.rnd.nextInt(outputStateList.outputStateList.size());
+        // Legt fest, wo der calcedCount-Wert landet.
+        final MatrixOutputState selectedOutputState =
+                this.outputStateList.get(outputStateSelectPos);
+                //outputStateList.outputStateList.peek();
 
-            final OutputState outputState =
-                    outputStateList.outputStateList.get(outputStatePos);
-                    //outputStateList.outputStateList.peek();
+        // Idea: just a hack to prevent the same positionType
+        //if (positionRuleState.positionType() == selectedOutputState.positionType)  {
+        //    // Blast all to type 0.
+        //    return new RuleState(
+        //            positionRuleState.positionType(),
+        //            0,
+        //            0,
+        //            0,
+        //            positionRuleState.count());
+        //}
 
-            final int calcedCount = outputState.calcCount(positionRuleState);
+        //Count Aufgrund des selectedOutputState und der stateCountMatrixArr berechnen.
+        //        Matrix-Operation(en) auf stateCountMatrixArr anwenden um einen Ergebnis Wert zu bekommen.
+        //        Völlig unklar, wie. (!)
+        final int calcedCount = selectedOutputState.calcCount(engineWorldService,
+                positionRuleState, stateCountMatrixArr, positionEwState);
 
-            final int inputResult =
-                    calcCountResult(positionRuleState);
+        //Die ganze Prüfung weglassen.
+        //final int inputResult =
+        //        calcCountResult(positionRuleState);
+        //
+        //final int newInputResult =
+        //        calcCountResult(positionRuleState, calcedCount);
+        //
+        //final int newOutputResult =
+        //        calcCountResult(selectedOutputState, calcedCount);
+        //
+        //if (inputResult == (newInputResult + newOutputResult)) {
+        if (calcedCount > 0) {
+            retPositionRuleState = new RuleState(
+                selectedOutputState.positionType,
+                selectedOutputState.typePos,
+                selectedOutputState.energyPos,
+                selectedOutputState.impulsePos,
+                calcedCount);
 
-            final int newInputResult =
-                    calcCountResult(positionRuleState, calcedCount);
+            //Die Idee mit dem sortieren und dann bevorzugt solche OutputStates zu nehmen,
+            //die eher am Anfang stehen, ist nicht schlecht.
+            //        Bevorzugt werden OutputStates die insgesammt eine große Anzahl Counts verschieben (Summe über alle Aufrufe)
+            //        oder solche die große Count-Blöcke verschieben (Summe durch Anzahl Aufrufe).
+            //removeOutputState(engineWorldService, this, selectedOutputState, false);
+            //removeOutputState(engineWorldService, this, selectedOutputState, true);
 
-            final int newOutputResult =
-                    calcCountResult(outputState, calcedCount);
+            selectedOutputState.calcCount++;
+            selectedOutputState.sumCount += calcedCount;
 
-            if (inputResult == (newInputResult + newOutputResult)) {
-                foundPositionRuleState = new RuleState(
-                    outputState.positionType(),
-                    outputState.typePos(),
-                    outputState.energyPos(),
-                    outputState.impulsePos(),
-                    calcedCount);
-                removeOutputState(engineWorldService, this, outputState, false);
-                //removeOutputState(engineWorldService, this, outputState, true);
-                break;
-            } else {
-                //outputStateList.outputStateList.remove(outputStatePos);
-                removeOutputState(engineWorldService, this, outputState, false);
-            }
-        }
-
-        if (Objects.nonNull(foundPositionRuleState)) {
-            retPositionRuleState = foundPositionRuleState;
+            this.outputStateList.sort((aOutputState, bOutputState) -> (int) (
+                            (aOutputState.sumCount / aOutputState.calcCount) -
+                            (bOutputState.sumCount / bOutputState.calcCount)));
+            //this.outputStateList.sort((aOutputState, bOutputState) -> (int) (bOutputState.sumCount - aOutputState.sumCount));
         } else {
+        //    //outputStateList.outputStateList.remove(outputStatePos);
+        //    removeOutputState(engineWorldService, this, selectedOutputState, false);
+            // Nichts braucht auch nicht verschoben werden.
+            //retPositionRuleState = null;
+
+            // Blast all to type 0.
             retPositionRuleState = new RuleState(
                     positionRuleState.positionType(),
-                    positionRuleState.typePos(),
-                    positionRuleState.energyPos(),
-                    positionRuleState.impulsePos(),
+                    0,
+                    0,
+                    0,
                     positionRuleState.count());
         }
 

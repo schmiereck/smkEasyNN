@@ -79,7 +79,8 @@ public class EngineWorldService {
             //}
 
             //try {
-            //    Thread.sleep(1);
+            //    //Thread.sleep(5L);
+            //    Thread.sleep(0L, 1);
             //} catch (final InterruptedException e) {
             //    e.printStackTrace();
             //}
@@ -113,17 +114,29 @@ public class EngineWorldService {
                             final RuleEngine.RuleState outputRuleState =
                                     ruleEngine.calc(this, locationRuleState, this.locationEwStateArr[this.engineLocationPos]);
 
-                            final int nextLocationPos =
-                                    calcNextLocationPos(this.engineLocationPos, inputPositionType, outputRuleState.positionType());
+                            if (Objects.nonNull(outputRuleState)) {
+                                final int nextLocationPos =
+                                        calcNextLocationPos(this.engineLocationPos, inputPositionType, outputRuleState.positionType());
 
-                            final EwState outputEwState =
-                                    this.locationEwStateArr[nextLocationPos].
-                                            ewStateArr[outputRuleState.typePos()].
-                                            ewStateArr[outputRuleState.energyPos()].
-                                            ewStateArr[outputRuleState.impulsePos()];
+                                final EwState outputEwState =
+                                        this.locationEwStateArr[nextLocationPos].
+                                                ewStateArr[outputRuleState.typePos()].
+                                                ewStateArr[outputRuleState.energyPos()].
+                                                ewStateArr[outputRuleState.impulsePos()];
 
-                            outputEwState.count += outputRuleState.count();
-                            inputEwState.count -= outputRuleState.count();
+                                final int sumCount = outputRuleState.count() + outputEwState.count;
+                                final int usedCount;
+
+                                if (sumCount > this.stateMaxCount) {
+                                    usedCount = this.stateMaxCount - outputEwState.count;
+                                } else {
+                                    usedCount = outputRuleState.count();
+                                }
+                                //outputEwState.count += outputRuleState.count();
+                                //inputEwState.count -= outputRuleState.count();
+                                outputEwState.count += usedCount;
+                                inputEwState.count -= usedCount;
+                            }
                         }
                     }
                 }

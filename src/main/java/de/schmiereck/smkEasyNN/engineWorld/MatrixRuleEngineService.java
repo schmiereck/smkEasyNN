@@ -1,11 +1,7 @@
 package de.schmiereck.smkEasyNN.engineWorld;
 
-import de.schmiereck.smkEasyNN.engineWorld.MatrixRuleEngine.OutputStateList;
-
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 public class MatrixRuleEngineService {
 
@@ -13,7 +9,7 @@ public class MatrixRuleEngineService {
 
     static EngineWorldService initMatrixWorld() {
         //final var engineWorldService  = new EngineWorldService(3 * 3 * 3,
-        final var engineWorldService  = new EngineWorldService(3 * 3 * 3 * 3,
+        final var engineWorldService  = new EngineWorldService(3 * 3 * 3 * 3*3*3,
                 3, 2, 3);
 
         engineWorldService.
@@ -117,11 +113,11 @@ public class MatrixRuleEngineService {
                 for (int inputEnergyPos = 0; inputEnergyPos < engineWorldService.energyCount; inputEnergyPos++) {
                     for (int inputImpulsePos = 0; inputImpulsePos < engineWorldService.impulseCount; inputImpulsePos++) {
 
-                        final OutputStateList[][][][] outputStateListArr = createOutputStateListArr(engineWorldService);
+                        final List<MatrixOutputState> outputStateList = createOutputStateListArr(engineWorldService);
 
                         final RuleEngine ruleEngine = new MatrixRuleEngine(
                                 inputPositionType, inputTypePos, inputEnergyPos, inputImpulsePos,
-                                outputStateListArr);
+                                outputStateList);
 
                         engineWorldService.addRuleEngine(ruleEngine);
                     }
@@ -130,41 +126,50 @@ public class MatrixRuleEngineService {
         }
     }
 
-    private static OutputStateList[][][][] createOutputStateListArr(EngineWorldService engineWorldService) {
-        final OutputStateList[][][][] outputStateListArr = new OutputStateList
-                [EngineWorldService.PositionType.values().length]
-                [engineWorldService.typeCount]
-                [engineWorldService.energyCount]
-                [engineWorldService.impulseCount];
+    private static List<MatrixOutputState> createOutputStateListArr(EngineWorldService engineWorldService) {
+        final List<MatrixOutputState> outputStateList =new ArrayList<>();
+        //outputStateList.outputStateList = new LinkedList<>();
 
-        for (final EngineWorldService.PositionType inputPositionType : EngineWorldService.PositionType.values()) {
-            for (int inputTypePos = 0; inputTypePos < engineWorldService.typeCount; inputTypePos++) {
-                for (int inputEnergyPos = 0; inputEnergyPos < engineWorldService.energyCount; inputEnergyPos++) {
-                    for (int inputImpulsePos = 0; inputImpulsePos < engineWorldService.impulseCount; inputImpulsePos++) {
+        // For every possible Input-States create all possible Output-States.
 
-                        final OutputStateList outputStateList = new OutputStateList();
-                        outputStateList.outputStateList = new ArrayList<>();
-                        //outputStateList.outputStateList = new LinkedList<>();
+        for (final EngineWorldService.PositionType outputPositionType : EngineWorldService.PositionType.values()) {
+            for (int outputTypePos = 0; outputTypePos < engineWorldService.typeCount; outputTypePos++) {
+                for (int outputEnergyPos = 0; outputEnergyPos < engineWorldService.energyCount; outputEnergyPos++) {
+                    for (int outputImpulsePos = 0; outputImpulsePos < engineWorldService.impulseCount; outputImpulsePos++) {
 
-                        outputStateListArr
-                                [inputPositionType.ordinal()]
-                                [inputTypePos]
-                                [inputEnergyPos]
-                                [inputImpulsePos] = outputStateList;
+                        // Every possible Matrix Operation.
 
-                        // For every possible Input-States create all possible Output-States.
+                        for (int matrixValue = 0; matrixValue < 3; matrixValue++) {
+                            for (MatrixOperation.Op matrixOp : MatrixOperation.Op.values()) {
 
-                        for (final EngineWorldService.PositionType outputPositionType : EngineWorldService.PositionType.values()) {
-                            for (int outputTypePos = 0; outputTypePos < engineWorldService.typeCount; outputTypePos++) {
-                                for (int outputEnergyPos = 0; outputEnergyPos < engineWorldService.energyCount; outputEnergyPos++) {
-                                    for (int outputImpulsePos = 0; outputImpulsePos < engineWorldService.impulseCount; outputImpulsePos++) {
+                                final MatrixOperation[][][][] matrixOperationArr = new MatrixOperation
+                                        [EngineWorldService.PositionType.values().length]
+                                        [engineWorldService.typeCount]
+                                        [engineWorldService.energyCount]
+                                        [engineWorldService.impulseCount];
 
-                                        final MatrixRuleEngine.OutputState outputState =
-                                                new MatrixRuleEngine.OutputState(outputPositionType, outputTypePos, outputEnergyPos, outputImpulsePos);
+                                for (final EngineWorldService.PositionType inputPositionType : EngineWorldService.PositionType.values()) {
+                                    for (int inputTypePos = 0; inputTypePos < engineWorldService.typeCount; inputTypePos++) {
+                                        for (int inputEnergyPos = 0; inputEnergyPos < engineWorldService.energyCount; inputEnergyPos++) {
+                                            for (int inputImpulsePos = 0; inputImpulsePos < engineWorldService.impulseCount; inputImpulsePos++) {
 
-                                        outputStateList.outputStateList.add(outputState);
+                                                final MatrixOperation matrixOperation = new MatrixOperation();
+
+                                                matrixOperation.op = matrixOp;
+                                                matrixOperation.value = matrixValue;
+
+                                                matrixOperationArr[inputPositionType.ordinal()][inputTypePos][inputEnergyPos][inputImpulsePos] =
+                                                        matrixOperation;
+                                            }
+                                        }
                                     }
                                 }
+
+                                final MatrixOutputState outputState =
+                                        new MatrixOutputState(outputPositionType, outputTypePos, outputEnergyPos, outputImpulsePos,
+                                                matrixOperationArr);
+
+                                outputStateList.add(outputState);
                             }
                         }
 
@@ -172,7 +177,7 @@ public class MatrixRuleEngineService {
                 }
             }
         }
-        return outputStateListArr;
+        return outputStateList;
     }
 
     public static int[][][][] createStateCountMatrix(final EngineWorldService engineWorldService,
@@ -211,72 +216,7 @@ public class MatrixRuleEngineService {
         return stateCountMatrixArr;
     }
 
-    public static OutputStateList searchMatchingOutputStateList(final OutputStateList[][][][] outputStateListArr, final int[][][][] stateCountMatrixArr) {
-        OutputStateList retOutputStateList = null;
-
-        final List<Integer> positionTypeList = new ArrayList<>();
-        final List<Integer> typeList = new ArrayList<>();
-        final List<Integer> energyList = new ArrayList<>();
-        final List<Integer> impulseList = new ArrayList<>();
-
-        for (final EngineWorldService.PositionType outputPositionType : EngineWorldService.PositionType.values()) {
-            for (int outputTypePos = 0; outputTypePos < stateCountMatrixArr[outputPositionType.ordinal()].length; outputTypePos++) {
-                for (int outputEnergyPos = 0; outputEnergyPos < stateCountMatrixArr[outputPositionType.ordinal()][outputTypePos].length; outputEnergyPos++) {
-                    for (int outputImpulsePos = 0; outputImpulsePos < stateCountMatrixArr[outputPositionType.ordinal()][outputTypePos][outputEnergyPos].length; outputImpulsePos++) {
-                        final int count =
-                                stateCountMatrixArr
-                                [outputPositionType.ordinal()]
-                                [outputTypePos]
-                                [outputEnergyPos]
-                                [outputImpulsePos];
-
-                        if (count > 0) {
-                            positionTypeList.add(outputPositionType.ordinal());
-                            typeList.add(outputTypePos);
-                            energyList.add(outputEnergyPos);
-                            impulseList.add(outputImpulsePos);
-                        }
-                    }
-                }
-            }
-        }
-
-        boolean foundFirst = true;
-
-        for (final Integer outputPositionTypePos : positionTypeList) {
-            for (final Integer outputTypePos : typeList) {
-                for (final Integer outputEnergyPos : energyList) {
-                    for (final Integer outputImpulsePos : impulseList) {
-
-                        final OutputStateList outputStateList =
-                                outputStateListArr
-                                        [outputPositionTypePos]
-                                        [outputTypePos]
-                                        [outputEnergyPos]
-                                        [outputImpulsePos];
-
-                        if (Objects.isNull(retOutputStateList)) {
-                            retOutputStateList = outputStateList;
-                        } else {
-                            if (foundFirst) {
-                                foundFirst = false;
-                                final OutputStateList newOutputStateList = new OutputStateList();
-                                newOutputStateList.outputStateList = new ArrayList<>();
-                                //newOutputStateList.outputStateList = new LinkedList<>();
-                                newOutputStateList.outputStateList.addAll(retOutputStateList.outputStateList);
-                                retOutputStateList = newOutputStateList;
-                            }
-
-                            retOutputStateList.outputStateList.addAll(outputStateList.outputStateList);
-                        }
-                    }
-                }
-            }
-        }
-
-        return retOutputStateList;
-    }
-
+    /*
     static void removeOutputState(final EngineWorldService engineWorldService,
                                   final MatrixRuleEngine matrixRuleEngine, final MatrixRuleEngine.OutputState outputState,
                                   final boolean readd) {
@@ -314,12 +254,12 @@ public class MatrixRuleEngineService {
             }
         }
     }
-
-    static int calcCountResult(MatrixRuleEngine.OutputState outputState, int calcedCount) {
+    */
+    static int calcCountResult(MatrixOutputState outputState, int calcedCount) {
         if (UseStateCountvalues) {
-            return (outputState.typePos() + 1) *
-                    (outputState.energyPos() + 1) *
-                    (outputState.impulsePos() + 1) *
+            return (outputState.typePos + 1) *
+                    (outputState.energyPos + 1) *
+                    (outputState.impulsePos + 1) *
                     calcedCount;
         } else {
             return calcedCount;

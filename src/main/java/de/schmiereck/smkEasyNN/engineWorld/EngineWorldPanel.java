@@ -101,15 +101,19 @@ public class EngineWorldPanel extends JPanel {
         final float worldWidth = viewWidth - (stateViewWidth % (count));
 
         final float locationWidth = worldWidth / this.engineWorldService.locationCount;
+        final float locationWidth2 = Math.max(1.0F, locationWidth);
         final float yLocation = 1;
 
         final float typeWidth = (locationWidth - 2) / this.engineWorldService.typeCount;
+        final float typeWidth2 = Math.max(1.0F, typeWidth);
         final float yType = yLocation + stateHeight + 1;
 
         final float energyWidth = (typeWidth - 2) / this.engineWorldService.energyCount;
+        final float energyWidth2 = Math.max(1.0F, energyWidth);
         final float yEnergy = yType + stateHeight + 1;
 
         final float impulseWidth = (energyWidth - 2) / this.engineWorldService.impulseCount;
+        final float impulseWidth2 = Math.max(1.0F, impulseWidth);
         final float yImpulse = yEnergy + stateHeight + 1;
 
         int sumCount = 0;
@@ -161,31 +165,33 @@ public class EngineWorldPanel extends JPanel {
                             impulseCountSum += impulseEwState.count;
                         }
                         g2d.setColor(ImpulseColorArr[impulsePos]);
-                        if (impulseWidth > 4) {
+                        if (impulseWidth >= 3.0F) {
                             g2d.draw(new Rectangle2D.Float(xImpulse, yImpulse, impulseWidth, stateHeight));
                         }
                         final float impulseCountHeight = (impulseCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
-                        g2d.fill(new Rectangle2D.Float(xImpulse, yImpulse, impulseWidth, impulseCountHeight));
+                        g2d.fill(new Rectangle2D.Float(xImpulse, yImpulse, impulseWidth2, impulseCountHeight));
                     }
                     g2d.setColor(EnergyColorArr[energyPos]);
-                    if (energyWidth > 4) {
-                        g2d.draw(new Rectangle2D.Float(xEnergy, yEnergy, energyWidth, stateHeight));
+                    if (energyWidth >= 3.0F) {
+                        g2d.draw(new Rectangle2D.Float(xEnergy, yEnergy, energyWidth2, stateHeight));
                     }
                     final float energyCountHeight = (energyCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
-                    g2d.fill(new Rectangle2D.Float(xEnergy, yEnergy, energyWidth, energyCountHeight));
+                    g2d.fill(new Rectangle2D.Float(xEnergy, yEnergy, energyWidth2, energyCountHeight));
                 }
                 g2d.setColor(TypeColorArr[typePos]);
-                if (typeWidth > 4) {
+                if (typeWidth >= 3.0F) {
                     g2d.draw(new Rectangle2D.Float(xType, yType, typeWidth, stateHeight));
                 }
                 final float typeCountHeight = (typeCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
-                g2d.fill(new Rectangle2D.Float(xType, yType, typeWidth, typeCountHeight));
+                g2d.fill(new Rectangle2D.Float(xType, yType, typeWidth2, typeCountHeight));
             }
 
             g2d.setColor(Color.ORANGE);
-            g2d.draw(new Rectangle2D.Float(xLocation, yLocation, locationWidth, stateHeight));
+            if (locationWidth >= 3.0F) {
+                g2d.draw(new Rectangle2D.Float(xLocation, yLocation, locationWidth, stateHeight));
+            }
             final float locationCountHeight = (historyCountSum * stateHeight) / this.engineWorldService.stateMaxCount;
-            g2d.fill(new Rectangle2D.Float(xLocation, yLocation, locationWidth, locationCountHeight));
+            g2d.fill(new Rectangle2D.Float(xLocation, yLocation, locationWidth2, locationCountHeight));
 
             historyEntry.locationHistoryEntryArr[locationPos] =
                     new HistoryEntry.LocationHistoryEntry(historyCountSum, historyTypeSum, historyEnergySum, historyImpulseSum);
@@ -202,8 +208,8 @@ public class EngineWorldPanel extends JPanel {
         g.drawString("Sum Count: " + sumCount, 10, -topHeight + 16);
         g.drawString("Sum Energy Count: " + sumEnergyCount, 10, -topHeight + 16 * 2);
 
-        g.drawString("Calc FPS: %d".formatted(this.engineWorldService.fpsCounter.getFPS()), 10 + 180, -topHeight + 16);
-        g.drawString("View FPS: %d".formatted(this.fpsCounter.getFPS()), 10 + 180, -topHeight + 16 * 2);
+        g.drawString("Calc FPS: %,d".formatted(this.engineWorldService.fpsCounter.getFPS()), 10 + 180, -topHeight + 16);
+        g.drawString("View FPS: %,d".formatted(this.fpsCounter.getFPS()), 10 + 180, -topHeight + 16 * 2);
 
         // History:
         final float historyEntryHeight = downHeight / (float)this.historyMaxSize;
