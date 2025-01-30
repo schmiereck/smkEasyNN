@@ -27,6 +27,7 @@ class MatrixOutputState {
         // TODO Idee: Count Aufgrund des outputState und der stateCountMatrixArr berechnen.
         //        Matrix-Operation(en) auf stateCountMatrixArr anwenden um einen Ergebnis Wert zu bekommen.
         //        Völlig unklar, wie. (!)
+        // TODO Idee: Positionen L&R auch mit einbeziehen
 
         // Do a matrix operation to this.matrixArr and stateCountMatrixArr to get a result value.
         // Iterate through the elements of matrixArr and stateCountMatrixArr
@@ -46,6 +47,9 @@ class MatrixOutputState {
                         final int stateCount = stateCountMatrixArr[positionType.ordinal()][inputTypePos][inputEnergyPos][inputImpulsePos];
                         final MatrixOperation matrixOperation = this.matrixOperationArr[positionType.ordinal()][inputTypePos][inputEnergyPos][inputImpulsePos];
                         final int matrixValue = matrixOperation.value;
+
+                        // TODO Idee positionRuleState
+                        //        in die Berechnung einbeziehen können (insbesondere positionType)
 
                         final int matrixResult =
                                 switch (matrixOperation.op) {
